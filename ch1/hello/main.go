@@ -8,6 +8,7 @@ import (
 )
 
 func winmain(hInstance windows.Handle, hPrevInstance windows.Handle, lpCmdLine *uint16, nCmdShow int) int {
+	_, _, _, _ = hInstance, hPrevInstance, lpCmdLine, nCmdShow
 	text := windows.StringToUTF16Ptr("Hello, Windows!")
 	caption := windows.StringToUTF16Ptr("HelloMsg")
 	windows.MessageBox(0, text, caption, 0)
@@ -31,6 +32,6 @@ func main() {
 	}
 	args := strings.Join(os.Args[1:], " ")
 	lpCmdLine := windows.StringToUTF16Ptr(args)
-	
+
 	winmain(hInstance, 0, lpCmdLine, nCmdShow)
 }
