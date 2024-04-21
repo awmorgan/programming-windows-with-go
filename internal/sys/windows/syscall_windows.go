@@ -212,6 +212,7 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	ShellExecute(hwnd Handle, verb *uint16, file *uint16, args *uint16, cwd *uint16, showCmd int32) (err error) [failretval<=32] = shell32.ShellExecuteW
 //sys	GetWindowThreadProcessId(hwnd HWND, pid *uint32) (tid uint32, err error) = user32.GetWindowThreadProcessId
 //sys	GetShellWindow() (shellWindow HWND) = user32.GetShellWindow
+//sys	GetSystemMetrics(metric int32) (n int32) = user32.GetSystemMetrics
 //sys	MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret int32, err error) [failretval==0] = user32.MessageBoxW
 //sys	ExitWindowsEx(flags uint32, reason uint32) (err error) = user32.ExitWindowsEx
 //sys	shGetKnownFolderPath(id *KNOWNFOLDERID, flags uint32, token Token, path **uint16) (ret error) = shell32.SHGetKnownFolderPath

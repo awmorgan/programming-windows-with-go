@@ -477,6 +477,7 @@ var (
 	procGetForegroundWindow                                  = moduser32.NewProc("GetForegroundWindow")
 	procGetGUIThreadInfo                                     = moduser32.NewProc("GetGUIThreadInfo")
 	procGetShellWindow                                       = moduser32.NewProc("GetShellWindow")
+	procGetSystemMetrics                                     = moduser32.NewProc("GetSystemMetrics")
 	procGetWindowThreadProcessId                             = moduser32.NewProc("GetWindowThreadProcessId")
 	procIsWindow                                             = moduser32.NewProc("IsWindow")
 	procIsWindowUnicode                                      = moduser32.NewProc("IsWindowUnicode")
@@ -4067,6 +4068,12 @@ func GetGUIThreadInfo(thread uint32, info *GUIThreadInfo) (err error) {
 func GetShellWindow() (shellWindow HWND) {
 	r0, _, _ := syscall.Syscall(procGetShellWindow.Addr(), 0, 0, 0, 0)
 	shellWindow = HWND(r0)
+	return
+}
+
+func GetSystemMetrics(metric int32) (n int32) {
+	r0, _, _ := syscall.Syscall(procGetSystemMetrics.Addr(), 1, uintptr(metric), 0, 0)
+	n = int32(r0)
 	return
 }
 
