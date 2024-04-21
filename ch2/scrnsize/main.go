@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -11,8 +12,8 @@ func winmain(hInstance windows.Handle, hPrevInstance windows.Handle, lpCmdLine *
 	_, _, _, _ = hInstance, hPrevInstance, lpCmdLine, nCmdShow
 	cxScreen := windows.GetSystemMetrics(windows.SM_CXSCREEN)
 	cyScreen := windows.GetSystemMetrics(windows.SM_CYSCREEN)
-	text := windows.StringToUTF16Ptr("Hello, Windows!")
-	caption := windows.StringToUTF16Ptr("HelloMsg")
+	text := windows.StringToUTF16Ptr(fmt.Sprintf("The screen is %d pixels wide by %d pixels high.", cxScreen, cyScreen))
+	caption := windows.StringToUTF16Ptr("ScrnSize")
 	windows.MessageBox(0, text, caption, 0)
 	return 0
 }
