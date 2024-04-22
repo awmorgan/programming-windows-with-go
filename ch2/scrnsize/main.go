@@ -12,8 +12,14 @@ func winmain(hInstance windows.Handle, hPrevInstance windows.Handle, lpCmdLine *
 	_, _, _, _ = hInstance, hPrevInstance, lpCmdLine, nCmdShow
 	cxScreen := windows.GetSystemMetrics(windows.SM_CXSCREEN)
 	cyScreen := windows.GetSystemMetrics(windows.SM_CYSCREEN)
-	text := windows.StringToUTF16Ptr(fmt.Sprintf("The screen is %d pixels wide by %d pixels high.", cxScreen, cyScreen))
-	caption := windows.StringToUTF16Ptr("ScrnSize")
+	text, err := windows.UTF16PtrFromString(fmt.Sprintf("The screen is %d pixels wide by %d pixels high.", cxScreen, cyScreen))
+	if err != nil {
+		panic(err)
+	}
+	caption, err := windows.UTF16PtrFromString("Screen Size")
+	if err != nil {
+		panic(err)
+	}
 	windows.MessageBox(0, text, caption, 0)
 	return 0
 }
