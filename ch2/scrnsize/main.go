@@ -40,7 +40,10 @@ func main() {
 		nCmdShow = int(s.ShowWindow)
 	}
 	args := strings.Join(os.Args[1:], " ")
-	lpCmdLine := windows.StringToUTF16Ptr(args)
+	lpCmdLine, err := windows.UTF16PtrFromString(args)
+	if err != nil {
+		panic(err)
+	}
 
 	winmain(hInstance, 0, lpCmdLine, nCmdShow)
 }
