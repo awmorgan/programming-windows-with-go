@@ -483,6 +483,7 @@ var (
 	procIsWindowUnicode                                      = moduser32.NewProc("IsWindowUnicode")
 	procIsWindowVisible                                      = moduser32.NewProc("IsWindowVisible")
 	procMessageBoxW                                          = moduser32.NewProc("MessageBoxW")
+	procRegisterClassW                                       = moduser32.NewProc("RegisterClassW")
 	procCreateEnvironmentBlock                               = moduserenv.NewProc("CreateEnvironmentBlock")
 	procDestroyEnvironmentBlock                              = moduserenv.NewProc("DestroyEnvironmentBlock")
 	procGetUserProfileDirectoryW                             = moduserenv.NewProc("GetUserProfileDirectoryW")
@@ -4110,6 +4111,12 @@ func MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret i
 	if ret == 0 {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func RegisterClassW(lpWndClass *WNDCLASSW) (atom uint16) {
+	r0, _, _ := syscall.Syscall(procRegisterClassW.Addr(), 1, uintptr(unsafe.Pointer(lpWndClass)), 0, 0)
+	atom = uint16(r0)
 	return
 }
 
