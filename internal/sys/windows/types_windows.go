@@ -3510,7 +3510,7 @@ type WNDCLASSW struct {
 	LpfnWndProc   uintptr
 	CbClsExtra    int32
 	CbWndExtra    int32
-	HInstance     uintptr
+	HInstance     Handle
 	HIcon         uintptr
 	HCursor       uintptr
 	HbrBackground uintptr

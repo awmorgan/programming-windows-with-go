@@ -16,6 +16,10 @@ func winmain(hInstance windows.Handle, hPrevInstance windows.Handle, lpCmdLine *
 	var wc windows.WNDCLASSW
 	wc.Style = windows.CS_HREDRAW | windows.CS_VREDRAW
 	wc.LpfnWndProc = syscall.NewCallback(wndproc)
+	wc.CbClsExtra = 0
+	wc.CbWndExtra = 0
+	wc.HInstance = hInstance
+	wc.hIcon = windows.LoadIcon(0, windows.MAKEINTRESOURCE(32512))
 
 	return 0
 }
