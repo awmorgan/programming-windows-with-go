@@ -146,6 +146,7 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 
 // windows api calls
 
+//sys	LoadIcon(instance Handle, iconName string) (icon Handle, err error) = LoadIconW
 //sys	GetLastError() (lasterr error)
 //sys	LoadLibrary(libname string) (handle Handle, err error) = LoadLibraryW
 //sys	LoadLibraryEx(libname string, zero Handle, flags uintptr) (handle Handle, err error) = LoadLibraryExW

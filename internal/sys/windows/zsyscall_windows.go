@@ -306,6 +306,7 @@ var (
 	procInitializeProcThreadAttributeList                    = modkernel32.NewProc("InitializeProcThreadAttributeList")
 	procIsWow64Process                                       = modkernel32.NewProc("IsWow64Process")
 	procIsWow64Process2                                      = modkernel32.NewProc("IsWow64Process2")
+	procLoadIconW                                            = modkernel32.NewProc("LoadIconW")
 	procLoadLibraryExW                                       = modkernel32.NewProc("LoadLibraryExW")
 	procLoadLibraryW                                         = modkernel32.NewProc("LoadLibraryW")
 	procLoadResource                                         = modkernel32.NewProc("LoadResource")
@@ -2645,6 +2646,24 @@ func IsWow64Process2(handle Handle, processMachine *uint16, nativeMachine *uint1
 	}
 	r1, _, e1 := syscall.Syscall(procIsWow64Process2.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(processMachine)), uintptr(unsafe.Pointer(nativeMachine)))
 	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func LoadIcon(instance Handle, iconName string) (icon Handle, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(iconName)
+	if err != nil {
+		return
+	}
+	return _LoadIcon(instance, _p0)
+}
+
+func _LoadIcon(instance Handle, iconName *uint16) (icon Handle, err error) {
+	r0, _, e1 := syscall.Syscall(procLoadIconW.Addr(), 2, uintptr(instance), uintptr(unsafe.Pointer(iconName)), 0)
+	icon = Handle(r0)
+	if icon == 0 {
 		err = errnoErr(e1)
 	}
 	return
