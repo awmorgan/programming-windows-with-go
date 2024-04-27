@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"strings"
-	"syscall"
 
 	"github.com/awmorgan/programming-windows-with-go/internal/sys/windows"
 )
@@ -13,13 +12,22 @@ func wndproc(hWnd windows.HWND, msg uint32, wParam, lParam uintptr) uintptr {
 }
 
 func winmain(hInstance windows.Handle, hPrevInstance windows.Handle, lpCmdLine *uint16, nCmdShow int) int {
-	var wc windows.WNDCLASSW
+	var wc windows.Wndclass
 	wc.Style = windows.CS_HREDRAW | windows.CS_VREDRAW
-	wc.LpfnWndProc = syscall.NewCallback(wndproc)
+	wc.LpfnWndProc = windows.NewCallback(wndproc)
 	wc.CbClsExtra = 0
 	wc.CbWndExtra = 0
 	wc.HInstance = hInstance
-	wc.hIcon = windows.LoadIcon(0, windows.MAKEINTRESOURCE(32512))
+	wc.HIcon, _ = windows.LoadIcon(0, windows.IDI_APPLICATION)
+	wc.HCursor, _ = windows.LoadCursor(0, windows.IDC_ARROW)
+	wc.HbrBackground = windows.GetStockObject(windows.WHITE_BRUSH)
+	wc.LpszMenuName = nil
+	wc.LpszClassName = windows.StringToUTF16Ptr("HelloWin")
+
+	if _, err := windows.RegisterClass(&wc); err != nil {
+		windows.MessageBox(0, "RegisterClass failed", "Error", windows.MB_ICONERROR)
+		return 0
+	}
 
 	return 0
 }

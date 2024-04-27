@@ -3505,15 +3505,15 @@ const (
 	SM_YVIRTUALSCREEN              = 77
 )
 
-type WNDCLASSW struct {
+type Wndclass struct {
 	Style         uint32
 	LpfnWndProc   uintptr
 	CbClsExtra    int32
 	CbWndExtra    int32
 	HInstance     Handle
-	HIcon         uintptr
-	HCursor       uintptr
-	HbrBackground uintptr
+	HIcon         Handle
+	HCursor       Handle
+	HbrBackground Handle
 	LpszMenuName  *uint16
 	LpszClassName *uint16
 }
@@ -3535,3 +3535,17 @@ const (
 	CS_DROPSHADOW      = 0x00020000
 )
 
+const (
+	IDI_APPLICATION = string(uintptr(32512))
+)
+
+const (
+	IDC_ARROW = string(uintptr(32512))
+)
+
+const (
+	WHITE_BRUSH = 0
+)
+
+type Word uint16
+type Atom Word

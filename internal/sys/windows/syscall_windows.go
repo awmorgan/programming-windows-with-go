@@ -146,7 +146,11 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 
 // windows api calls
 
+//sys	CreateWindow( 
+//sys	RegisterClass(wc *Wndclass) (a Atom, err error) = user32.RegisterClassW
+//sys	GetStockObject( i int) (obj Handle) = gdi32.GetStockObject
 //sys	LoadIcon(instance Handle, iconName string) (icon Handle, err error) = LoadIconW
+//sys	LoadCursor(instance Handle, cursorName string) (cursor Handle, err error) = LoadCursorW
 //sys	GetLastError() (lasterr error)
 //sys	LoadLibrary(libname string) (handle Handle, err error) = LoadLibraryW
 //sys	LoadLibraryEx(libname string, zero Handle, flags uintptr) (handle Handle, err error) = LoadLibraryExW
@@ -214,7 +218,7 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	GetWindowThreadProcessId(hwnd HWND, pid *uint32) (tid uint32, err error) = user32.GetWindowThreadProcessId
 //sys	GetShellWindow() (shellWindow HWND) = user32.GetShellWindow
 //sys	GetSystemMetrics(metric int32) (n int32) = user32.GetSystemMetrics
-//sys	MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret int32, err error) [failretval==0] = user32.MessageBoxW
+//sys	MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) = user32.MessageBoxW
 //sys	ExitWindowsEx(flags uint32, reason uint32) (err error) = user32.ExitWindowsEx
 //sys	shGetKnownFolderPath(id *KNOWNFOLDERID, flags uint32, token Token, path **uint16) (ret error) = shell32.SHGetKnownFolderPath
 //sys	TerminateProcess(handle Handle, exitcode uint32) (err error)
@@ -295,7 +299,6 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	CryptProtectData(dataIn *DataBlob, name *uint16, optionalEntropy *DataBlob, reserved uintptr, promptStruct *CryptProtectPromptStruct, flags uint32, dataOut *DataBlob) (err error) = crypt32.CryptProtectData
 //sys	CryptUnprotectData(dataIn *DataBlob, name **uint16, optionalEntropy *DataBlob, reserved uintptr, promptStruct *CryptProtectPromptStruct, flags uint32, dataOut *DataBlob) (err error) = crypt32.CryptUnprotectData
 //sys	WinVerifyTrustEx(hwnd HWND, actionId *GUID, data *WinTrustData) (ret error) = wintrust.WinVerifyTrustEx
-//sys 	RegisterClassW(lpWndClass *WNDCLASSW) (atom uint16) = user32.RegisterClassW
 //sys	RegOpenKeyEx(key Handle, subkey *uint16, options uint32, desiredAccess uint32, result *Handle) (regerrno error) = advapi32.RegOpenKeyExW
 //sys	RegCloseKey(key Handle) (regerrno error) = advapi32.RegCloseKey
 //sys	RegQueryInfoKey(key Handle, class *uint16, classLen *uint32, reserved *uint32, subkeysLen *uint32, maxSubkeyLen *uint32, maxClassLen *uint32, valuesLen *uint32, maxValueNameLen *uint32, maxValueLen *uint32, saLen *uint32, lastWriteTime *Filetime) (regerrno error) = advapi32.RegQueryInfoKeyW

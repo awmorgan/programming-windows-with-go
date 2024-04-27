@@ -41,6 +41,7 @@ var (
 	modcrypt32  = NewLazySystemDLL("crypt32.dll")
 	moddnsapi   = NewLazySystemDLL("dnsapi.dll")
 	moddwmapi   = NewLazySystemDLL("dwmapi.dll")
+	modgdi32    = NewLazySystemDLL("gdi32.dll")
 	modiphlpapi = NewLazySystemDLL("iphlpapi.dll")
 	modkernel32 = NewLazySystemDLL("kernel32.dll")
 	modmswsock  = NewLazySystemDLL("mswsock.dll")
@@ -180,6 +181,7 @@ var (
 	procDnsRecordListFree                                    = moddnsapi.NewProc("DnsRecordListFree")
 	procDwmGetWindowAttribute                                = moddwmapi.NewProc("DwmGetWindowAttribute")
 	procDwmSetWindowAttribute                                = moddwmapi.NewProc("DwmSetWindowAttribute")
+	procGetStockObject                                       = modgdi32.NewProc("GetStockObject")
 	procGetAdaptersAddresses                                 = modiphlpapi.NewProc("GetAdaptersAddresses")
 	procGetAdaptersInfo                                      = modiphlpapi.NewProc("GetAdaptersInfo")
 	procGetBestInterfaceEx                                   = modiphlpapi.NewProc("GetBestInterfaceEx")
@@ -306,6 +308,7 @@ var (
 	procInitializeProcThreadAttributeList                    = modkernel32.NewProc("InitializeProcThreadAttributeList")
 	procIsWow64Process                                       = modkernel32.NewProc("IsWow64Process")
 	procIsWow64Process2                                      = modkernel32.NewProc("IsWow64Process2")
+	procLoadCursorW                                          = modkernel32.NewProc("LoadCursorW")
 	procLoadIconW                                            = modkernel32.NewProc("LoadIconW")
 	procLoadLibraryExW                                       = modkernel32.NewProc("LoadLibraryExW")
 	procLoadLibraryW                                         = modkernel32.NewProc("LoadLibraryW")
@@ -1591,6 +1594,12 @@ func DwmSetWindowAttribute(hwnd HWND, attribute uint32, value unsafe.Pointer, si
 	return
 }
 
+func GetStockObject(i int) (obj Handle) {
+	r0, _, _ := syscall.Syscall(procGetStockObject.Addr(), 1, uintptr(i), 0, 0)
+	obj = Handle(r0)
+	return
+}
+
 func GetAdaptersAddresses(family uint32, flags uint32, reserved uintptr, adapterAddresses *IpAdapterAddresses, sizePointer *uint32) (errcode error) {
 	r0, _, _ := syscall.Syscall6(procGetAdaptersAddresses.Addr(), 5, uintptr(family), uintptr(flags), uintptr(reserved), uintptr(unsafe.Pointer(adapterAddresses)), uintptr(unsafe.Pointer(sizePointer)), 0)
 	if r0 != 0 {
@@ -2646,6 +2655,24 @@ func IsWow64Process2(handle Handle, processMachine *uint16, nativeMachine *uint1
 	}
 	r1, _, e1 := syscall.Syscall(procIsWow64Process2.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(processMachine)), uintptr(unsafe.Pointer(nativeMachine)))
 	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func LoadCursor(instance Handle, cursorName string) (cursor Handle, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(cursorName)
+	if err != nil {
+		return
+	}
+	return _LoadCursor(instance, _p0)
+}
+
+func _LoadCursor(instance Handle, cursorName *uint16) (cursor Handle, err error) {
+	r0, _, e1 := syscall.Syscall(procLoadCursorW.Addr(), 2, uintptr(instance), uintptr(unsafe.Pointer(cursorName)), 0)
+	cursor = Handle(r0)
+	if cursor == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -4124,7 +4151,21 @@ func IsWindowVisible(hwnd HWND) (isVisible bool) {
 	return
 }
 
-func MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret int32, err error) {
+func MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(text)
+	if err != nil {
+		return
+	}
+	var _p1 *uint16
+	_p1, err = syscall.UTF16PtrFromString(caption)
+	if err != nil {
+		return
+	}
+	return _MessageBox(hwnd, _p0, _p1, boxtype)
+}
+
+func _MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret int32, err error) {
 	r0, _, e1 := syscall.Syscall6(procMessageBoxW.Addr(), 4, uintptr(hwnd), uintptr(unsafe.Pointer(text)), uintptr(unsafe.Pointer(caption)), uintptr(boxtype), 0, 0)
 	ret = int32(r0)
 	if ret == 0 {
@@ -4133,9 +4174,12 @@ func MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret i
 	return
 }
 
-func RegisterClassW(lpWndClass *WNDCLASSW) (atom uint16) {
-	r0, _, _ := syscall.Syscall(procRegisterClassW.Addr(), 1, uintptr(unsafe.Pointer(lpWndClass)), 0, 0)
-	atom = uint16(r0)
+func RegisterClass(wc *Wndclass) (a Atom, err error) {
+	r0, _, e1 := syscall.Syscall(procRegisterClassW.Addr(), 1, uintptr(unsafe.Pointer(wc)), 0, 0)
+	a = Atom(r0)
+	if a == 0 {
+		err = errnoErr(e1)
+	}
 	return
 }
 
