@@ -3507,13 +3507,13 @@ const (
 
 type WNDCLASS struct {
 	Style         uint32
-	LpfnWndProc   uintptr
+	LpfnWndProc   WNDPROC
 	CbClsExtra    int32
 	CbWndExtra    int32
-	HInstance     Handle
-	HIcon         Handle
-	HCursor       Handle
-	HbrBackground Handle
+	HInstance     HINSTANCE
+	HIcon         HICON
+	HCursor       HCURSOR
+	HbrBackground HBRUSH
 	LpszMenuName  *uint16
 	LpszClassName *uint16
 }
@@ -3555,3 +3555,5 @@ type HICON Handle
 type HCURSOR Handle
 type HMENU Handle
 type HINSTANCE Handle
+type HBRUSH Handle
+type WNDPROC uintptr
