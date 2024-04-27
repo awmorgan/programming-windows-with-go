@@ -308,8 +308,6 @@ var (
 	procInitializeProcThreadAttributeList                    = modkernel32.NewProc("InitializeProcThreadAttributeList")
 	procIsWow64Process                                       = modkernel32.NewProc("IsWow64Process")
 	procIsWow64Process2                                      = modkernel32.NewProc("IsWow64Process2")
-	procLoadCursorW                                          = modkernel32.NewProc("LoadCursorW")
-	procLoadIconW                                            = modkernel32.NewProc("LoadIconW")
 	procLoadLibraryExW                                       = modkernel32.NewProc("LoadLibraryExW")
 	procLoadLibraryW                                         = modkernel32.NewProc("LoadLibraryW")
 	procLoadResource                                         = modkernel32.NewProc("LoadResource")
@@ -473,6 +471,7 @@ var (
 	procCommandLineToArgvW                                   = modshell32.NewProc("CommandLineToArgvW")
 	procSHGetKnownFolderPath                                 = modshell32.NewProc("SHGetKnownFolderPath")
 	procShellExecuteW                                        = modshell32.NewProc("ShellExecuteW")
+	procCreateWindowExW                                      = moduser32.NewProc("CreateWindowExW")
 	procEnumChildWindows                                     = moduser32.NewProc("EnumChildWindows")
 	procEnumWindows                                          = moduser32.NewProc("EnumWindows")
 	procExitWindowsEx                                        = moduser32.NewProc("ExitWindowsEx")
@@ -486,6 +485,8 @@ var (
 	procIsWindow                                             = moduser32.NewProc("IsWindow")
 	procIsWindowUnicode                                      = moduser32.NewProc("IsWindowUnicode")
 	procIsWindowVisible                                      = moduser32.NewProc("IsWindowVisible")
+	procLoadCursorW                                          = moduser32.NewProc("LoadCursorW")
+	procLoadIconW                                            = moduser32.NewProc("LoadIconW")
 	procMessageBoxW                                          = moduser32.NewProc("MessageBoxW")
 	procRegisterClassW                                       = moduser32.NewProc("RegisterClassW")
 	procCreateEnvironmentBlock                               = moduserenv.NewProc("CreateEnvironmentBlock")
@@ -1594,9 +1595,9 @@ func DwmSetWindowAttribute(hwnd HWND, attribute uint32, value unsafe.Pointer, si
 	return
 }
 
-func GetStockObject(i int) (obj Handle) {
+func GetStockObject(i int) (obj HGDIOBJ) {
 	r0, _, _ := syscall.Syscall(procGetStockObject.Addr(), 1, uintptr(i), 0, 0)
-	obj = Handle(r0)
+	obj = HGDIOBJ(r0)
 	return
 }
 
@@ -2655,42 +2656,6 @@ func IsWow64Process2(handle Handle, processMachine *uint16, nativeMachine *uint1
 	}
 	r1, _, e1 := syscall.Syscall(procIsWow64Process2.Addr(), 3, uintptr(handle), uintptr(unsafe.Pointer(processMachine)), uintptr(unsafe.Pointer(nativeMachine)))
 	if r1 == 0 {
-		err = errnoErr(e1)
-	}
-	return
-}
-
-func LoadCursor(instance Handle, cursorName string) (cursor Handle, err error) {
-	var _p0 *uint16
-	_p0, err = syscall.UTF16PtrFromString(cursorName)
-	if err != nil {
-		return
-	}
-	return _LoadCursor(instance, _p0)
-}
-
-func _LoadCursor(instance Handle, cursorName *uint16) (cursor Handle, err error) {
-	r0, _, e1 := syscall.Syscall(procLoadCursorW.Addr(), 2, uintptr(instance), uintptr(unsafe.Pointer(cursorName)), 0)
-	cursor = Handle(r0)
-	if cursor == 0 {
-		err = errnoErr(e1)
-	}
-	return
-}
-
-func LoadIcon(instance Handle, iconName string) (icon Handle, err error) {
-	var _p0 *uint16
-	_p0, err = syscall.UTF16PtrFromString(iconName)
-	if err != nil {
-		return
-	}
-	return _LoadIcon(instance, _p0)
-}
-
-func _LoadIcon(instance Handle, iconName *uint16) (icon Handle, err error) {
-	r0, _, e1 := syscall.Syscall(procLoadIconW.Addr(), 2, uintptr(instance), uintptr(unsafe.Pointer(iconName)), 0)
-	icon = Handle(r0)
-	if icon == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -4062,6 +4027,29 @@ func ShellExecute(hwnd Handle, verb *uint16, file *uint16, args *uint16, cwd *ui
 	return
 }
 
+func CreateWindowEx(exStyle DWORD, className string, windowName string, style DWORD, x int, y int, width int, height int, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(className)
+	if err != nil {
+		return
+	}
+	var _p1 *uint16
+	_p1, err = syscall.UTF16PtrFromString(windowName)
+	if err != nil {
+		return
+	}
+	return _CreateWindowEx(exStyle, _p0, _p1, style, x, y, width, height, parent, menu, instance, param)
+}
+
+func _CreateWindowEx(exStyle DWORD, className *uint16, windowName *uint16, style DWORD, x int, y int, width int, height int, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) {
+	r0, _, e1 := syscall.Syscall12(procCreateWindowExW.Addr(), 12, uintptr(exStyle), uintptr(unsafe.Pointer(className)), uintptr(unsafe.Pointer(windowName)), uintptr(style), uintptr(x), uintptr(y), uintptr(width), uintptr(height), uintptr(parent), uintptr(menu), uintptr(instance), uintptr(param))
+	hwnd = HWND(r0)
+	if hwnd == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func EnumChildWindows(hwnd HWND, enumFunc uintptr, param unsafe.Pointer) {
 	syscall.Syscall(procEnumChildWindows.Addr(), 3, uintptr(hwnd), uintptr(enumFunc), uintptr(param))
 	return
@@ -4118,9 +4106,12 @@ func GetShellWindow() (shellWindow HWND) {
 	return
 }
 
-func GetSystemMetrics(metric int32) (n int32) {
-	r0, _, _ := syscall.Syscall(procGetSystemMetrics.Addr(), 1, uintptr(metric), 0, 0)
+func GetSystemMetrics(metric int32) (n int32, err error) {
+	r0, _, e1 := syscall.Syscall(procGetSystemMetrics.Addr(), 1, uintptr(metric), 0, 0)
 	n = int32(r0)
+	if n == 0 {
+		err = errnoErr(e1)
+	}
 	return
 }
 
@@ -4151,6 +4142,42 @@ func IsWindowVisible(hwnd HWND) (isVisible bool) {
 	return
 }
 
+func LoadCursor(instance HINSTANCE, cursorName string) (cursor HCURSOR, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(cursorName)
+	if err != nil {
+		return
+	}
+	return _LoadCursor(instance, _p0)
+}
+
+func _LoadCursor(instance HINSTANCE, cursorName *uint16) (cursor HCURSOR, err error) {
+	r0, _, e1 := syscall.Syscall(procLoadCursorW.Addr(), 2, uintptr(instance), uintptr(unsafe.Pointer(cursorName)), 0)
+	cursor = HCURSOR(r0)
+	if cursor == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func LoadIcon(instance HINSTANCE, iconName string) (icon HICON, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(iconName)
+	if err != nil {
+		return
+	}
+	return _LoadIcon(instance, _p0)
+}
+
+func _LoadIcon(instance HINSTANCE, iconName *uint16) (icon HICON, err error) {
+	r0, _, e1 := syscall.Syscall(procLoadIconW.Addr(), 2, uintptr(instance), uintptr(unsafe.Pointer(iconName)), 0)
+	icon = HICON(r0)
+	if icon == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(text)
@@ -4174,9 +4201,9 @@ func _MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret 
 	return
 }
 
-func RegisterClass(wc *Wndclass) (a Atom, err error) {
+func RegisterClass(wc *WNDCLASS) (a ATOM, err error) {
 	r0, _, e1 := syscall.Syscall(procRegisterClassW.Addr(), 1, uintptr(unsafe.Pointer(wc)), 0, 0)
-	a = Atom(r0)
+	a = ATOM(r0)
 	if a == 0 {
 		err = errnoErr(e1)
 	}

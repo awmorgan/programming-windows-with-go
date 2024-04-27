@@ -10,8 +10,8 @@ import (
 
 func winmain(hInstance windows.Handle, hPrevInstance windows.Handle, lpCmdLine *uint16, nCmdShow int) int {
 	_, _, _, _ = hInstance, hPrevInstance, lpCmdLine, nCmdShow
-	cxScreen := windows.GetSystemMetrics(windows.SM_CXSCREEN)
-	cyScreen := windows.GetSystemMetrics(windows.SM_CYSCREEN)
+	cxScreen, _ := windows.GetSystemMetrics(windows.SM_CXSCREEN)
+	cyScreen, _ := windows.GetSystemMetrics(windows.SM_CYSCREEN)
 	text := fmt.Sprintf("The screen is %d pixels wide by %d pixels high.", cxScreen, cyScreen)
 	windows.MessageBox(0, text, "Screen Size", 0)
 	return 0

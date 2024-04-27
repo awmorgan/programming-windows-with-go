@@ -146,11 +146,13 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 
 // windows api calls
 
-//sys	CreateWindow( 
-//sys	RegisterClass(wc *Wndclass) (a Atom, err error) = user32.RegisterClassW
-//sys	GetStockObject( i int) (obj Handle) = gdi32.GetStockObject
-//sys	LoadIcon(instance Handle, iconName string) (icon Handle, err error) = LoadIconW
-//sys	LoadCursor(instance Handle, cursorName string) (cursor Handle, err error) = LoadCursorW
+//sys	CreateWindowEx(exStyle DWORD, className string, windowName string, style DWORD, x int, y int, width int, height int, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) = user32.CreateWindowExW
+//sys	RegisterClass(wc *WNDCLASS) (a ATOM, err error) = user32.RegisterClassW
+//sys	GetStockObject( i int) (obj HGDIOBJ) = gdi32.GetStockObject
+//sys	LoadIcon(instance HINSTANCE, iconName string) (icon HICON, err error) = user32.LoadIconW
+//sys	LoadCursor(instance HINSTANCE, cursorName string) (cursor HCURSOR, err error) = user32.LoadCursorW
+//sys	GetSystemMetrics(metric int32) (n int32, err error) = user32.GetSystemMetrics
+
 //sys	GetLastError() (lasterr error)
 //sys	LoadLibrary(libname string) (handle Handle, err error) = LoadLibraryW
 //sys	LoadLibraryEx(libname string, zero Handle, flags uintptr) (handle Handle, err error) = LoadLibraryExW
@@ -217,7 +219,6 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	ShellExecute(hwnd Handle, verb *uint16, file *uint16, args *uint16, cwd *uint16, showCmd int32) (err error) [failretval<=32] = shell32.ShellExecuteW
 //sys	GetWindowThreadProcessId(hwnd HWND, pid *uint32) (tid uint32, err error) = user32.GetWindowThreadProcessId
 //sys	GetShellWindow() (shellWindow HWND) = user32.GetShellWindow
-//sys	GetSystemMetrics(metric int32) (n int32) = user32.GetSystemMetrics
 //sys	MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) = user32.MessageBoxW
 //sys	ExitWindowsEx(flags uint32, reason uint32) (err error) = user32.ExitWindowsEx
 //sys	shGetKnownFolderPath(id *KNOWNFOLDERID, flags uint32, token Token, path **uint16) (ret error) = shell32.SHGetKnownFolderPath

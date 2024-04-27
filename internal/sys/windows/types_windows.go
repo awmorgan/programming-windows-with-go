@@ -3505,7 +3505,7 @@ const (
 	SM_YVIRTUALSCREEN              = 77
 )
 
-type Wndclass struct {
+type WNDCLASS struct {
 	Style         uint32
 	LpfnWndProc   uintptr
 	CbClsExtra    int32
@@ -3536,16 +3536,22 @@ const (
 )
 
 const (
-	IDI_APPLICATION = string(uintptr(32512))
+	IDI_APPLICATION = string(32512)
 )
 
 const (
-	IDC_ARROW = string(uintptr(32512))
+	IDC_ARROW = string(32512)
 )
 
 const (
 	WHITE_BRUSH = 0
 )
 
-type Word uint16
-type Atom Word
+type WORD uint16
+type ATOM WORD
+type DWORD uint32
+type HGDIOBJ Handle
+type HICON Handle
+type HCURSOR Handle
+type HMENU Handle
+type HINSTANCE Handle
