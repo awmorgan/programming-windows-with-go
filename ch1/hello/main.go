@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/awmorgan/programming-windows-with-go/internal/sys/windows"
+	"github.com/awmorgan/programming-windows-with-go/internal/windows"
 )
 
 func main() {

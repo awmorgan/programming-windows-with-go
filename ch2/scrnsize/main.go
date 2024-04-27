@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/awmorgan/programming-windows-with-go/internal/sys/windows"
+	"github.com/awmorgan/programming-windows-with-go/internal/windows"
 )
 
 func main() {
