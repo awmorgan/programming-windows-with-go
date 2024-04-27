@@ -27,5 +27,28 @@ func main() {
 		windows.MessageBox(0, fmt.Sprintf("RegisterClass failed: %v", err), "Error", windows.MB_ICONERROR)
 		os.Exit(1)
 	}
+	hwnd, err := windows.CreateWindowEx(0, "HelloWin",
+		"Hello, Windows App",
+		windows.WS_OVERLAPPEDWINDOW,
+		windows.CW_USEDEFAULT,
+		windows.CW_USEDEFAULT,
+		windows.CW_USEDEFAULT,
+		windows.CW_USEDEFAULT,
+		0, 0, windows.WinmainArgs.HInstance, 0)
+	if err != nil {
+		windows.MessageBox(0, fmt.Sprintf("CreateWindow failed: %v", err), "Error", windows.MB_ICONERROR)
+		os.Exit(1)
+	}
+	windows.ShowWindow(hwnd, windows.SW_SHOWNORMAL)
+	windows.UpdateWindow(hwnd)
+	msg := windows.MSG{}
+	for {
+		if ret, _ := windows.GetMessage(&msg, 0, 0, 0); ret == 0 {
+			break
+		}
 
+		windows.TranslateMessage(&msg)
+		windows.DispatchMessage(&msg)
+	}
+	os.Exit(int(msg.WParam))
 }

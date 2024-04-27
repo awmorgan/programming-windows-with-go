@@ -152,6 +152,11 @@ func NewCallbackCDecl(fn interface{}) uintptr {
 //sys	LoadIcon(instance HINSTANCE, iconName string) (icon HICON, err error) = user32.LoadIconW
 //sys	LoadCursor(instance HINSTANCE, cursorName string) (cursor HCURSOR, err error) = user32.LoadCursorW
 //sys	GetSystemMetrics(metric int32) (n int32, err error) = user32.GetSystemMetrics
+//sys	ShowWindow(hWnd HWND, nCmdShow int) (isWindowVisible bool) = user32.ShowWindow
+//sys	UpdateWindow(hWnd HWND) (success bool) = user32.UpdateWindow
+//sys	GetMessage( msg *MSG, hWnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) [failretval==-1] = user32.GetMessageW
+//sys   TranslateMessage(msg *MSG) = user32.TranslateMessage
+//sys   DispatchMessage(msg *MSG) = user32.DispatchMessageW
 
 //sys	GetLastError() (lasterr error)
 //sys	LoadLibrary(libname string) (handle Handle, err error) = LoadLibraryW

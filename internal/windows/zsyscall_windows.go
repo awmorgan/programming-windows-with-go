@@ -472,6 +472,7 @@ var (
 	procSHGetKnownFolderPath                                 = modshell32.NewProc("SHGetKnownFolderPath")
 	procShellExecuteW                                        = modshell32.NewProc("ShellExecuteW")
 	procCreateWindowExW                                      = moduser32.NewProc("CreateWindowExW")
+	procDispatchMessageW                                     = moduser32.NewProc("DispatchMessageW")
 	procEnumChildWindows                                     = moduser32.NewProc("EnumChildWindows")
 	procEnumWindows                                          = moduser32.NewProc("EnumWindows")
 	procExitWindowsEx                                        = moduser32.NewProc("ExitWindowsEx")
@@ -479,6 +480,7 @@ var (
 	procGetDesktopWindow                                     = moduser32.NewProc("GetDesktopWindow")
 	procGetForegroundWindow                                  = moduser32.NewProc("GetForegroundWindow")
 	procGetGUIThreadInfo                                     = moduser32.NewProc("GetGUIThreadInfo")
+	procGetMessageW                                          = moduser32.NewProc("GetMessageW")
 	procGetShellWindow                                       = moduser32.NewProc("GetShellWindow")
 	procGetSystemMetrics                                     = moduser32.NewProc("GetSystemMetrics")
 	procGetWindowThreadProcessId                             = moduser32.NewProc("GetWindowThreadProcessId")
@@ -489,6 +491,9 @@ var (
 	procLoadIconW                                            = moduser32.NewProc("LoadIconW")
 	procMessageBoxW                                          = moduser32.NewProc("MessageBoxW")
 	procRegisterClassW                                       = moduser32.NewProc("RegisterClassW")
+	procShowWindow                                           = moduser32.NewProc("ShowWindow")
+	procTranslateMessage                                     = moduser32.NewProc("TranslateMessage")
+	procUpdateWindow                                         = moduser32.NewProc("UpdateWindow")
 	procCreateEnvironmentBlock                               = moduserenv.NewProc("CreateEnvironmentBlock")
 	procDestroyEnvironmentBlock                              = moduserenv.NewProc("DestroyEnvironmentBlock")
 	procGetUserProfileDirectoryW                             = moduserenv.NewProc("GetUserProfileDirectoryW")
@@ -4050,6 +4055,11 @@ func _CreateWindowEx(exStyle DWORD, className *uint16, windowName *uint16, style
 	return
 }
 
+func DispatchMessage(msg *MSG) {
+	syscall.Syscall(procDispatchMessageW.Addr(), 1, uintptr(unsafe.Pointer(msg)), 0, 0)
+	return
+}
+
 func EnumChildWindows(hwnd HWND, enumFunc uintptr, param unsafe.Pointer) {
 	syscall.Syscall(procEnumChildWindows.Addr(), 3, uintptr(hwnd), uintptr(enumFunc), uintptr(param))
 	return
@@ -4095,6 +4105,15 @@ func GetForegroundWindow() (hwnd HWND) {
 func GetGUIThreadInfo(thread uint32, info *GUIThreadInfo) (err error) {
 	r1, _, e1 := syscall.Syscall(procGetGUIThreadInfo.Addr(), 2, uintptr(thread), uintptr(unsafe.Pointer(info)), 0)
 	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func GetMessage(msg *MSG, hWnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) {
+	r0, _, e1 := syscall.Syscall6(procGetMessageW.Addr(), 4, uintptr(unsafe.Pointer(msg)), uintptr(hWnd), uintptr(msgFilterMin), uintptr(msgFilterMax), 0, 0)
+	ret = int32(r0)
+	if ret == -1 {
 		err = errnoErr(e1)
 	}
 	return
@@ -4207,6 +4226,23 @@ func RegisterClass(wc *WNDCLASS) (a ATOM, err error) {
 	if a == 0 {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func ShowWindow(hWnd HWND, nCmdShow int) (isWindowVisible bool) {
+	r0, _, _ := syscall.Syscall(procShowWindow.Addr(), 2, uintptr(hWnd), uintptr(nCmdShow), 0)
+	isWindowVisible = r0 != 0
+	return
+}
+
+func TranslateMessage(msg *MSG) {
+	syscall.Syscall(procTranslateMessage.Addr(), 1, uintptr(unsafe.Pointer(msg)), 0, 0)
+	return
+}
+
+func UpdateWindow(hWnd HWND) (success bool) {
+	r0, _, _ := syscall.Syscall(procUpdateWindow.Addr(), 1, uintptr(hWnd), 0, 0)
+	success = r0 != 0
 	return
 }
 
