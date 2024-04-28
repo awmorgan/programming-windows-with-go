@@ -61,3 +61,48 @@ func init() {
 	args := strings.Join(os.Args, " ")
 	WinmainArgs.LpCmdLine = Str(args)
 }
+
+func NewWndProc(f func(hwnd win.HWND, msg uint32, wParam, lParam uintptr) uintptr) uintptr {
+	return syscall.NewCallback(f)
+}
+
+func CreateWindow(lpClassName, lpWindowName *uint16, dwStyle uint32, x, y, nWidth, nHeight int32, hWndParent win.HWND, hMenu win.HMENU, hInstance win.HINSTANCE, lpParam unsafe.Pointer) win.HWND {
+	return win.CreateWindowEx(0, lpClassName, lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam)
+}
+
+func DrawText(hdc win.HDC, lpchText *uint16, cchText int32, lprc *win.RECT, dwDTFormat uint32) int32 {
+	return win.DrawTextEx(hdc, lpchText, cchText, lprc, dwDTFormat, nil)
+}
+
+var (
+	// Load the library containing PlaySound
+	libwinmm      = syscall.NewLazyDLL("winmm.dll")
+	procPlaySound = libwinmm.NewProc("PlaySoundW")
+)
+
+// PlaySound plays a sound from a file, resource, or system event.
+// Parameters:
+// - soundName is the name of the sound to play, or the resource identifier.
+// - hMod specifies the executable module (use 0 for a file or system event).
+// - flags specify how to play the sound (use SND_ASYNC, SND_FILENAME, SND_RESOURCE, etc.).
+func PlaySound(soundName *uint16, hMod win.HMODULE, flags uint32) bool {
+	ret, _, _ := procPlaySound.Call(
+		uintptr(unsafe.Pointer(soundName)),
+		uintptr(hMod),
+		uintptr(flags),
+	)
+	return ret != 0
+}
+
+// Constants for flags parameter of PlaySound
+const (
+	SND_SYNC      uint32 = 0x0000     // play synchronously (default)
+	SND_ASYNC     uint32 = 0x0001     // play asynchronously
+	SND_NODEFAULT uint32 = 0x0002     // silence (!default) if sound not found
+	SND_MEMORY    uint32 = 0x0004     // pszSound points to a memory file
+	SND_LOOP      uint32 = 0x0008     // loop the sound until next sndPlaySound
+	SND_NOSTOP    uint32 = 0x0010     // don't stop any currently playing sound
+	SND_NOWAIT    uint32 = 0x00002000 // don't wait if the driver is busy
+	SND_FILENAME  uint32 = 0x00020000 // name is a file name
+	SND_RESOURCE  uint32 = 0x00040004 // name is a resource name or atom
+)
