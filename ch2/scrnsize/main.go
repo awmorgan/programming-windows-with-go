@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/awmorgan/programming-windows-with-go/internal/windows"
+	"x/win32"
 )
 
 func main() {
-	cxScreen, _ := windows.GetSystemMetrics(windows.SM_CXSCREEN)
-	cyScreen, _ := windows.GetSystemMetrics(windows.SM_CYSCREEN)
+	cxScreen, _ := win32.GetSystemMetrics(win32.SM_CXSCREEN)
+	cyScreen, _ := win32.GetSystemMetrics(win32.SM_CYSCREEN)
 	text := fmt.Sprintf("The screen is %d pixels wide by %d pixels high.", cxScreen, cyScreen)
-	windows.MessageBox(0, text, "Screen Size", 0)
+	win32.MessageBox(0, text, "Screen Size", 0)
 }

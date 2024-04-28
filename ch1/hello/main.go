@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/awmorgan/programming-windows-with-go/internal/windows"
-)
+import "x/win32"
 
 func main() {
-	windows.MessageBox(0, "Hello, Windows!", "HelloMsg", windows.MB_OK)
+	win32.MessageBox(0, "Hello, Windows!", "HelloMsg", win32.MB_OK)
 }
