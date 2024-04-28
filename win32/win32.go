@@ -13,6 +13,14 @@ const (
 
 type HWND win.HWND
 
+func Str(str string) *uint16 {
+	s, err := syscall.UTF16PtrFromString(str)
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
+
 func MessageBox(hwnd HWND, text, caption string, flags uint32) (int32, error) {
 	t, err := syscall.UTF16PtrFromString(text)
 	if err != nil {
@@ -40,4 +48,42 @@ func GetSystemMetrics(nIndex int32) (int32, error) {
 		return 0, fmt.Errorf("GetSystemMetrics failed")
 	}
 	return ret, nil
+}
+
+type HINSTANCE win.HINSTANCE
+type HICON win.HICON
+type HCURSOR win.HCURSOR
+type HBRUSH win.HBRUSH
+
+type WNDCLASS struct {
+	Style         uint32
+	LpfnWndProc   uintptr
+	CbClsExtra    int32
+	CbWndExtra    int32
+	HInstance     HINSTANCE
+	HIcon         HICON
+	HCursor       HCURSOR
+	HbrBackground HBRUSH
+	LpszMenuName  *uint16
+	LpszClassName *uint16
+}
+
+const (
+	CS_HREDRAW    = win.CS_HREDRAW
+	CS_VREDRAW    = win.CS_VREDRAW
+	CW_USEDEFAULT = win.CW_USEDEFAULT
+	WS_OVERLAPPED = win.WS_OVERLAPPED
+)
+
+var HInstance HINSTANCE
+
+func init() {
+	HInstance := win.GetModuleHandle(nil)
+	if HInstance == 0 {
+		panic("GetModuleHandle")
+	}
+}
+
+func NewWndProc(fn func(hwnd HWND, msg uint32, wParam, lParam uintptr) uintptr) uintptr {
+	return syscall.NewCallback(fn)
 }
