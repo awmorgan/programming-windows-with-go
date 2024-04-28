@@ -7,6 +7,7 @@ import (
 	"unsafe"
 
 	"github.com/lxn/win"
+	"golang.org/x/sys/windows"
 )
 
 func Str(s string) *uint16 {
@@ -60,6 +61,12 @@ func init() {
 	WinmainArgs.HPrevInst = 0
 	args := strings.Join(os.Args, " ")
 	WinmainArgs.LpCmdLine = Str(args)
+	s := windows.StartupInfo{}
+	err := windows.GetStartupInfo(&s)
+	if err != nil {
+		panic(err)
+	}
+	WinmainArgs.NCmdShow = int(s.ShowWindow)
 }
 
 func NewWndProc(f func(hwnd win.HWND, msg uint32, wParam, lParam uintptr) uintptr) uintptr {
