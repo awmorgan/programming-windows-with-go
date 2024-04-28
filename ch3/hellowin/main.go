@@ -1,21 +1,22 @@
 package main
 
 import (
+	"os"
+	"runtime"
 	"x/win32"
 
 	"github.com/lxn/win"
 )
 
 func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
-	var hdc win.HDC
-	var ps win.PAINTSTRUCT
-	var rect win.RECT
 	switch msg {
 	case win.WM_CREATE:
 		win32.PlaySound(win32.Str("hellowin.wav"), 0, win32.SND_FILENAME|win32.SND_ASYNC)
 		return 0
 	case win.WM_PAINT:
-		hdc = win.BeginPaint(hwnd, &ps)
+		rect := win.RECT{}
+		ps := win.PAINTSTRUCT{}
+		hdc := win.BeginPaint(hwnd, &ps)
 		win.GetClientRect(hwnd, &rect)
 		win32.DrawText(hdc, win32.Str("Hello, Windows 98!"), -1, &rect, win.DT_SINGLELINE|win.DT_CENTER|win.DT_VCENTER)
 		win.EndPaint(hwnd, &ps)
@@ -28,6 +29,7 @@ func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr)
 }
 
 func main() {
+	runtime.LockOSThread() // Windows GUI message loop must run in the main OS thread
 	var appName = win32.Str("HelloWin")
 	var wc win32.WNDCLASS
 	wc.Style = win.CS_HREDRAW | win.CS_VREDRAW
@@ -55,4 +57,5 @@ func main() {
 		win.TranslateMessage(&msg)
 		win.DispatchMessage(&msg)
 	}
+	os.Exit(int(msg.WParam))
 }
