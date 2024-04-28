@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 	"x/win32"
 
 	"github.com/lxn/win"
+	"golang.org/x/sys/windows"
 )
 
 func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
@@ -30,18 +32,16 @@ func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr)
 
 func main() {
 	runtime.LockOSThread() // Windows GUI message loop must run in the main OS thread
-	var appName = win32.Str("HelloWin")
-	var wc win32.WNDCLASS
-	wc.Style = win.CS_HREDRAW | win.CS_VREDRAW
-	wc.LpfnWndProc = win32.NewWndProc(wndproc)
-	wc.CbClsExtra = 0
-	wc.CbWndExtra = 0
-	wc.HInstance = win32.WinmainArgs.HInstance
-	wc.HIcon = win.LoadIcon(0, win.MAKEINTRESOURCE(win.IDI_APPLICATION))
-	wc.HCursor = win.LoadCursor(0, win.MAKEINTRESOURCE(win.IDC_ARROW))
-	wc.HbrBackground = win.HBRUSH(win.GetStockObject(win.WHITE_BRUSH))
-	wc.LpszMenuName = nil
-	wc.LpszClassName = appName
+	appName := win32.Str("HelloWin")
+	wc := win32.WNDCLASS{
+		Style:         win.CS_HREDRAW | win.CS_VREDRAW,
+		LpfnWndProc:   win32.NewWndProc(wndproc),
+		HInstance:     win32.WinmainArgs.HInstance,
+		HIcon:         win.LoadIcon(0, win.MAKEINTRESOURCE(win.IDI_APPLICATION)),
+		HCursor:       win.LoadCursor(0, win.MAKEINTRESOURCE(win.IDC_ARROW)),
+		HbrBackground: win.HBRUSH(win.GetStockObject(win.WHITE_BRUSH)),
+		LpszClassName: appName,
+	}
 	if win32.RegisterClass(&wc) == 0 {
 		win.MessageBox(0, win32.Str("RegisterClass failed"), appName, win.MB_ICONERROR)
 		return
@@ -53,9 +53,18 @@ func main() {
 	win.ShowWindow(hwnd, win.SW_SHOWNORMAL)
 	win.UpdateWindow(hwnd)
 	msg := win.MSG{}
-	for win.GetMessage(&msg, 0, 0, 0) != 0 {
+	for {
+		ret := win.GetMessage(&msg, 0, 0, 0)
+		switch ret {
+		case 0: // WM_QUIT
+			os.Exit(int(msg.WParam))
+		case -1: // error
+			errMsg := fmt.Sprintf("GetMessage failed: %v", windows.GetLastError())
+			win.MessageBox(0, win32.Str(errMsg), appName, win.MB_ICONERROR)
+			os.Exit(1)
+		}
 		win.TranslateMessage(&msg)
 		win.DispatchMessage(&msg)
 	}
-	os.Exit(int(msg.WParam))
+
 }
