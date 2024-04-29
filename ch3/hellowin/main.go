@@ -31,7 +31,8 @@ func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr)
 }
 
 func main() {
-	runtime.LockOSThread() // Windows GUI message loop must run in the main OS thread
+	// Windows messages are delivered to the thread that created the window.
+	runtime.LockOSThread()
 	appName := win32.Str("HelloWin")
 	wc := win32.WNDCLASS{
 		Style:         win.CS_HREDRAW | win.CS_VREDRAW,
