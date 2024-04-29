@@ -85,6 +85,8 @@ var (
 	// Load the library containing PlaySound
 	libwinmm      = syscall.NewLazyDLL("winmm.dll")
 	procPlaySound = libwinmm.NewProc("PlaySoundW")
+	libgdi32      = syscall.NewLazyDLL("gdi32.dll")
+	setTextAlign  = libgdi32.NewProc("SetTextAlign")
 )
 
 // PlaySound plays a sound from a file, resource, or system event.
@@ -112,4 +114,24 @@ const (
 	SND_NOWAIT    uint32 = 0x00002000 // don't wait if the driver is busy
 	SND_FILENAME  uint32 = 0x00020000 // name is a file name
 	SND_RESOURCE  uint32 = 0x00040004 // name is a resource name or atom
+)
+
+func SetTextAlign(hdc win.HDC, align uint32) uint32 {
+	ret, _, _ := setTextAlign.Call(
+		uintptr(hdc),
+		uintptr(align),
+	)
+	return uint32(ret)
+}
+
+// Constants for align parameter of SetTextAlign
+const (
+	TA_NOUPDATECP uint32 = 0
+	TA_UPDATECP   uint32 = 1
+	TA_LEFT       uint32 = 0
+	TA_RIGHT      uint32 = 2
+	TA_CENTER     uint32 = 6
+	TA_TOP        uint32 = 0
+	TA_BOTTOM     uint32 = 8
+	TA_BASELINE   uint32 = 24
 )
