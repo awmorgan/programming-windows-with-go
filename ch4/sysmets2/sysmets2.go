@@ -11,13 +11,16 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-var cxChar, cxCaps, cyChar int32
+var cxChar, cxCaps, cyChar, cyClient, iVscrollPos int32
 
 func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
+	var hdc win.HDC
+	var x, y int32
+	var ps win.PAINTSTRUCT
+	var tm win.TEXTMETRIC
 	switch msg {
 	case win.WM_CREATE:
-		hdc := win.GetDC(hwnd)
-		tm := win.TEXTMETRIC{}
+		hdc = win.GetDC(hwnd)
 		win.GetTextMetrics(hdc, &tm)
 		cxChar = int32(tm.TmAveCharWidth)
 		cxCaps = int32((int32(tm.TmPitchAndFamily) & 1) * 3 * cxChar / 2)
@@ -25,8 +28,7 @@ func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr)
 		win.ReleaseDC(hwnd, hdc)
 		return 0
 	case win.WM_PAINT:
-		var ps win.PAINTSTRUCT
-		hdc := win.BeginPaint(hwnd, &ps)
+		hdc = win.BeginPaint(hwnd, &ps)
 		for i, sm := range win32.Sysmetrics {
 			win.TextOut(hdc, 0, cyChar*int32(i), sm.Label, int32(sm.LabelLen))
 			win.TextOut(hdc, 22*cxCaps, cyChar*int32(i), sm.Desc, int32(sm.DescLen))
