@@ -53,7 +53,7 @@ var WinmainArgs struct {
 	HInstance win.HINSTANCE
 	HPrevInst win.HINSTANCE
 	LpCmdLine *uint16
-	NCmdShow  int
+	NCmdShow  int32
 }
 
 func init() {
@@ -66,7 +66,11 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	WinmainArgs.NCmdShow = int(s.ShowWindow)
+	if s.Flags&windows.STARTF_USESHOWWINDOW == windows.STARTF_USESHOWWINDOW {
+		WinmainArgs.NCmdShow = int32(s.ShowWindow)
+	} else {
+		WinmainArgs.NCmdShow = win.SW_SHOWDEFAULT
+	}
 }
 
 func NewWndProc(f func(hwnd win.HWND, msg uint32, wParam, lParam uintptr) uintptr) uintptr {
