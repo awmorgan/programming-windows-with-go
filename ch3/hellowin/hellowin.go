@@ -31,8 +31,7 @@ func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr)
 }
 
 func main() {
-	// Windows messages are delivered to the thread that created the window.
-	runtime.LockOSThread()
+	runtime.LockOSThread() // Windows messages are delivered to the thread that created the window.
 	appName := win32.Str("HelloWin")
 	wc := win32.WNDCLASS{
 		Style:         win.CS_HREDRAW | win.CS_VREDRAW,
@@ -51,7 +50,7 @@ func main() {
 		win.CW_USEDEFAULT, win.CW_USEDEFAULT, win.CW_USEDEFAULT, win.CW_USEDEFAULT,
 		0, 0, win32.WinmainArgs.HInstance, nil)
 
-	win.ShowWindow(hwnd, win.SW_SHOWNORMAL)
+	win.ShowWindow(hwnd, win32.WinmainArgs.NCmdShow)
 	win.UpdateWindow(hwnd)
 	msg := win.MSG{}
 	for {
