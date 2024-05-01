@@ -86,11 +86,14 @@ func DrawText(hdc win.HDC, lpchText *uint16, cchText int32, lprc *win.RECT, dwDT
 }
 
 var (
-	// Load the library containing PlaySound
-	libwinmm      = syscall.NewLazyDLL("winmm.dll")
-	procPlaySound = libwinmm.NewProc("PlaySoundW")
-	libgdi32      = syscall.NewLazyDLL("gdi32.dll")
-	setTextAlign  = libgdi32.NewProc("SetTextAlign")
+	libwinmm  = syscall.NewLazyDLL("winmm.dll")
+	libgdi32  = syscall.NewLazyDLL("gdi32.dll")
+	libuser32 = syscall.NewLazyDLL("user32.dll")
+
+	procPlaySound  = libwinmm.NewProc("PlaySoundW")
+	setTextAlign   = libgdi32.NewProc("SetTextAlign")
+	setScrollRange = libuser32.NewProc("SetScrollRange")
+	setScrollPos   = libuser32.NewProc("SetScrollPos")
 )
 
 // PlaySound plays a sound from a file, resource, or system event.
@@ -139,3 +142,33 @@ const (
 	TA_BOTTOM     uint32 = 8
 	TA_BASELINE   uint32 = 24
 )
+
+func boolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+func SetScrollRange(hwnd win.HWND, fnBar int32, nMinPos, nMaxPos int32, redraw bool) bool {
+	ret, _, _ := syscall.SyscallN(setScrollRange.Addr(), 5,
+		uintptr(hwnd),
+		uintptr(fnBar),
+		uintptr(nMinPos),
+		uintptr(nMaxPos),
+		uintptr(boolToBOOL(redraw)),
+		0)
+	return ret != 0
+}
+
+func SetScrollPos(hwnd win.HWND, fnBar, nPos int32, redraw bool) int32 {
+	ret, _, _ := syscall.SyscallN(setScrollPos.Addr(), 4,
+		uintptr(hwnd),
+		uintptr(fnBar),
+		uintptr(nPos),
+		uintptr(boolToInt(redraw)),
+		0,
+		0)
+
+	return int32(ret)
+}
