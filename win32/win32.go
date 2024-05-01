@@ -94,6 +94,7 @@ var (
 	setTextAlign   = libgdi32.NewProc("SetTextAlign")
 	setScrollRange = libuser32.NewProc("SetScrollRange")
 	setScrollPos   = libuser32.NewProc("SetScrollPos")
+	getScrollPos   = libuser32.NewProc("GetScrollPos")
 )
 
 // PlaySound plays a sound from a file, resource, or system event.
@@ -156,7 +157,7 @@ func SetScrollRange(hwnd win.HWND, fnBar int32, nMinPos, nMaxPos int32, redraw b
 		uintptr(fnBar),
 		uintptr(nMinPos),
 		uintptr(nMaxPos),
-		uintptr(boolToBOOL(redraw)),
+		uintptr(boolToInt(redraw)),
 		0)
 	return ret != 0
 }
@@ -168,6 +169,15 @@ func SetScrollPos(hwnd win.HWND, fnBar, nPos int32, redraw bool) int32 {
 		uintptr(nPos),
 		uintptr(boolToInt(redraw)),
 		0,
+		0)
+
+	return int32(ret)
+}
+
+func GetScrollPos(hwnd win.HWND, fnBar int32) int32 {
+	ret, _, _ := syscall.SyscallN(getScrollPos.Addr(), 2,
+		uintptr(hwnd),
+		uintptr(fnBar),
 		0)
 
 	return int32(ret)
