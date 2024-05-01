@@ -20,7 +20,10 @@ func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr)
 		tm := win.TEXTMETRIC{}
 		win.GetTextMetrics(hdc, &tm)
 		cxChar = int32(tm.TmAveCharWidth)
-		cxCaps = int32((int32(tm.TmPitchAndFamily) & 1) * 3 * cxChar / 2)
+		cxCaps = cxChar
+		if tm.TmPitchAndFamily&1 == 1 {
+			cxCaps += cxChar / 2
+		}
 		cyChar = int32(tm.TmHeight + tm.TmExternalLeading)
 		win.ReleaseDC(hwnd, hdc)
 		return 0
