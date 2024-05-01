@@ -15,7 +15,6 @@ var cxChar, cxCaps, cyChar, cyClient, iVscrollPos int32
 
 func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
 	var hdc win.HDC
-	var x, y int32
 	var ps win.PAINTSTRUCT
 	var tm win.TEXTMETRIC
 	switch msg {
@@ -53,15 +52,17 @@ func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr)
 			win32.SetScrollPos(hwnd, win.SB_VERT, iVscrollPos, true)
 			win.InvalidateRect(hwnd, nil, true)
 		}
+		return 0
 	case win.WM_PAINT:
 		hdc = win.BeginPaint(hwnd, &ps)
 		for i, sm := range win32.Sysmetrics {
-			win.TextOut(hdc, 0, cyChar*int32(i), sm.Label, int32(sm.LabelLen))
-			win.TextOut(hdc, 22*cxCaps, cyChar*int32(i), sm.Desc, int32(sm.DescLen))
+			y := cyChar * (int32(i) - iVscrollPos)
+			win.TextOut(hdc, 0, y, sm.Label, int32(sm.LabelLen))
+			win.TextOut(hdc, 22*cxCaps, y, sm.Desc, int32(sm.DescLen))
 			win32.SetTextAlign(hdc, win32.TA_RIGHT|win32.TA_TOP)
 			s := fmt.Sprintf("%5d", win.GetSystemMetrics(sm.Index))
 			l := utf8.RuneCountInString(s)
-			win.TextOut(hdc, 22*cxCaps+40*cxChar, cyChar*int32(i), win32.Str(s), int32(l))
+			win.TextOut(hdc, 22*cxCaps+40*cxChar, y, win32.Str(s), int32(l))
 			win32.SetTextAlign(hdc, win32.TA_LEFT|win32.TA_TOP)
 		}
 		win.EndPaint(hwnd, &ps)
