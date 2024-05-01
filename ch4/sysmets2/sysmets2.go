@@ -23,10 +23,36 @@ func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr)
 		hdc = win.GetDC(hwnd)
 		win.GetTextMetrics(hdc, &tm)
 		cxChar = int32(tm.TmAveCharWidth)
-		cxCaps = int32((int32(tm.TmPitchAndFamily) & 1) * 3 * cxChar / 2)
+		cxCaps = cxChar
+		if tm.TmPitchAndFamily&1 == 1 {
+			cxCaps += cxChar / 2
+		}
 		cyChar = int32(tm.TmHeight + tm.TmExternalLeading)
 		win.ReleaseDC(hwnd, hdc)
+		win32.SetScrollRange(hwnd, win.SB_VERT, 0, int32(len(win32.Sysmetrics)-1), false)
+		win32.SetScrollPos(hwnd, win.SB_VERT, iVscrollPos, true)
 		return 0
+	case win.WM_SIZE:
+		cyClient = int32(win.HIWORD(uint32(lParam)))
+		return 0
+	case win.WM_VSCROLL:
+		switch win.LOWORD(uint32(wParam)) {
+		case win.SB_LINEUP:
+			iVscrollPos--
+		case win.SB_LINEDOWN:
+			iVscrollPos++
+		case win.SB_PAGEUP:
+			iVscrollPos -= cyClient / cyChar
+		case win.SB_PAGEDOWN:
+			iVscrollPos += cyClient / cyChar
+		case win.SB_THUMBPOSITION:
+			iVscrollPos = int32(win.HIWORD(uint32(wParam)))
+		}
+		iVscrollPos = max(0, min(iVscrollPos, int32(len(win32.Sysmetrics)-1)))
+		if iVscrollPos != win32.GetScrollPos(hwnd, win.SB_VERT) {
+			win32.SetScrollPos(hwnd, win.SB_VERT, iVscrollPos, true)
+			win.InvalidateRect(hwnd, nil, true)
+		}
 	case win.WM_PAINT:
 		hdc = win.BeginPaint(hwnd, &ps)
 		for i, sm := range win32.Sysmetrics {
