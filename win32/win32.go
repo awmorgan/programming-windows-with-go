@@ -1,6 +1,7 @@
 package win32
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"syscall"
@@ -163,22 +164,26 @@ func SetScrollRange(hwnd win.HWND, fnBar int32, nMinPos, nMaxPos int32, redraw b
 }
 
 func SetScrollPos(hwnd win.HWND, fnBar, nPos int32, redraw bool) int32 {
-	ret, _, _ := syscall.SyscallN(setScrollPos.Addr(), 4,
+	r1, _, _ := syscall.SyscallN(setScrollPos.Addr(), 4,
 		uintptr(hwnd),
 		uintptr(fnBar),
 		uintptr(nPos),
 		uintptr(boolToInt(redraw)),
 		0,
 		0)
-
-	return int32(ret)
+	if r1 == 0 {
+		fmt.Printf("SetScrollPos failed: %v\n", windows.GetLastError())
+	}
+	return int32(r1)
 }
 
 func GetScrollPos(hwnd win.HWND, fnBar int32) int32 {
-	ret, _, _ := syscall.SyscallN(getScrollPos.Addr(), 2,
+	r1, _,_ := syscall.SyscallN(getScrollPos.Addr(), 2,
 		uintptr(hwnd),
 		uintptr(fnBar),
 		0)
-
-	return int32(ret)
+	if r1 == 0 {
+		fmt.Printf("GetScrollPos failed: %v\n", windows.GetLastError())
+	}
+	return int32(r1)
 }
