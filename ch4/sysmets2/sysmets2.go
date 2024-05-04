@@ -49,7 +49,6 @@ func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr)
 		}
 		iVscrollPos = max(0, min(iVscrollPos, int32(len(win32.Sysmetrics)-1)))
 		currentPos := win32.GetScrollPos(hwnd, win.SB_VERT)
-		fmt.Printf("iVscrollPos: %d, currentPos: %d\n", iVscrollPos, currentPos)
 		if iVscrollPos != currentPos {
 			win32.SetScrollPos(hwnd, win.SB_VERT, iVscrollPos, true)
 			win.InvalidateRect(hwnd, nil, true)
