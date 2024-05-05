@@ -13,7 +13,7 @@ import (
 func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
 	switch msg {
 	case win.WM_CREATE:
-		win32.PlaySound(win32.Str("hellowin.wav"), 0, win32.SND_FILENAME|win32.SND_ASYNC)
+		win32.PlaySound("hellowin.wav", 0, win32.SND_FILENAME|win32.SND_ASYNC)
 		return 0
 	case win.WM_PAINT:
 		rect := win.RECT{}

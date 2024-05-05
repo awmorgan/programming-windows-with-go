@@ -39,9 +39,11 @@ func errnoErr(e syscall.Errno) error {
 
 var (
 	moduser32 = windows.NewLazySystemDLL("user32.dll")
+	modwinmm  = windows.NewLazySystemDLL("winmm.dll")
 
 	procGetSystemMetrics = moduser32.NewProc("GetSystemMetrics")
 	procMessageBoxW      = moduser32.NewProc("MessageBoxW")
+	procPlaySoundW       = modwinmm.NewProc("PlaySoundW")
 )
 
 func GetSystemMetrics(nIndex int) (ret int, err error) {
@@ -71,6 +73,24 @@ func _MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret 
 	r0, _, e1 := syscall.Syscall6(procMessageBoxW.Addr(), 4, uintptr(hwnd), uintptr(unsafe.Pointer(text)), uintptr(unsafe.Pointer(caption)), uintptr(boxtype), 0, 0)
 	ret = int32(r0)
 	if ret == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func PlaySound(sound string, hmod uintptr, flags uint32) (ret bool, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(sound)
+	if err != nil {
+		return
+	}
+	return _PlaySound(_p0, hmod, flags)
+}
+
+func _PlaySound(sound *uint16, hmod uintptr, flags uint32) (ret bool, err error) {
+	r0, _, e1 := syscall.Syscall(procPlaySoundW.Addr(), 3, uintptr(unsafe.Pointer(sound)), uintptr(hmod), uintptr(flags))
+	ret = r0 != 0
+	if ret == false {
 		err = errnoErr(e1)
 	}
 	return

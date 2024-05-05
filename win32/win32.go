@@ -92,30 +92,14 @@ func DrawText(hdc win.HDC, lpchText *uint16, cchText int32, lprc *win.RECT, dwDT
 }
 
 var (
-	libwinmm  = syscall.NewLazyDLL("winmm.dll")
 	libgdi32  = syscall.NewLazyDLL("gdi32.dll")
 	libuser32 = syscall.NewLazyDLL("user32.dll")
 
-	procPlaySound  = libwinmm.NewProc("PlaySoundW")
 	setTextAlign   = libgdi32.NewProc("SetTextAlign")
 	setScrollRange = libuser32.NewProc("SetScrollRange")
 	setScrollPos   = libuser32.NewProc("SetScrollPos")
 	getScrollPos   = libuser32.NewProc("GetScrollPos")
 )
-
-// PlaySound plays a sound from a file, resource, or system event.
-// Parameters:
-// - soundName is the name of the sound to play, or the resource identifier.
-// - hMod specifies the executable module (use 0 for a file or system event).
-// - flags specify how to play the sound (use SND_ASYNC, SND_FILENAME, SND_RESOURCE, etc.).
-func PlaySound(soundName *uint16, hMod win.HMODULE, flags uint32) bool {
-	ret, _, _ := procPlaySound.Call(
-		uintptr(unsafe.Pointer(soundName)),
-		uintptr(hMod),
-		uintptr(flags),
-	)
-	return ret != 0
-}
 
 // Constants for flags parameter of PlaySound
 const (
