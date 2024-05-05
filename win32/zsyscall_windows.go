@@ -40,8 +40,18 @@ func errnoErr(e syscall.Errno) error {
 var (
 	moduser32 = windows.NewLazySystemDLL("user32.dll")
 
-	procMessageBoxW = moduser32.NewProc("MessageBoxW")
+	procGetSystemMetrics = moduser32.NewProc("GetSystemMetrics")
+	procMessageBoxW      = moduser32.NewProc("MessageBoxW")
 )
+
+func GetSystemMetrics(nIndex int) (ret int, err error) {
+	r0, _, e1 := syscall.Syscall(procGetSystemMetrics.Addr(), 1, uintptr(nIndex), 0, 0)
+	ret = int(r0)
+	if ret == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
 
 func MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) {
 	var _p0 *uint16
