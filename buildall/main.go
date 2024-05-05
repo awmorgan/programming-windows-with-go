@@ -1,19 +1,29 @@
 package main
 
 import (
+	"bytes"
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"sync"
 )
 
 func main() {
-	tobuild := []string{
-		"x/ch1/hello",
-		"x/ch2/scrnsize",
-		"x/ch3/hellowin",
-		"x/ch4/sysmets1",
-		"x/ch4/sysmets2",
+	cmd := exec.Command("go", "list", "-f", `{{if eq .Name "main"}}{{.ImportPath}}{{end}}`, "./...")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		log.Fatalf("Failed to list main packages: %v", err)
+	}
+
+	// Read the output and filter the packages
+	var tobuild []string
+	for _, line := range strings.Split(out.String(), "\n") {
+		if line != "" && !strings.Contains(line, "x/buildall") {
+			tobuild = append(tobuild, line)
+		}
 	}
 
 	var wg sync.WaitGroup
@@ -24,7 +34,7 @@ func main() {
 			defer wg.Done()
 
 			// Build the executable path
-			exePath := pkg + ".exe"
+			exePath := strings.Replace(pkg, "x/", "", 1) + ".exe"
 
 			// Run "go build -v" command specifying output directly
 			cmd := exec.Command("go", "build", "-v", "-o", exePath, pkg)
