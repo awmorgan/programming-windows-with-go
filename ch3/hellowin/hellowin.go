@@ -12,10 +12,10 @@ import (
 
 func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
 	switch msg {
-	case win.WM_CREATE:
+	case win32.WM_CREATE:
 		win32.PlaySound("hellowin.wav", 0, win32.SND_FILENAME|win32.SND_ASYNC)
 		return 0
-	case win.WM_PAINT:
+	case win32.WM_PAINT:
 		rect := win.RECT{}
 		ps := win.PAINTSTRUCT{}
 		hdc := win.BeginPaint(hwnd, &ps)
@@ -23,7 +23,7 @@ func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr)
 		win32.DrawText(hdc, win32.Str("Hello, Windows 98!"), -1, &rect, win.DT_SINGLELINE|win.DT_CENTER|win.DT_VCENTER)
 		win.EndPaint(hwnd, &ps)
 		return 0
-	case win.WM_DESTROY:
+	case win32.WM_DESTROY:
 		win.PostQuitMessage(0)
 		return 0
 	}
