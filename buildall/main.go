@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"log"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,13 +11,29 @@ import (
 )
 
 func main() {
+	// Deferred removal of the 'bin' directory if it exists
+	defer func() {
+		fmt.Printf("Removing 'bin' directory\n")
+		if _, err := os.Stat("bin"); err == nil {
+			err = os.RemoveAll("bin") // Remove the 'bin' directory
+			if err != nil {
+				fmt.Printf("Failed to remove 'bin' directory: %v\n", err)
+				os.Exit(1)
+			}
+		} else {
+			fmt.Printf("os.Stat(\"bin\") failed: %v\n", err)
+		}
+	}()
+
 	// Run go list to find all main packages
 	cmd := exec.Command("go", "list", "-f", `{{if eq .Name "main"}}{{.ImportPath}}{{end}}`, "./...")
 	var out bytes.Buffer
 	cmd.Stdout = &out
+	fmt.Printf("Listing main packages...\n")
 	err := cmd.Run()
 	if err != nil {
-		log.Fatalf("Failed to list main packages: %v", err)
+		fmt.Printf("Failed to list main packages: %v\n", err)
+		os.Exit(1)
 	}
 
 	// Read the output and filter the packages
@@ -34,7 +50,7 @@ func main() {
 		go func(pkg string) {
 			defer wg.Done()
 
-			// Simplify the executable path to put all executables in the same directory
+			// put all executables in the same directory
 			exePath := "bin/" + filepath.Base(pkg) + ".exe" // Put executables in a 'bin' directory
 
 			// Run "go build -v" command specifying output directly
@@ -42,17 +58,10 @@ func main() {
 			cmd.Stderr = os.Stderr
 			err := cmd.Run()
 			if err != nil {
-				log.Printf("Build failed for %s: %v", pkg, err)
+				fmt.Printf("Build failed for %s: %v\n", pkg, err)
 				return
 			}
-			log.Printf("Successfully built %s", pkg)
-
-			// If build was successful, remove the executable
-			if err := os.Remove(exePath); err != nil {
-				log.Printf("Failed to remove %s: %v", exePath, err)
-			} else {
-				log.Printf("Removed %s", exePath)
-			}
+			fmt.Printf("Successfully built %s\n", pkg)
 		}(pkg)
 	}
 	wg.Wait()
