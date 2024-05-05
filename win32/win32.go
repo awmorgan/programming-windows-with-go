@@ -12,6 +12,10 @@ import (
 
 type HWND = win.HWND
 
+const (
+	MB_OK = win.MB_OK
+)
+
 func MessageBox(hwnd win.HWND, text, caption *uint16, flags uint32) int32 {
 	return win.MessageBox(hwnd, text, caption, flags)
 }
