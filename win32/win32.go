@@ -16,10 +16,6 @@ const (
 	MB_OK = win.MB_OK
 )
 
-func MessageBox(hwnd win.HWND, text, caption *uint16, flags uint32) int32 {
-	return win.MessageBox(hwnd, text, caption, flags)
-}
-
 func Str(s string) *uint16 {
 	p, err := syscall.UTF16PtrFromString(s)
 	if err != nil {
