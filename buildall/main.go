@@ -5,11 +5,13 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 )
 
 func main() {
+	// Run go list to find all main packages
 	cmd := exec.Command("go", "list", "-f", `{{if eq .Name "main"}}{{.ImportPath}}{{end}}`, "./...")
 	var out bytes.Buffer
 	cmd.Stdout = &out
@@ -21,20 +23,19 @@ func main() {
 	// Read the output and filter the packages
 	var tobuild []string
 	for _, line := range strings.Split(out.String(), "\n") {
-		if line != "" && !strings.Contains(line, "x/buildall") {
+		if line != "" {
 			tobuild = append(tobuild, line)
 		}
 	}
 
 	var wg sync.WaitGroup
-
 	for _, pkg := range tobuild {
 		wg.Add(1)
 		go func(pkg string) {
 			defer wg.Done()
 
-			// Build the executable path
-			exePath := strings.Replace(pkg, "x/", "", 1) + ".exe"
+			// Simplify the executable path to put all executables in the same directory
+			exePath := "bin/" + filepath.Base(pkg) + ".exe" // Put executables in a 'bin' directory
 
 			// Run "go build -v" command specifying output directly
 			cmd := exec.Command("go", "build", "-v", "-o", exePath, pkg)
