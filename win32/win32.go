@@ -10,6 +10,12 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+type HWND = win.HWND
+
+func MessageBox(hwnd win.HWND, text, caption *uint16, flags uint32) int32 {
+	return win.MessageBox(hwnd, text, caption, flags)
+}
+
 func Str(s string) *uint16 {
 	p, err := syscall.UTF16PtrFromString(s)
 	if err != nil {

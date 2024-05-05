@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	win.MessageBox(0, win32.Str("Hello, Windows!"), win32.Str("HelloMsg"), win.MB_OK)
+	win32.MessageBox(0, win32.Str("Hello, Windows!"), win32.Str("HelloMsg"), win.MB_OK)
 }
