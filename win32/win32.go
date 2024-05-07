@@ -21,7 +21,6 @@ import (
 //sys	GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) [failretval==-1] = user32.GetMessageW
 //sys	getModuleHandle(moduleName *uint16) (hModule HMODULE, err error) [failretval==0] = kernel32.GetModuleHandleW
 //sys	GetScrollPos(hwnd HWND, nBar int32) (ret int32, err error) [failretval==0] = user32.GetScrollPos
-//sys	getStartupInfo(startupInfo *startupInfo) = kernel32.GetStartupInfoW
 //sys	GetStockObject(fnObject int32) (ret HGDIOBJ) = gdi32.GetStockObject
 //sys	GetSystemMetrics(nIndex int32) (ret int32) = user32.GetSystemMetrics
 //sys	GetTextMetrics(hdc HDC, tm *TEXTMETRIC) (err error) [failretval==0] = gdi32.GetTextMetricsW
@@ -47,33 +46,12 @@ var WinmainArgs struct {
 	NCmdShow  int32
 }
 
-type startupInfo struct {
-	Cb            uint32
-	_             *uint16
-	Desktop       *uint16
-	Title         *uint16
-	X             uint32
-	Y             uint32
-	XSize         uint32
-	YSize         uint32
-	XCountChars   uint32
-	YCountChars   uint32
-	FillAttribute uint32
-	Flags         uint32
-	ShowWindow    uint16
-	_             uint16
-	_             *byte
-	StdInput      HANDLE
-	StdOutput     HANDLE
-	StdErr        HANDLE
-}
-
 func init() {
 	h, _ := getModuleHandle(nil)
 	WinmainArgs.HInstance = HINSTANCE(h)
 	WinmainArgs.CmdLine = strings.Join(os.Args, " ")
-	s := startupInfo{}
-	getStartupInfo(&s)
+	s := windows.StartupInfo{Cb: uint32(unsafe.Sizeof(windows.StartupInfo{}))}
+	windows.GetStartupInfo(&s)
 	if s.Flags&windows.STARTF_USESHOWWINDOW == windows.STARTF_USESHOWWINDOW {
 		WinmainArgs.NCmdShow = int32(s.ShowWindow)
 	} else {
