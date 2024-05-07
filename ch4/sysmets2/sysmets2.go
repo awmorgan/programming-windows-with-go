@@ -4,112 +4,108 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"unicode/utf8"
 	"x/win32"
-
-	"github.com/lxn/win"
-	"golang.org/x/sys/windows"
 )
 
 var cxChar, cxCaps, cyChar, cyClient, iVscrollPos int32
 
-func wndproc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
-	var hdc win.HDC
-	var ps win.PAINTSTRUCT
-	var tm win.TEXTMETRIC
+func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
+	var hdc win32.HDC
+	var ps win32.PAINTSTRUCT
+	var tm win32.TEXTMETRIC
 	switch msg {
-	case win.WM_CREATE:
-		hdc = win.GetDC(hwnd)
-		win.GetTextMetrics(hdc, &tm)
+	case win32.WM_CREATE:
+		hdc = win32.GetDC(hwnd)
+		win32.GetTextMetrics(hdc, &tm)
 		cxChar = int32(tm.TmAveCharWidth)
 		cxCaps = cxChar
 		if tm.TmPitchAndFamily&1 == 1 {
 			cxCaps += cxChar / 2
 		}
 		cyChar = int32(tm.TmHeight + tm.TmExternalLeading)
-		win.ReleaseDC(hwnd, hdc)
-		win32.SetScrollRange(hwnd, win.SB_VERT, 0, int32(len(win32.Sysmetrics)-1), false)
-		win32.SetScrollPos(hwnd, win.SB_VERT, iVscrollPos, true)
+		win32.ReleaseDC(hwnd, hdc)
+		win32.SetScrollRange(hwnd, win32.SB_VERT, 0, int32(len(win32.Sysmetrics)-1), false)
+		win32.SetScrollPos(hwnd, win32.SB_VERT, iVscrollPos, true)
 		return 0
-	case win.WM_SIZE:
-		cyClient = int32(win.HIWORD(uint32(lParam)))
+	case win32.WM_SIZE:
+		cyClient = int32(win32.HIWORD(uint32(lParam)))
 		return 0
-	case win.WM_VSCROLL:
-		switch win.LOWORD(uint32(wParam)) {
-		case win.SB_LINEUP:
+	case win32.WM_VSCROLL:
+		switch win32.LOWORD(uint32(wParam)) {
+		case win32.SB_LINEUP:
 			iVscrollPos--
-		case win.SB_LINEDOWN:
+		case win32.SB_LINEDOWN:
 			iVscrollPos++
-		case win.SB_PAGEUP:
+		case win32.SB_PAGEUP:
 			iVscrollPos -= cyClient / cyChar
-		case win.SB_PAGEDOWN:
+		case win32.SB_PAGEDOWN:
 			iVscrollPos += cyClient / cyChar
-		case win.SB_THUMBPOSITION:
-			iVscrollPos = int32(win.HIWORD(uint32(wParam)))
+		case win32.SB_THUMBPOSITION:
+			iVscrollPos = int32(win32.HIWORD(uint32(wParam)))
 		}
 		iVscrollPos = max(0, min(iVscrollPos, int32(len(win32.Sysmetrics)-1)))
-		currentPos := win32.GetScrollPos(hwnd, win.SB_VERT)
+		currentPos, _ := win32.GetScrollPos(hwnd, win32.SB_VERT)
 		if iVscrollPos != currentPos {
-			win32.SetScrollPos(hwnd, win.SB_VERT, iVscrollPos, true)
-			win.InvalidateRect(hwnd, nil, true)
+			win32.SetScrollPos(hwnd, win32.SB_VERT, iVscrollPos, true)
+			win32.InvalidateRect(hwnd, nil, true)
 		}
 		return 0
-	case win.WM_PAINT:
-		hdc = win.BeginPaint(hwnd, &ps)
+	case win32.WM_PAINT:
+		hdc = win32.BeginPaint(hwnd, &ps)
 		for i, sm := range win32.Sysmetrics {
 			y := cyChar * (int32(i) - iVscrollPos)
-			win.TextOut(hdc, 0, y, sm.Label, int32(sm.LabelLen))
-			win.TextOut(hdc, 22*cxCaps, y, sm.Desc, int32(sm.DescLen))
+			win32.TextOut(hdc, 0, y, sm.Label, len(sm.Label))
+			win32.TextOut(hdc, 22*cxCaps, y, sm.Desc, len(sm.Desc))
 			win32.SetTextAlign(hdc, win32.TA_RIGHT|win32.TA_TOP)
-			s := fmt.Sprintf("%5d", win.GetSystemMetrics(sm.Index))
-			l := utf8.RuneCountInString(s)
-			win.TextOut(hdc, 22*cxCaps+40*cxChar, y, win32.Str(s), int32(l))
+			s := fmt.Sprintf("%5d", win32.GetSystemMetrics(sm.Index))
+			win32.TextOut(hdc, 22*cxCaps+40*cxChar, y, s, len(s))
 			win32.SetTextAlign(hdc, win32.TA_LEFT|win32.TA_TOP)
 		}
-		win.EndPaint(hwnd, &ps)
+		win32.EndPaint(hwnd, &ps)
 		return 0
-	case win.WM_DESTROY:
-		win.PostQuitMessage(0)
+	case win32.WM_DESTROY:
+		win32.PostQuitMessage(0)
 		return 0
 	}
-	return win.DefWindowProc(hwnd, msg, wParam, lParam)
+	return win32.DefWindowProc(hwnd, msg, wParam, lParam)
 }
 
 func main() {
 	runtime.LockOSThread() // Windows messages are delivered to the thread that created the window.
-	appName := win32.Str("Sysmets2")
+	appName := "Sysmets2"
 	wc := win32.WNDCLASS{
-		Style:         win.CS_HREDRAW | win.CS_VREDRAW,
+		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
 		HInstance:     win32.WinmainArgs.HInstance,
-		HIcon:         win.LoadIcon(0, win.MAKEINTRESOURCE(win.IDI_APPLICATION)),
-		HCursor:       win.LoadCursor(0, win.MAKEINTRESOURCE(win.IDC_ARROW)),
-		HbrBackground: win.HBRUSH(win.GetStockObject(win.WHITE_BRUSH)),
-		LpszClassName: appName,
+		HIcon:         win32.LoadApplicationIcon(),
+		HCursor:       win32.LoadArrowCursor(),
+		HbrBackground: win32.HBRUSH(win32.GetStockObject(win32.WHITE_BRUSH)),
+		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
 	if win32.RegisterClass(&wc) == 0 {
-		win.MessageBox(0, win32.Str("RegisterClass failed"), appName, win.MB_ICONERROR)
+		win32.MessageBox(0, "RegisterClass failed", appName, win32.MB_ICONERROR)
 		return
 	}
-	hwnd := win32.CreateWindow(appName, win32.Str("Get System Metrics No. 1"), win.WS_OVERLAPPEDWINDOW|win.WS_VSCROLL,
-		win.CW_USEDEFAULT, win.CW_USEDEFAULT, win.CW_USEDEFAULT, win.CW_USEDEFAULT,
+	hwnd, _ := win32.CreateWindow(appName, "Get System Metrics No. 1", win32.WS_OVERLAPPEDWINDOW|win32.WS_VSCROLL,
+		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT, win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
 		0, 0, win32.WinmainArgs.HInstance, nil)
 
-	win.ShowWindow(hwnd, win32.WinmainArgs.NCmdShow)
-	win.UpdateWindow(hwnd)
-	msg := win.MSG{}
+	win32.ShowWindow(hwnd, win32.WinmainArgs.NCmdShow)
+	win32.UpdateWindow(hwnd)
+	msg := win32.MSG{}
 	for {
-		ret := win.GetMessage(&msg, 0, 0, 0)
-		switch ret {
-		case 0: // WM_QUIT
-			os.Exit(int(msg.WParam))
-		case -1: // error
-			errMsg := fmt.Sprintf("GetMessage failed: %v", windows.GetLastError())
-			win.MessageBox(0, win32.Str(errMsg), appName, win.MB_ICONERROR)
+		ret, err := win32.GetMessage(&msg, 0, 0, 0)
+		if err != nil {
+			errMsg := fmt.Sprintf("GetMessage failed: %v", err)
+			win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)
 			os.Exit(1)
 		}
-		win.TranslateMessage(&msg)
-		win.DispatchMessage(&msg)
+		if ret == 0 {
+			os.Exit(int(msg.WParam))
+		}
+
+		win32.TranslateMessage(&msg)
+		win32.DispatchMessage(&msg)
 	}
 
 }
