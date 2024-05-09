@@ -126,7 +126,7 @@ func BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) {
 	return
 }
 
-func CreateWindow(className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param unsafe.Pointer) (hwnd HWND, err error) {
+func CreateWindowEx(exstyle uint32, className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(className)
 	if err != nil {
@@ -137,11 +137,11 @@ func CreateWindow(className string, windowName string, style uint32, x int32, y 
 	if err != nil {
 		return
 	}
-	return _CreateWindow(_p0, _p1, style, x, y, width, height, parent, menu, instance, param)
+	return _CreateWindowEx(exstyle, _p0, _p1, style, x, y, width, height, parent, menu, instance, param)
 }
 
-func _CreateWindow(className *uint16, windowName *uint16, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param unsafe.Pointer) (hwnd HWND, err error) {
-	r0, _, e1 := syscall.Syscall12(procCreateWindowExW.Addr(), 11, uintptr(unsafe.Pointer(className)), uintptr(unsafe.Pointer(windowName)), uintptr(style), uintptr(x), uintptr(y), uintptr(width), uintptr(height), uintptr(parent), uintptr(menu), uintptr(instance), uintptr(param), 0)
+func _CreateWindowEx(exstyle uint32, className *uint16, windowName *uint16, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) {
+	r0, _, e1 := syscall.Syscall12(procCreateWindowExW.Addr(), 12, uintptr(exstyle), uintptr(unsafe.Pointer(className)), uintptr(unsafe.Pointer(windowName)), uintptr(style), uintptr(x), uintptr(y), uintptr(width), uintptr(height), uintptr(parent), uintptr(menu), uintptr(instance), uintptr(param))
 	hwnd = HWND(r0)
 	if hwnd == 0 {
 		err = errnoErr(e1)
@@ -297,9 +297,12 @@ func PostQuitMessage(exitCode int32) {
 	return
 }
 
-func RegisterClass(wc *WNDCLASS) (atom ATOM) {
-	r0, _, _ := syscall.Syscall(procRegisterClassW.Addr(), 1, uintptr(unsafe.Pointer(wc)), 0, 0)
+func RegisterClass(wc *WNDCLASS) (atom ATOM, err error) {
+	r0, _, e1 := syscall.Syscall(procRegisterClassW.Addr(), 1, uintptr(unsafe.Pointer(wc)), 0, 0)
 	atom = ATOM(r0)
+	if atom == 0 {
+		err = errnoErr(e1)
+	}
 	return
 }
 

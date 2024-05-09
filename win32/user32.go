@@ -2,8 +2,6 @@
 
 package win32
 
-import "github.com/lxn/win"
-
 const CW_USEDEFAULT = ^0x7fffffff
 
 // MessageBox constants
@@ -1599,7 +1597,7 @@ type DRAWTEXTPARAMS struct {
 
 type PAINTSTRUCT struct {
 	Hdc         HDC
-	FErase      win.BOOL
+	FErase      BOOL
 	RcPaint     RECT
 	FRestore    BOOL
 	FIncUpdate  BOOL

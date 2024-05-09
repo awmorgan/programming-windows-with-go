@@ -10,7 +10,7 @@ import (
 func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
 	switch msg {
 	case win32.WM_CREATE:
-		win32.PlaySound("hellowin32.wav", 0, win32.SND_FILENAME|win32.SND_ASYNC)
+		win32.PlaySound("hellowin.wav", 0, win32.SND_FILENAME|win32.SND_ASYNC)
 		return 0
 	case win32.WM_PAINT:
 		rect := win32.RECT{}
@@ -39,13 +39,19 @@ func main() {
 		HbrBackground: win32.HBRUSH(win32.GetStockObject(win32.WHITE_BRUSH)),
 		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
-	if win32.RegisterClass(&wc) == 0 {
-		win32.MessageBox(0, "RegisterClass failed", appName, win32.MB_ICONERROR)
+	if _, err := win32.RegisterClass(&wc); err != nil {
+		errMsg := fmt.Sprintf("RegisterClass failed: %v", err)
+		win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)
 		return
 	}
-	hwnd, _ := win32.CreateWindow(appName, "The Hello Program", win32.WS_OVERLAPPEDWINDOW,
+	hwnd, err := win32.CreateWindow(appName, "The Hello Program", win32.WS_OVERLAPPEDWINDOW,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT, win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
-		0, 0, win32.WinmainArgs.HInstance, nil)
+		0, 0, win32.WinmainArgs.HInstance, 0)
+	if err != nil {
+		errMsg := fmt.Sprintf("CreateWindow failed: %v", err)
+		win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)
+		return
+	}
 
 	win32.ShowWindow(hwnd, win32.WinmainArgs.NCmdShow)
 	win32.UpdateWindow(hwnd)

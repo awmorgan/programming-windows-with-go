@@ -6,12 +6,11 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/lxn/win"
 	"golang.org/x/sys/windows"
 )
 
 //sys	BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) = user32.BeginPaint
-//sys	CreateWindow(className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param unsafe.Pointer) (hwnd HWND, err error) [failretval==0] = user32.CreateWindowExW
+//sys	CreateWindowEx(exstyle uint32, className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) [failretval==0] = user32.CreateWindowExW
 //sys	DefWindowProc(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (ret uintptr) = user32.DefWindowProcW
 //sys	DispatchMessage(msg *MSG) = user32.DispatchMessageW
 //sys	DrawText(hdc HDC, text string, n int32, rect *RECT, format uint32) (ret int32, err error) [failretval==0] = user32.DrawTextW
@@ -30,7 +29,7 @@ import (
 //sys	MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) [failretval==0] = user32.MessageBoxW
 //sys	PlaySound(sound string, hmod uintptr, flags uint32) (err error) [failretval==0] = winmm.PlaySoundW
 //sys	PostQuitMessage(exitCode int32) = user32.PostQuitMessage
-//sys	RegisterClass(wc *WNDCLASS) (atom ATOM) [failretval==0] = user32.RegisterClassW
+//sys	RegisterClass(wc *WNDCLASS) (atom ATOM, err error) [failretval==0] = user32.RegisterClassW
 //sys	ReleaseDC(hwnd HWND, hdc HDC) (err error) [failretval==0] = user32.ReleaseDC
 //sys	SetScrollPos(hwnd HWND, nBar int32, nPos int32, bRedraw bool) (ret int32, err error) [failretval==0] = user32.SetScrollPos
 //sys	SetScrollRange(hwnd HWND, nBar int32, nMinPos int32, nMaxPos int32, bRedraw bool) (ret BOOL, err error) [failretval==0] = user32.SetScrollRange
@@ -55,7 +54,7 @@ func init() {
 	if s.Flags&windows.STARTF_USESHOWWINDOW == windows.STARTF_USESHOWWINDOW {
 		WinmainArgs.NCmdShow = int32(s.ShowWindow)
 	} else {
-		WinmainArgs.NCmdShow = win.SW_SHOWDEFAULT
+		WinmainArgs.NCmdShow = SW_SHOWDEFAULT
 	}
 }
 
@@ -74,6 +73,10 @@ type WNDCLASS struct {
 
 func NewWndProc(f func(hwnd HWND, msg uint32, wParam, lParam uintptr) uintptr) uintptr {
 	return syscall.NewCallback(f)
+}
+
+func CreateWindow(className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) {
+	return CreateWindowEx(0, className, windowName, style, x, y, width, height, parent, menu, instance, param)
 }
 
 // Constants for flags parameter of PlaySound
