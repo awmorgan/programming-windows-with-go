@@ -55,13 +55,14 @@ func main() {
 		HbrBackground: win32.HBRUSH(win32.GetStockObject(win32.WHITE_BRUSH)),
 		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
-	if win32.RegisterClass(&wc) == 0 {
-		win32.MessageBox(0, "RegisterClass failed", appName, win32.MB_ICONERROR)
+	if _, err := win32.RegisterClass(&wc); err != nil {
+		errMsg := fmt.Sprintf("RegisterClass failed: %v", err)
+		win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)
 		return
 	}
 	hwnd, _ := win32.CreateWindow(appName, "Get System Metrics No. 1", win32.WS_OVERLAPPEDWINDOW,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT, win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
-		0, 0, win32.WinmainArgs.HInstance, nil)
+		0, 0, win32.WinmainArgs.HInstance, 0)
 
 	win32.ShowWindow(hwnd, win32.WinmainArgs.NCmdShow)
 	win32.UpdateWindow(hwnd)
