@@ -7,19 +7,22 @@ import (
 	"unsafe"
 )
 
-//sys	GetStartupInfo(startupInfo *StartupInfo) = GetStartupInfoW
 //sys	BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) = user32.BeginPaint
 //sys	CreateWindowEx(exstyle uint32, className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) [failretval==0] = user32.CreateWindowExW
 //sys	DefWindowProc(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (ret uintptr) = user32.DefWindowProcW
 //sys	DispatchMessage(msg *MSG) = user32.DispatchMessageW
 //sys	DrawText(hdc HDC, text string, n int32, rect *RECT, format uint32) (ret int32, err error) [failretval==0] = user32.DrawTextW
 //sys	EndPaint(hwnd HWND, ps *PAINTSTRUCT) = user32.EndPaint
+//sys	FreeLibrary(handle HANDLE) (err error)
 //sys	GetClientRect(hwnd HWND, rect *RECT) (err error) [failretval==0] = user32.GetClientRect
 //sys	GetDC(hwnd HWND) (hdc HDC) = user32.GetDC
 //sys	GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) [failretval==-1] = user32.GetMessageW
 //sys	getModuleHandle(moduleName *uint16) (hModule HMODULE, err error) [failretval==0] = kernel32.GetModuleHandleW
+//sys	GetProcAddress(module HANDLE, procname string) (proc uintptr, err error)
 //sys	GetScrollPos(hwnd HWND, nBar int32) (ret int32, err error) [failretval==0] = user32.GetScrollPos
+//sys	GetStartupInfo(startupInfo *StartupInfo) = GetStartupInfoW
 //sys	GetStockObject(fnObject int32) (ret HGDIOBJ) = gdi32.GetStockObject
+//sys	getSystemDirectory(dir *uint16, dirLen uint32) (len uint32, err error) = kernel32.GetSystemDirectoryW
 //sys	GetSystemMetrics(nIndex int32) (ret int32) = user32.GetSystemMetrics
 //sys	GetTextMetrics(hdc HDC, tm *TEXTMETRIC) (err error) [failretval==0] = gdi32.GetTextMetricsW
 //sys	InvalidateRect(hwnd HWND, rect *RECT, erase bool) (err error) [failretval==0] = user32.InvalidateRect
@@ -37,6 +40,7 @@ import (
 //sys	TextOut(hdc HDC, x int32, y int32, text string, n int) (err error) [failretval==0] = gdi32.TextOutW
 //sys	TranslateMessage(msg *MSG) (translated bool) = user32.TranslateMessage
 //sys	UpdateWindow(hwnd HWND) (ok bool) = user32.UpdateWindow
+//sys	LoadLibraryEx(libname string, zero HANDLE, flags uintptr) (handle HANDLE, err error) = LoadLibraryExW
 
 var WinmainArgs struct {
 	HInstance HINSTANCE
@@ -244,3 +248,39 @@ func LoadArrowCursor() HCURSOR {
 // ProcThreadAttributeListContainer.Delete, and access the list itself using
 // ProcThreadAttributeListContainer.List.
 type ProcThreadAttributeList struct{}
+
+// LoadLibrary flags for determining from where to search for a DLL
+const (
+	DONT_RESOLVE_DLL_REFERENCES               = 0x1
+	LOAD_LIBRARY_AS_DATAFILE                  = 0x2
+	LOAD_WITH_ALTERED_SEARCH_PATH             = 0x8
+	LOAD_IGNORE_CODE_AUTHZ_LEVEL              = 0x10
+	LOAD_LIBRARY_AS_IMAGE_RESOURCE            = 0x20
+	LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE        = 0x40
+	LOAD_LIBRARY_REQUIRE_SIGNED_TARGET        = 0x80
+	LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR          = 0x100
+	LOAD_LIBRARY_SEARCH_APPLICATION_DIR       = 0x200
+	LOAD_LIBRARY_SEARCH_USER_DIRS             = 0x400
+	LOAD_LIBRARY_SEARCH_SYSTEM32              = 0x800
+	LOAD_LIBRARY_SEARCH_DEFAULT_DIRS          = 0x1000
+	LOAD_LIBRARY_SAFE_CURRENT_DIRS            = 0x00002000
+	LOAD_LIBRARY_SEARCH_SYSTEM32_NO_FORWARDER = 0x00004000
+	LOAD_LIBRARY_OS_INTEGRITY_CONTINUITY      = 0x00008000
+)
+
+// GetSystemDirectory retrieves the path to current location of the system
+// directory, which is typically, though not always, `C:\Windows\System32`.
+func GetSystemDirectory() (string, error) {
+	n := uint32(MAX_PATH)
+	for {
+		b := make([]uint16, n)
+		l, e := getSystemDirectory(&b[0], n)
+		if e != nil {
+			return "", e
+		}
+		if l <= n {
+			return syscall.UTF16ToString(b[:l]), nil
+		}
+		n = l
+	}
+}

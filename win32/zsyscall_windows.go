@@ -5,8 +5,6 @@ package win32
 import (
 	"syscall"
 	"unsafe"
-
-	"golang.org/x/sys/windows"
 )
 
 var _ unsafe.Pointer
@@ -38,41 +36,45 @@ func errnoErr(e syscall.Errno) error {
 }
 
 var (
-	modgdi32    = windows.NewLazySystemDLL("gdi32.dll")
-	modkernel32 = windows.NewLazySystemDLL("kernel32.dll")
-	moduser32   = windows.NewLazySystemDLL("user32.dll")
-	modwinmm    = windows.NewLazySystemDLL("winmm.dll")
+	modgdi32    = NewLazySystemDLL("gdi32.dll")
+	modkernel32 = NewLazySystemDLL("kernel32.dll")
+	moduser32   = NewLazySystemDLL("user32.dll")
+	modwinmm    = NewLazySystemDLL("winmm.dll")
 
-	procGetStockObject   = modgdi32.NewProc("GetStockObject")
-	procGetTextMetricsW  = modgdi32.NewProc("GetTextMetricsW")
-	procSetTextAlign     = modgdi32.NewProc("SetTextAlign")
-	procTextOutW         = modgdi32.NewProc("TextOutW")
-	procGetModuleHandleW = modkernel32.NewProc("GetModuleHandleW")
-	procGetStartupInfoW  = modkernel32.NewProc("GetStartupInfoW")
-	procBeginPaint       = moduser32.NewProc("BeginPaint")
-	procCreateWindowExW  = moduser32.NewProc("CreateWindowExW")
-	procDefWindowProcW   = moduser32.NewProc("DefWindowProcW")
-	procDispatchMessageW = moduser32.NewProc("DispatchMessageW")
-	procDrawTextW        = moduser32.NewProc("DrawTextW")
-	procEndPaint         = moduser32.NewProc("EndPaint")
-	procGetClientRect    = moduser32.NewProc("GetClientRect")
-	procGetDC            = moduser32.NewProc("GetDC")
-	procGetMessageW      = moduser32.NewProc("GetMessageW")
-	procGetScrollPos     = moduser32.NewProc("GetScrollPos")
-	procGetSystemMetrics = moduser32.NewProc("GetSystemMetrics")
-	procInvalidateRect   = moduser32.NewProc("InvalidateRect")
-	procLoadCursorW      = moduser32.NewProc("LoadCursorW")
-	procLoadIconW        = moduser32.NewProc("LoadIconW")
-	procMessageBoxW      = moduser32.NewProc("MessageBoxW")
-	procPostQuitMessage  = moduser32.NewProc("PostQuitMessage")
-	procRegisterClassW   = moduser32.NewProc("RegisterClassW")
-	procReleaseDC        = moduser32.NewProc("ReleaseDC")
-	procSetScrollPos     = moduser32.NewProc("SetScrollPos")
-	procSetScrollRange   = moduser32.NewProc("SetScrollRange")
-	procShowWindow       = moduser32.NewProc("ShowWindow")
-	procTranslateMessage = moduser32.NewProc("TranslateMessage")
-	procUpdateWindow     = moduser32.NewProc("UpdateWindow")
-	procPlaySoundW       = modwinmm.NewProc("PlaySoundW")
+	procGetStockObject      = modgdi32.NewProc("GetStockObject")
+	procGetTextMetricsW     = modgdi32.NewProc("GetTextMetricsW")
+	procSetTextAlign        = modgdi32.NewProc("SetTextAlign")
+	procTextOutW            = modgdi32.NewProc("TextOutW")
+	procFreeLibrary         = modkernel32.NewProc("FreeLibrary")
+	procGetModuleHandleW    = modkernel32.NewProc("GetModuleHandleW")
+	procGetProcAddress      = modkernel32.NewProc("GetProcAddress")
+	procGetStartupInfoW     = modkernel32.NewProc("GetStartupInfoW")
+	procGetSystemDirectoryW = modkernel32.NewProc("GetSystemDirectoryW")
+	procLoadLibraryExW      = modkernel32.NewProc("LoadLibraryExW")
+	procBeginPaint          = moduser32.NewProc("BeginPaint")
+	procCreateWindowExW     = moduser32.NewProc("CreateWindowExW")
+	procDefWindowProcW      = moduser32.NewProc("DefWindowProcW")
+	procDispatchMessageW    = moduser32.NewProc("DispatchMessageW")
+	procDrawTextW           = moduser32.NewProc("DrawTextW")
+	procEndPaint            = moduser32.NewProc("EndPaint")
+	procGetClientRect       = moduser32.NewProc("GetClientRect")
+	procGetDC               = moduser32.NewProc("GetDC")
+	procGetMessageW         = moduser32.NewProc("GetMessageW")
+	procGetScrollPos        = moduser32.NewProc("GetScrollPos")
+	procGetSystemMetrics    = moduser32.NewProc("GetSystemMetrics")
+	procInvalidateRect      = moduser32.NewProc("InvalidateRect")
+	procLoadCursorW         = moduser32.NewProc("LoadCursorW")
+	procLoadIconW           = moduser32.NewProc("LoadIconW")
+	procMessageBoxW         = moduser32.NewProc("MessageBoxW")
+	procPostQuitMessage     = moduser32.NewProc("PostQuitMessage")
+	procRegisterClassW      = moduser32.NewProc("RegisterClassW")
+	procReleaseDC           = moduser32.NewProc("ReleaseDC")
+	procSetScrollPos        = moduser32.NewProc("SetScrollPos")
+	procSetScrollRange      = moduser32.NewProc("SetScrollRange")
+	procShowWindow          = moduser32.NewProc("ShowWindow")
+	procTranslateMessage    = moduser32.NewProc("TranslateMessage")
+	procUpdateWindow        = moduser32.NewProc("UpdateWindow")
+	procPlaySoundW          = modwinmm.NewProc("PlaySoundW")
 )
 
 func GetStockObject(fnObject int32) (ret HGDIOBJ) {
@@ -112,6 +114,14 @@ func _TextOut(hdc HDC, x int32, y int32, text *uint16, n int) (err error) {
 	return
 }
 
+func FreeLibrary(handle HANDLE) (err error) {
+	r1, _, e1 := syscall.Syscall(procFreeLibrary.Addr(), 1, uintptr(handle), 0, 0)
+	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func getModuleHandle(moduleName *uint16) (hModule HMODULE, err error) {
 	r0, _, e1 := syscall.Syscall(procGetModuleHandleW.Addr(), 1, uintptr(unsafe.Pointer(moduleName)), 0, 0)
 	hModule = HMODULE(r0)
@@ -121,8 +131,53 @@ func getModuleHandle(moduleName *uint16) (hModule HMODULE, err error) {
 	return
 }
 
+func GetProcAddress(module HANDLE, procname string) (proc uintptr, err error) {
+	var _p0 *byte
+	_p0, err = syscall.BytePtrFromString(procname)
+	if err != nil {
+		return
+	}
+	return _GetProcAddress(module, _p0)
+}
+
+func _GetProcAddress(module HANDLE, procname *byte) (proc uintptr, err error) {
+	r0, _, e1 := syscall.Syscall(procGetProcAddress.Addr(), 2, uintptr(module), uintptr(unsafe.Pointer(procname)), 0)
+	proc = uintptr(r0)
+	if proc == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func GetStartupInfo(startupInfo *StartupInfo) {
 	syscall.Syscall(procGetStartupInfoW.Addr(), 1, uintptr(unsafe.Pointer(startupInfo)), 0, 0)
+	return
+}
+
+func getSystemDirectory(dir *uint16, dirLen uint32) (len uint32, err error) {
+	r0, _, e1 := syscall.Syscall(procGetSystemDirectoryW.Addr(), 2, uintptr(unsafe.Pointer(dir)), uintptr(dirLen), 0)
+	len = uint32(r0)
+	if len == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func LoadLibraryEx(libname string, zero HANDLE, flags uintptr) (handle HANDLE, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(libname)
+	if err != nil {
+		return
+	}
+	return _LoadLibraryEx(_p0, zero, flags)
+}
+
+func _LoadLibraryEx(libname *uint16, zero HANDLE, flags uintptr) (handle HANDLE, err error) {
+	r0, _, e1 := syscall.Syscall(procLoadLibraryExW.Addr(), 3, uintptr(unsafe.Pointer(libname)), uintptr(zero), uintptr(flags))
+	handle = HANDLE(r0)
+	if handle == 0 {
+		err = errnoErr(e1)
+	}
 	return
 }
 
