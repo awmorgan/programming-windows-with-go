@@ -219,7 +219,7 @@ func loadIconFromID(id uintptr) HICON {
 	return h
 }
 
-func LoadApplicationIcon() HICON {
+func ApplicationIcon() HICON {
 	return loadIconFromID(IDI_APPLICATION)
 }
 
@@ -231,7 +231,7 @@ func loadCursorFromID(id uintptr) HCURSOR {
 	return h
 }
 
-func LoadArrowCursor() HCURSOR {
+func ArrowCursor() HCURSOR {
 	return loadCursorFromID(IDC_ARROW)
 }
 

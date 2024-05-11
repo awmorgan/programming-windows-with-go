@@ -77,9 +77,9 @@ func main() {
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
 		HInstance:     win32.WinmainArgs.HInstance,
-		HIcon:         win32.LoadApplicationIcon(),
-		HCursor:       win32.LoadArrowCursor(),
-		HbrBackground: win32.HBRUSH(win32.GetStockObject(win32.WHITE_BRUSH)),
+		HIcon:         win32.ApplicationIcon(),
+		HCursor:       win32.ArrowCursor(),
+		HbrBackground: win32.WhiteBrush(),
 		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
 	if _, err := win32.RegisterClass(&wc); err != nil {

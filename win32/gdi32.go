@@ -776,6 +776,10 @@ type (
 	CLIPFORMAT   uint16
 )
 
+func WhiteBrush() HBRUSH {
+	return HBRUSH(GetStockObject(WHITE_BRUSH))
+}
+
 type PIXELFORMATDESCRIPTOR struct {
 	NSize           uint16
 	NVersion        uint16
