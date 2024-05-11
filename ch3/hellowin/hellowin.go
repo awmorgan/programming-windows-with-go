@@ -33,7 +33,7 @@ func main() {
 	wc := win32.WNDCLASS{
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
-		HInstance:     win32.WinmainArgs.HInstance,
+		HInstance:     win32.HInstance(),
 		HIcon:         win32.ApplicationIcon(),
 		HCursor:       win32.ArrowCursor(),
 		HbrBackground: win32.WhiteBrush(),
@@ -46,14 +46,14 @@ func main() {
 	}
 	hwnd, err := win32.CreateWindow(appName, "The Hello Program", win32.WS_OVERLAPPEDWINDOW,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT, win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
-		0, 0, win32.WinmainArgs.HInstance, 0)
+		0, 0, win32.HInstance(), 0)
 	if err != nil {
 		errMsg := fmt.Sprintf("CreateWindow failed: %v", err)
 		win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)
 		return
 	}
 
-	win32.ShowWindow(hwnd, win32.WinmainArgs.NCmdShow)
+	win32.ShowWindow(hwnd, win32.NCmdShow())
 	win32.UpdateWindow(hwnd)
 	msg := win32.MSG{}
 	for {

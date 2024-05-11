@@ -44,23 +44,31 @@ import (
 //sys	UpdateWindow(hwnd HWND) (ok bool) = user32.UpdateWindow
 //sys	LoadLibraryEx(libname string, zero HANDLE, flags uintptr) (handle HANDLE, err error) = LoadLibraryExW
 
-var WinmainArgs struct {
-	HInstance HINSTANCE
-	CmdLine   string
-	NCmdShow  int32
+var winmainArgs struct {
+	hinstance HINSTANCE
+	cmdLine   string
+	nCmdShow  int32
 }
 
 func init() {
 	h, _ := getModuleHandle(nil)
-	WinmainArgs.HInstance = HINSTANCE(h)
-	WinmainArgs.CmdLine = strings.Join(os.Args, " ")
+	winmainArgs.hinstance = HINSTANCE(h)
+	winmainArgs.cmdLine = strings.Join(os.Args, " ")
 	s := StartupInfo{Cb: uint32(unsafe.Sizeof(StartupInfo{}))}
 	GetStartupInfo(&s)
 	if s.Flags&STARTF_USESHOWWINDOW == STARTF_USESHOWWINDOW {
-		WinmainArgs.NCmdShow = int32(s.ShowWindow)
+		winmainArgs.nCmdShow = int32(s.ShowWindow)
 	} else {
-		WinmainArgs.NCmdShow = SW_SHOWDEFAULT
+		winmainArgs.nCmdShow = SW_SHOWDEFAULT
 	}
+}
+
+func HInstance() HINSTANCE {
+	return winmainArgs.hinstance
+}
+
+func NCmdShow() int32 {
+	return winmainArgs.nCmdShow
 }
 
 const (
