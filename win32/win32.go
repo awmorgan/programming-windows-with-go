@@ -5,10 +5,9 @@ import (
 	"strings"
 	"syscall"
 	"unsafe"
-
-	"golang.org/x/sys/windows"
 )
 
+//sys	GetStartupInfo(startupInfo *StartupInfo) = GetStartupInfoW
 //sys	BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) = user32.BeginPaint
 //sys	CreateWindowEx(exstyle uint32, className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) [failretval==0] = user32.CreateWindowExW
 //sys	DefWindowProc(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (ret uintptr) = user32.DefWindowProcW
@@ -49,13 +48,44 @@ func init() {
 	h, _ := getModuleHandle(nil)
 	WinmainArgs.HInstance = HINSTANCE(h)
 	WinmainArgs.CmdLine = strings.Join(os.Args, " ")
-	s := windows.StartupInfo{Cb: uint32(unsafe.Sizeof(windows.StartupInfo{}))}
-	windows.GetStartupInfo(&s)
-	if s.Flags&windows.STARTF_USESHOWWINDOW == windows.STARTF_USESHOWWINDOW {
+	s := StartupInfo{Cb: uint32(unsafe.Sizeof(StartupInfo{}))}
+	GetStartupInfo(&s)
+	if s.Flags&STARTF_USESHOWWINDOW == STARTF_USESHOWWINDOW {
 		WinmainArgs.NCmdShow = int32(s.ShowWindow)
 	} else {
 		WinmainArgs.NCmdShow = SW_SHOWDEFAULT
 	}
+}
+
+const (
+	STARTF_USESTDHANDLES = 0x00000100
+	STARTF_USESHOWWINDOW = 0x00000001
+)
+
+type StartupInfo struct {
+	Cb            uint32
+	_             *uint16
+	Desktop       *uint16
+	Title         *uint16
+	X             uint32
+	Y             uint32
+	XSize         uint32
+	YSize         uint32
+	XCountChars   uint32
+	YCountChars   uint32
+	FillAttribute uint32
+	Flags         uint32
+	ShowWindow    uint16
+	_             uint16
+	_             *byte
+	StdInput      HANDLE
+	StdOutput     HANDLE
+	StdErr        HANDLE
+}
+
+type StartupInfoEx struct {
+	StartupInfo
+	ProcThreadAttributeList ProcThreadAttributeList
 }
 
 type WNDCLASS struct {
@@ -206,3 +236,11 @@ func LoadArrowCursor() HCURSOR {
 
 // 	return 0
 // }
+
+// ProcThreadAttributeList is a placeholder type to represent a PROC_THREAD_ATTRIBUTE_LIST.
+//
+// To create a *ProcThreadAttributeList, use NewProcThreadAttributeList, update
+// it with ProcThreadAttributeListContainer.Update, free its memory using
+// ProcThreadAttributeListContainer.Delete, and access the list itself using
+// ProcThreadAttributeListContainer.List.
+type ProcThreadAttributeList struct{}

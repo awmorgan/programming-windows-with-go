@@ -48,6 +48,7 @@ var (
 	procSetTextAlign     = modgdi32.NewProc("SetTextAlign")
 	procTextOutW         = modgdi32.NewProc("TextOutW")
 	procGetModuleHandleW = modkernel32.NewProc("GetModuleHandleW")
+	procGetStartupInfoW  = modkernel32.NewProc("GetStartupInfoW")
 	procBeginPaint       = moduser32.NewProc("BeginPaint")
 	procCreateWindowExW  = moduser32.NewProc("CreateWindowExW")
 	procDefWindowProcW   = moduser32.NewProc("DefWindowProcW")
@@ -117,6 +118,11 @@ func getModuleHandle(moduleName *uint16) (hModule HMODULE, err error) {
 	if hModule == 0 {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func GetStartupInfo(startupInfo *StartupInfo) {
+	syscall.Syscall(procGetStartupInfoW.Addr(), 1, uintptr(unsafe.Pointer(startupInfo)), 0, 0)
 	return
 }
 
