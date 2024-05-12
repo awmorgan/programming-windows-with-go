@@ -48,10 +48,12 @@ var (
 	procLineTo              = modgdi32.NewProc("LineTo")
 	procMoveToEx            = modgdi32.NewProc("MoveToEx")
 	procPolyBezier          = modgdi32.NewProc("PolyBezier")
+	procPolygon             = modgdi32.NewProc("Polygon")
 	procPolyline            = modgdi32.NewProc("Polyline")
 	procRectangle           = modgdi32.NewProc("Rectangle")
 	procRoundRect           = modgdi32.NewProc("RoundRect")
 	procSelectObject        = modgdi32.NewProc("SelectObject")
+	procSetPolyFillMode     = modgdi32.NewProc("SetPolyFillMode")
 	procSetTextAlign        = modgdi32.NewProc("SetTextAlign")
 	procTextOutW            = modgdi32.NewProc("TextOutW")
 	procFreeLibrary         = modkernel32.NewProc("FreeLibrary")
@@ -137,6 +139,16 @@ func PolyBezier(hdc HDC, pt []POINT) (ok bool) {
 	return
 }
 
+func Polygon(hdc HDC, pt []POINT) (ok bool) {
+	var _p0 *POINT
+	if len(pt) > 0 {
+		_p0 = &pt[0]
+	}
+	r0, _, _ := syscall.Syscall(procPolygon.Addr(), 3, uintptr(hdc), uintptr(unsafe.Pointer(_p0)), uintptr(len(pt)))
+	ok = r0 != 0
+	return
+}
+
 func Polyline(hdc HDC, pt []POINT) (ok bool) {
 	var _p0 *POINT
 	if len(pt) > 0 {
@@ -162,6 +174,12 @@ func RoundRect(hdc HDC, left int32, top int32, right int32, bottom int32, width 
 func SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) {
 	r0, _, _ := syscall.Syscall(procSelectObject.Addr(), 2, uintptr(hdc), uintptr(h), 0)
 	ret = HGDIOBJ(r0)
+	return
+}
+
+func SetPolyFillMode(hdc HDC, mode int32) (ret int32) {
+	r0, _, _ := syscall.Syscall(procSetPolyFillMode.Addr(), 2, uintptr(hdc), uintptr(mode), 0)
+	ret = int32(r0)
 	return
 }
 

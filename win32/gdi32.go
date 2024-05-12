@@ -1033,3 +1033,9 @@ type BLENDFUNCTION struct {
 	SourceConstantAlpha byte
 	AlphaFormat         byte
 }
+
+//PolyFill mode constants
+const (
+	ALTERNATE = 1
+	WINDING   = 2
+)
