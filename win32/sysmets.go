@@ -84,4 +84,3 @@ var Sysmetrics = [...]struct {
 
 
 const NUMLINES = len(Sysmetrics)
-

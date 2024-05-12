@@ -166,7 +166,6 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		// If the position has changed, scroll the window
 		if si.NPos != iHorzPos {
 			win32.ScrollWindow(hwnd, cxChar*(iHorzPos-si.NPos), 0, nil, nil)
-			win32.UpdateWindow(hwnd)
 		}
 		return 0
 	case win32.WM_PAINT:
