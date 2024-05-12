@@ -199,11 +199,11 @@ type (
 // 	return uint32(uint32(lo) | ((uint32(hi)) << 16))
 // }
 
-func LOWORD(dw uint32) uint16 {
+func LOWORD(dw uintptr) uint16 {
 	return uint16(dw)
 }
 
-func HIWORD(dw uint32) uint16 {
+func HIWORD(dw uintptr) uint16 {
 	return uint16(dw >> 16 & 0xffff)
 }
 

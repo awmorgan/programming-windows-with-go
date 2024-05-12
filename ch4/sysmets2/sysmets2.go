@@ -28,10 +28,10 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		win32.SetScrollPos(hwnd, win32.SB_VERT, iVscrollPos, true)
 		return 0
 	case win32.WM_SIZE:
-		cyClient = int32(win32.HIWORD(uint32(lParam)))
+		cyClient = int32(win32.HIWORD(lParam))
 		return 0
 	case win32.WM_VSCROLL:
-		switch win32.LOWORD(uint32(wParam)) {
+		switch win32.LOWORD(wParam) {
 		case win32.SB_LINEUP:
 			iVscrollPos--
 		case win32.SB_LINEDOWN:
@@ -41,7 +41,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		case win32.SB_PAGEDOWN:
 			iVscrollPos += cyClient / cyChar
 		case win32.SB_THUMBPOSITION:
-			iVscrollPos = int32(win32.HIWORD(uint32(wParam)))
+			iVscrollPos = int32(win32.HIWORD(wParam))
 		}
 		iVscrollPos = max(0, min(iVscrollPos, int32(len(win32.Sysmetrics)-1)))
 		currentPos, _ := win32.GetScrollPos(hwnd, win32.SB_VERT)
