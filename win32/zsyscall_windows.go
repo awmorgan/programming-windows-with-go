@@ -74,6 +74,8 @@ var (
 	procDispatchMessageW    = moduser32.NewProc("DispatchMessageW")
 	procDrawTextW           = moduser32.NewProc("DrawTextW")
 	procEndPaint            = moduser32.NewProc("EndPaint")
+	procFillRect            = moduser32.NewProc("FillRect")
+	procFrameRect           = moduser32.NewProc("FrameRect")
 	procGetClientRect       = moduser32.NewProc("GetClientRect")
 	procGetDC               = moduser32.NewProc("GetDC")
 	procGetMessageW         = moduser32.NewProc("GetMessageW")
@@ -81,6 +83,7 @@ var (
 	procGetScrollPos        = moduser32.NewProc("GetScrollPos")
 	procGetSystemMetrics    = moduser32.NewProc("GetSystemMetrics")
 	procInvalidateRect      = moduser32.NewProc("InvalidateRect")
+	procInvertRect          = moduser32.NewProc("InvertRect")
 	procLoadCursorW         = moduser32.NewProc("LoadCursorW")
 	procLoadIconW           = moduser32.NewProc("LoadIconW")
 	procMessageBoxW         = moduser32.NewProc("MessageBoxW")
@@ -382,6 +385,18 @@ func EndPaint(hwnd HWND, ps *PAINTSTRUCT) {
 	return
 }
 
+func FillRect(hdc HDC, lprc *RECT, hbr HBRUSH) (ok bool) {
+	r0, _, _ := syscall.Syscall(procFillRect.Addr(), 3, uintptr(hdc), uintptr(unsafe.Pointer(lprc)), uintptr(hbr))
+	ok = r0 != 0
+	return
+}
+
+func FrameRect(hdc HDC, lprc *RECT, hbr HBRUSH) (ok bool) {
+	r0, _, _ := syscall.Syscall(procFrameRect.Addr(), 3, uintptr(hdc), uintptr(unsafe.Pointer(lprc)), uintptr(hbr))
+	ok = r0 != 0
+	return
+}
+
 func GetClientRect(hwnd HWND, rect *RECT) (err error) {
 	r1, _, e1 := syscall.Syscall(procGetClientRect.Addr(), 2, uintptr(hwnd), uintptr(unsafe.Pointer(rect)), 0)
 	if r1 == 0 {
@@ -438,6 +453,12 @@ func InvalidateRect(hwnd HWND, rect *RECT, erase bool) (err error) {
 	if r1 == 0 {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func InvertRect(hdc HDC, lprc *RECT) (ok bool) {
+	r0, _, _ := syscall.Syscall(procInvertRect.Addr(), 2, uintptr(hdc), uintptr(unsafe.Pointer(lprc)), 0)
+	ok = r0 != 0
 	return
 }
 
