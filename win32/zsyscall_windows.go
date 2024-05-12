@@ -47,9 +47,11 @@ var (
 	procGetTextMetricsW     = modgdi32.NewProc("GetTextMetricsW")
 	procLineTo              = modgdi32.NewProc("LineTo")
 	procMoveToEx            = modgdi32.NewProc("MoveToEx")
+	procPolyBezier          = modgdi32.NewProc("PolyBezier")
 	procPolyline            = modgdi32.NewProc("Polyline")
 	procRectangle           = modgdi32.NewProc("Rectangle")
 	procRoundRect           = modgdi32.NewProc("RoundRect")
+	procSelectObject        = modgdi32.NewProc("SelectObject")
 	procSetTextAlign        = modgdi32.NewProc("SetTextAlign")
 	procTextOutW            = modgdi32.NewProc("TextOutW")
 	procFreeLibrary         = modkernel32.NewProc("FreeLibrary")
@@ -125,6 +127,16 @@ func MoveToEx(hdc HDC, x int32, y int32, lpPoint *POINT) (ok bool) {
 	return
 }
 
+func PolyBezier(hdc HDC, pt []POINT) (ok bool) {
+	var _p0 *POINT
+	if len(pt) > 0 {
+		_p0 = &pt[0]
+	}
+	r0, _, _ := syscall.Syscall(procPolyBezier.Addr(), 3, uintptr(hdc), uintptr(unsafe.Pointer(_p0)), uintptr(len(pt)))
+	ok = r0 != 0
+	return
+}
+
 func Polyline(hdc HDC, pt []POINT) (ok bool) {
 	var _p0 *POINT
 	if len(pt) > 0 {
@@ -144,6 +156,12 @@ func Rectangle(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bo
 func RoundRect(hdc HDC, left int32, top int32, right int32, bottom int32, width int32, height int32) (ok bool) {
 	r0, _, _ := syscall.Syscall9(procRoundRect.Addr(), 7, uintptr(hdc), uintptr(left), uintptr(top), uintptr(right), uintptr(bottom), uintptr(width), uintptr(height), 0, 0)
 	ok = r0 != 0
+	return
+}
+
+func SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) {
+	r0, _, _ := syscall.Syscall(procSelectObject.Addr(), 2, uintptr(hdc), uintptr(h), 0)
+	ret = HGDIOBJ(r0)
 	return
 }
 
