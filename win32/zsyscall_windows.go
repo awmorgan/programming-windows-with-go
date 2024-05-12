@@ -41,6 +41,7 @@ var (
 	moduser32   = NewLazySystemDLL("user32.dll")
 	modwinmm    = NewLazySystemDLL("winmm.dll")
 
+	procDPtoLP              = modgdi32.NewProc("DPtoLP")
 	procEllipse             = modgdi32.NewProc("Ellipse")
 	procGetDeviceCaps       = modgdi32.NewProc("GetDeviceCaps")
 	procGetStockObject      = modgdi32.NewProc("GetStockObject")
@@ -51,10 +52,15 @@ var (
 	procPolygon             = modgdi32.NewProc("Polygon")
 	procPolyline            = modgdi32.NewProc("Polyline")
 	procRectangle           = modgdi32.NewProc("Rectangle")
+	procRestoreDC           = modgdi32.NewProc("RestoreDC")
 	procRoundRect           = modgdi32.NewProc("RoundRect")
+	procSaveDC              = modgdi32.NewProc("SaveDC")
 	procSelectObject        = modgdi32.NewProc("SelectObject")
+	procSetMapMode          = modgdi32.NewProc("SetMapMode")
 	procSetPolyFillMode     = modgdi32.NewProc("SetPolyFillMode")
 	procSetTextAlign        = modgdi32.NewProc("SetTextAlign")
+	procSetViewportExtEx    = modgdi32.NewProc("SetViewportExtEx")
+	procSetWindowExtEx      = modgdi32.NewProc("SetWindowExtEx")
 	procTextOutW            = modgdi32.NewProc("TextOutW")
 	procFreeLibrary         = modkernel32.NewProc("FreeLibrary")
 	procGetModuleHandleW    = modkernel32.NewProc("GetModuleHandleW")
@@ -90,6 +96,16 @@ var (
 	procUpdateWindow        = moduser32.NewProc("UpdateWindow")
 	procPlaySoundW          = modwinmm.NewProc("PlaySoundW")
 )
+
+func DPtoLP(hdc HDC, pt []POINT) (ok bool) {
+	var _p0 *POINT
+	if len(pt) > 0 {
+		_p0 = &pt[0]
+	}
+	r0, _, _ := syscall.Syscall(procDPtoLP.Addr(), 3, uintptr(hdc), uintptr(unsafe.Pointer(_p0)), uintptr(len(pt)))
+	ok = r0 != 0
+	return
+}
 
 func Ellipse(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bool) {
 	r0, _, _ := syscall.Syscall6(procEllipse.Addr(), 5, uintptr(hdc), uintptr(left), uintptr(top), uintptr(right), uintptr(bottom), 0)
@@ -165,15 +181,33 @@ func Rectangle(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bo
 	return
 }
 
+func RestoreDC(hdc HDC, saved int32) (ok bool) {
+	r0, _, _ := syscall.Syscall(procRestoreDC.Addr(), 2, uintptr(hdc), uintptr(saved), 0)
+	ok = r0 != 0
+	return
+}
+
 func RoundRect(hdc HDC, left int32, top int32, right int32, bottom int32, width int32, height int32) (ok bool) {
 	r0, _, _ := syscall.Syscall9(procRoundRect.Addr(), 7, uintptr(hdc), uintptr(left), uintptr(top), uintptr(right), uintptr(bottom), uintptr(width), uintptr(height), 0, 0)
 	ok = r0 != 0
 	return
 }
 
+func SaveDC(hdc HDC) (ret int32) {
+	r0, _, _ := syscall.Syscall(procSaveDC.Addr(), 1, uintptr(hdc), 0, 0)
+	ret = int32(r0)
+	return
+}
+
 func SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) {
 	r0, _, _ := syscall.Syscall(procSelectObject.Addr(), 2, uintptr(hdc), uintptr(h), 0)
 	ret = HGDIOBJ(r0)
+	return
+}
+
+func SetMapMode(hdc HDC, iMapMode int32) (ret int32) {
+	r0, _, _ := syscall.Syscall(procSetMapMode.Addr(), 2, uintptr(hdc), uintptr(iMapMode), 0)
+	ret = int32(r0)
 	return
 }
 
@@ -186,6 +220,18 @@ func SetPolyFillMode(hdc HDC, mode int32) (ret int32) {
 func SetTextAlign(hdc HDC, align uint32) (ret uint32) {
 	r0, _, _ := syscall.Syscall(procSetTextAlign.Addr(), 2, uintptr(hdc), uintptr(align), 0)
 	ret = uint32(r0)
+	return
+}
+
+func SetViewportExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) {
+	r0, _, _ := syscall.Syscall6(procSetViewportExtEx.Addr(), 4, uintptr(hdc), uintptr(x), uintptr(y), uintptr(unsafe.Pointer(size)), 0, 0)
+	ok = r0 != 0
+	return
+}
+
+func SetWindowExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) {
+	r0, _, _ := syscall.Syscall6(procSetWindowExtEx.Addr(), 4, uintptr(hdc), uintptr(x), uintptr(y), uintptr(unsafe.Pointer(size)), 0, 0)
+	ok = r0 != 0
 	return
 }
 
