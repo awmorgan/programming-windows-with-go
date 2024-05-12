@@ -76,14 +76,14 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		iMaxWidth = 40*cxChar + 22*cxCaps
 		return 0
 	case win32.WM_SIZE:
-		cyClient = int32(win32.HIWORD(lParam))
 		cxClient = int32(win32.LOWORD(lParam))
+		cyClient = int32(win32.HIWORD(lParam))
 
 		// set vertical scroll bar range and page size
 		si.CbSize = uint32(unsafe.Sizeof(si))
 		si.FMask = win32.SIF_RANGE | win32.SIF_PAGE
 		si.NMin = 0
-		si.NMax = int32(len(win32.Sysmetrics) - 1)
+		si.NMax = int32(win32.NUMLINES - 1)
 		si.NPage = uint32(cyClient / cyChar)
 		win32.SetScrollInfo(hwnd, win32.SB_VERT, &si, true)
 
@@ -166,7 +166,9 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		// If the position has changed, scroll the window
 		if si.NPos != iHorzPos {
 			win32.ScrollWindow(hwnd, cxChar*(iHorzPos-si.NPos), 0, nil, nil)
+			win32.UpdateWindow(hwnd)
 		}
+		return 0
 	case win32.WM_PAINT:
 		hdc = win32.BeginPaint(hwnd, &ps)
 
@@ -182,19 +184,27 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 
 		// find painting limits
 		iPaintBeg = max(0, iVertPos+int32(ps.RcPaint.Top/cyChar))
-		iPaintEnd = min(int32(len(win32.Sysmetrics))-1,
+		iPaintEnd = min(int32(win32.NUMLINES)-1,
 			iVertPos+int32(ps.RcPaint.Bottom/cyChar))
 
 		for i = iPaintBeg; i <= iPaintEnd; i++ {
 			x = cxChar * (1 - iHorzPos)
 			y = cyChar * (i - iVertPos)
 
-			win32.TextOut(hdc, x, y, win32.Sysmetrics[i].Label, len(win32.Sysmetrics[i].Label))
-			win32.TextOut(hdc, 22*cxChar, y, win32.Sysmetrics[i].Desc, len(win32.Sysmetrics[i].Desc))
+			win32.TextOut(hdc, x, y,
+				win32.Sysmetrics[i].Label,
+				len(win32.Sysmetrics[i].Label))
+
+			win32.TextOut(hdc, x+22*cxChar, y,
+				win32.Sysmetrics[i].Desc,
+				len(win32.Sysmetrics[i].Desc))
+
 			win32.SetTextAlign(hdc, win32.TA_RIGHT|win32.TA_TOP)
 
 			s := fmt.Sprintf("%5d", win32.GetSystemMetrics(win32.Sysmetrics[i].Index))
-			win32.TextOut(hdc, 22*cxChar+40*cxCaps, y, s, len(s))
+
+			win32.TextOut(hdc, x+22*cxChar+40*cxCaps, y, s, len(s))
+
 			win32.SetTextAlign(hdc, win32.TA_LEFT|win32.TA_TOP)
 		}
 

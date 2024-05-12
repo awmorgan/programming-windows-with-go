@@ -1,6 +1,6 @@
 package win32
 
-var Sysmetrics = []struct {
+var Sysmetrics = [...]struct {
 	Index int32
 	Label string
 	Desc  string
@@ -43,11 +43,11 @@ var Sysmetrics = []struct {
 	{SM_CYICONSPACING, "SM_CYICONSPACING", "Vertical icon spacing"},
 	{SM_MENUDROPALIGNMENT, "SM_MENUDROPALIGNMENT", "Left or right menu drop"},
 	{SM_PENWINDOWS, "SM_PENWINDOWS", "Pen extensions installed"},
-	{SM_DBCSENABLED, "SM_DBCSENABLED", "Double−Byte Char Set enabled"},
+	{SM_DBCSENABLED, "SM_DBCSENABLED", "Double-Byte Char Set enabled"},
 	{SM_CMOUSEBUTTONS, "SM_CMOUSEBUTTONS", "Number of mouse buttons"},
 	{SM_SECURE, "SM_SECURE", "Security present flag"},
-	{SM_CXEDGE, "SM_CXEDGE", "3−D border width"},
-	{SM_CYEDGE, "SM_CYEDGE", "3−D border height"},
+	{SM_CXEDGE, "SM_CXEDGE", "3-D border width"},
+	{SM_CYEDGE, "SM_CYEDGE", "3-D border height"},
 	{SM_CXMINSPACING, "SM_CXMINSPACING", "Minimized window spacing width"},
 	{SM_CYMINSPACING, "SM_CYMINSPACING", "Minimized window spacing height"},
 	{SM_CXSMICON, "SM_CXSMICON", "Small icon width"},
@@ -69,8 +69,8 @@ var Sysmetrics = []struct {
 	{SM_CXDRAG, "SM_CXDRAG", "Avoid drag x tolerance"},
 	{SM_CYDRAG, "SM_CYDRAG", "Avoid drag y tolerance"},
 	{SM_SHOWSOUNDS, "SM_SHOWSOUNDS", "Present sounds visually"},
-	{SM_CXMENUCHECK, "SM_CXMENUCHECK", "Menu check−mark width"},
-	{SM_CYMENUCHECK, "SM_CYMENUCHECK", "Menu check−mark height"},
+	{SM_CXMENUCHECK, "SM_CXMENUCHECK", "Menu check-mark width"},
+	{SM_CYMENUCHECK, "SM_CYMENUCHECK", "Menu check-mark height"},
 	{SM_SLOWMACHINE, "SM_SLOWMACHINE", "Slow processor flag"},
 	{SM_MIDEASTENABLED, "SM_MIDEASTENABLED", "Hebrew and Arabic enabled flag"},
 	{SM_MOUSEWHEELPRESENT, "SM_MOUSEWHEELPRESENT", "Mouse wheel present flag"},
@@ -81,3 +81,7 @@ var Sysmetrics = []struct {
 	{SM_CMONITORS, "SM_CMONITORS", "Number of monitors"},
 	{SM_SAMEDISPLAYFORMAT, "SM_SAMEDISPLAYFORMAT", "Same color format flag"},
 }
+
+
+const NUMLINES = len(Sysmetrics)
+
