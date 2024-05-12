@@ -60,6 +60,7 @@ var (
 	procGetClientRect       = moduser32.NewProc("GetClientRect")
 	procGetDC               = moduser32.NewProc("GetDC")
 	procGetMessageW         = moduser32.NewProc("GetMessageW")
+	procGetScrollInfo       = moduser32.NewProc("GetScrollInfo")
 	procGetScrollPos        = moduser32.NewProc("GetScrollPos")
 	procGetSystemMetrics    = moduser32.NewProc("GetSystemMetrics")
 	procInvalidateRect      = moduser32.NewProc("InvalidateRect")
@@ -69,6 +70,8 @@ var (
 	procPostQuitMessage     = moduser32.NewProc("PostQuitMessage")
 	procRegisterClassW      = moduser32.NewProc("RegisterClassW")
 	procReleaseDC           = moduser32.NewProc("ReleaseDC")
+	procScrollWindow        = moduser32.NewProc("ScrollWindow")
+	procSetScrollInfo       = moduser32.NewProc("SetScrollInfo")
 	procSetScrollPos        = moduser32.NewProc("SetScrollPos")
 	procSetScrollRange      = moduser32.NewProc("SetScrollRange")
 	procShowWindow          = moduser32.NewProc("ShowWindow")
@@ -267,6 +270,15 @@ func GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (
 	return
 }
 
+func GetScrollInfo(hwnd HWND, nBar int32, si *SCROLLINFO) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall(procGetScrollInfo.Addr(), 3, uintptr(hwnd), uintptr(nBar), uintptr(unsafe.Pointer(si)))
+	ok = r0 != 0
+	if ok == false {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func GetScrollPos(hwnd HWND, nBar int32) (ret int32, err error) {
 	r0, _, e1 := syscall.Syscall(procGetScrollPos.Addr(), 2, uintptr(hwnd), uintptr(nBar), 0)
 	ret = int32(r0)
@@ -372,6 +384,25 @@ func ReleaseDC(hwnd HWND, hdc HDC) (err error) {
 	if r1 == 0 {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func ScrollWindow(hwnd HWND, dx int32, dy int32, rect *RECT, clipRect *RECT) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall6(procScrollWindow.Addr(), 5, uintptr(hwnd), uintptr(dx), uintptr(dy), uintptr(unsafe.Pointer(rect)), uintptr(unsafe.Pointer(clipRect)), 0)
+	ok = r0 != 0
+	if ok == false {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func SetScrollInfo(hwnd HWND, nBar int32, si *SCROLLINFO, redraw bool) (pos int32) {
+	var _p0 uint32
+	if redraw {
+		_p0 = 1
+	}
+	r0, _, _ := syscall.Syscall6(procSetScrollInfo.Addr(), 4, uintptr(hwnd), uintptr(nBar), uintptr(unsafe.Pointer(si)), uintptr(_p0), 0, 0)
+	pos = int32(r0)
 	return
 }
 
