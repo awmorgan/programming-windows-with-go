@@ -44,6 +44,9 @@ var (
 	procGetDeviceCaps       = modgdi32.NewProc("GetDeviceCaps")
 	procGetStockObject      = modgdi32.NewProc("GetStockObject")
 	procGetTextMetricsW     = modgdi32.NewProc("GetTextMetricsW")
+	procLineTo              = modgdi32.NewProc("LineTo")
+	procMoveToEx            = modgdi32.NewProc("MoveToEx")
+	procPolyline            = modgdi32.NewProc("Polyline")
 	procSetTextAlign        = modgdi32.NewProc("SetTextAlign")
 	procTextOutW            = modgdi32.NewProc("TextOutW")
 	procFreeLibrary         = modkernel32.NewProc("FreeLibrary")
@@ -98,6 +101,28 @@ func GetTextMetrics(hdc HDC, tm *TEXTMETRIC) (err error) {
 	if r1 == 0 {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func LineTo(hdc HDC, x int32, y int32) (ok bool) {
+	r0, _, _ := syscall.Syscall(procLineTo.Addr(), 3, uintptr(hdc), uintptr(x), uintptr(y))
+	ok = r0 != 0
+	return
+}
+
+func MoveToEx(hdc HDC, x int32, y int32, lpPoint *POINT) (ok bool) {
+	r0, _, _ := syscall.Syscall6(procMoveToEx.Addr(), 4, uintptr(hdc), uintptr(x), uintptr(y), uintptr(unsafe.Pointer(lpPoint)), 0, 0)
+	ok = r0 != 0
+	return
+}
+
+func Polyline(hdc HDC, pt []POINT) (ok bool) {
+	var _p0 *POINT
+	if len(pt) > 0 {
+		_p0 = &pt[0]
+	}
+	r0, _, _ := syscall.Syscall(procPolyline.Addr(), 3, uintptr(hdc), uintptr(unsafe.Pointer(_p0)), uintptr(len(pt)))
+	ok = r0 != 0
 	return
 }
 
