@@ -104,10 +104,9 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 
 		ps := win32.PAINTSTRUCT{}
 		hdc := win32.BeginPaint(hwnd, &ps)
+		defer win32.EndPaint(hwnd, &ps)
 
 		DrawBezier(hdc, apt[:])
-
-		win32.EndPaint(hwnd, &ps)
 		return 0
 
 	case win32.WM_DESTROY:
