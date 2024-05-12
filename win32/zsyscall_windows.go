@@ -41,6 +41,7 @@ var (
 	moduser32   = NewLazySystemDLL("user32.dll")
 	modwinmm    = NewLazySystemDLL("winmm.dll")
 
+	procGetDeviceCaps       = modgdi32.NewProc("GetDeviceCaps")
 	procGetStockObject      = modgdi32.NewProc("GetStockObject")
 	procGetTextMetricsW     = modgdi32.NewProc("GetTextMetricsW")
 	procSetTextAlign        = modgdi32.NewProc("SetTextAlign")
@@ -79,6 +80,12 @@ var (
 	procUpdateWindow        = moduser32.NewProc("UpdateWindow")
 	procPlaySoundW          = modwinmm.NewProc("PlaySoundW")
 )
+
+func GetDeviceCaps(hdc HDC, index int32) (ret int32) {
+	r0, _, _ := syscall.Syscall(procGetDeviceCaps.Addr(), 2, uintptr(hdc), uintptr(index), 0)
+	ret = int32(r0)
+	return
+}
 
 func GetStockObject(fnObject int32) (ret HGDIOBJ) {
 	r0, _, _ := syscall.Syscall(procGetStockObject.Addr(), 1, uintptr(fnObject), 0, 0)
