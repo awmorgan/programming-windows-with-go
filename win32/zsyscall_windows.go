@@ -41,12 +41,15 @@ var (
 	moduser32   = NewLazySystemDLL("user32.dll")
 	modwinmm    = NewLazySystemDLL("winmm.dll")
 
+	procEllipse             = modgdi32.NewProc("Ellipse")
 	procGetDeviceCaps       = modgdi32.NewProc("GetDeviceCaps")
 	procGetStockObject      = modgdi32.NewProc("GetStockObject")
 	procGetTextMetricsW     = modgdi32.NewProc("GetTextMetricsW")
 	procLineTo              = modgdi32.NewProc("LineTo")
 	procMoveToEx            = modgdi32.NewProc("MoveToEx")
 	procPolyline            = modgdi32.NewProc("Polyline")
+	procRectangle           = modgdi32.NewProc("Rectangle")
+	procRoundRect           = modgdi32.NewProc("RoundRect")
 	procSetTextAlign        = modgdi32.NewProc("SetTextAlign")
 	procTextOutW            = modgdi32.NewProc("TextOutW")
 	procFreeLibrary         = modkernel32.NewProc("FreeLibrary")
@@ -83,6 +86,12 @@ var (
 	procUpdateWindow        = moduser32.NewProc("UpdateWindow")
 	procPlaySoundW          = modwinmm.NewProc("PlaySoundW")
 )
+
+func Ellipse(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bool) {
+	r0, _, _ := syscall.Syscall6(procEllipse.Addr(), 5, uintptr(hdc), uintptr(left), uintptr(top), uintptr(right), uintptr(bottom), 0)
+	ok = r0 != 0
+	return
+}
 
 func GetDeviceCaps(hdc HDC, index int32) (ret int32) {
 	r0, _, _ := syscall.Syscall(procGetDeviceCaps.Addr(), 2, uintptr(hdc), uintptr(index), 0)
@@ -122,6 +131,18 @@ func Polyline(hdc HDC, pt []POINT) (ok bool) {
 		_p0 = &pt[0]
 	}
 	r0, _, _ := syscall.Syscall(procPolyline.Addr(), 3, uintptr(hdc), uintptr(unsafe.Pointer(_p0)), uintptr(len(pt)))
+	ok = r0 != 0
+	return
+}
+
+func Rectangle(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bool) {
+	r0, _, _ := syscall.Syscall6(procRectangle.Addr(), 5, uintptr(hdc), uintptr(left), uintptr(top), uintptr(right), uintptr(bottom), 0)
+	ok = r0 != 0
+	return
+}
+
+func RoundRect(hdc HDC, left int32, top int32, right int32, bottom int32, width int32, height int32) (ok bool) {
+	r0, _, _ := syscall.Syscall9(procRoundRect.Addr(), 7, uintptr(hdc), uintptr(left), uintptr(top), uintptr(right), uintptr(bottom), uintptr(width), uintptr(height), 0, 0)
 	ok = r0 != 0
 	return
 }
