@@ -1,6 +1,6 @@
 package win32
 
-//go:generate go run x/win32/mkwinsyscall -output zsyscall_windows.go win32.go
+//go:generate go run x/win32/mkwinsyscall -output zsyscall_win32.go win32.go
 
 import (
 	"os"
@@ -10,6 +10,7 @@ import (
 )
 
 //sys	BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) = user32.BeginPaint
+//sys	CopyRect(dst *RECT, src *RECT) (ok bool) = user32.CopyRect
 //sys	CreateWindowEx(exstyle uint32, className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) [failretval==0] = user32.CreateWindowExW
 //sys	DefWindowProc(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (ret uintptr) = user32.DefWindowProcW
 //sys	DispatchMessage(msg *MSG) = user32.DispatchMessageW
@@ -33,14 +34,18 @@ import (
 //sys	getSystemDirectory(dir *uint16, dirLen uint32) (len uint32, err error) = kernel32.GetSystemDirectoryW
 //sys	GetSystemMetrics(nIndex int32) (ret int32) = user32.GetSystemMetrics
 //sys	GetTextMetrics(hdc HDC, tm *TEXTMETRIC) (err error) [failretval==0] = gdi32.GetTextMetricsW
+//sys	InflateRect(rect *RECT, x int32, y int32) (ok bool) = user32.InflateRect
+//sys	IntersectRect(dst *RECT, src1 *RECT, src2 *RECT) (intersect bool) = user32.IntersectRect
 //sys	InvalidateRect(hwnd HWND, rect *RECT, erase bool) (err error) [failretval==0] = user32.InvalidateRect
 //sys	InvertRect( hdc HDC, lprc *RECT ) (ok bool) = user32.InvertRect
+//sys	IsRectEmpty(rect *RECT) (empty bool) = user32.IsRectEmpty
 //sys	LineTo(hdc HDC, x int32, y int32) (ok bool) = gdi32.LineTo
 //sys	LoadCursor(hInstance HINSTANCE, cursorName string) (hCursor HCURSOR, err error) [failretval==0] = user32.LoadCursorW
 //sys	LoadIcon(hInstance HINSTANCE, iconName string) (hIcon HICON, err error) [failretval==0] = user32.LoadIconW
 //sys	LoadLibraryEx(libname string, zero HANDLE, flags uintptr) (handle HANDLE, err error) = LoadLibraryExW
 //sys	MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) [failretval==0] = user32.MessageBoxW
 //sys	MoveToEx(hdc HDC, x int32, y int32, lpPoint *POINT) (ok bool) = gdi32.MoveToEx
+//sys	OffsetRect(rect *RECT, x int32, y int32) (ok bool) = user32.OffsetRect
 //sys	PlaySound(sound string, hmod uintptr, flags uint32) (err error) [failretval==0] = winmm.PlaySoundW
 //sys	PolyBezier(hdc HDC, pt []POINT) (ok bool) = gdi32.PolyBezier
 //sys	Polygon(hdc HDC, pt []POINT) (ok bool) = gdi32.Polygon
@@ -56,6 +61,8 @@ import (
 //sys	SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) = gdi32.SelectObject
 //sys	SetMapMode(hdc HDC, iMapMode int32) (ret int32) = gdi32.SetMapMode
 //sys	SetPolyFillMode(hdc HDC, mode int32) (ret int32) = gdi32.SetPolyFillMode
+//sys	SetRect(rect *RECT, left int32, top int32, right int32, bottom int32) (ok bool) = user32.SetRect
+//sys	SetRectEmpty(rect *RECT) (ok bool) = user32.SetRectEmpty
 //sys	SetScrollInfo(hwnd HWND, nBar int32, si *SCROLLINFO, redraw bool) (pos int32) = user32.SetScrollInfo
 //sys	SetScrollPos(hwnd HWND, nBar int32, nPos int32, bRedraw bool) (ret int32, err error) [failretval==0] = user32.SetScrollPos
 //sys	SetScrollRange(hwnd HWND, nBar int32, nMinPos int32, nMaxPos int32, bRedraw bool) (ret BOOL, err error) [failretval==0] = user32.SetScrollRange
@@ -65,6 +72,7 @@ import (
 //sys	ShowWindow(hwnd HWND, nCmdShow int32) (wasVisible bool) = user32.ShowWindow
 //sys	TextOut(hdc HDC, x int32, y int32, text string, n int) (err error) [failretval==0] = gdi32.TextOutW
 //sys	TranslateMessage(msg *MSG) (translated bool) = user32.TranslateMessage
+//sys	UnionRect(dst *RECT, src1 *RECT, src2 *RECT) (nonempty bool) = user32.UnionRect
 //sys	UpdateWindow(hwnd HWND) (ok bool) = user32.UpdateWindow
 
 var winmainArgs struct {
@@ -316,4 +324,29 @@ func GetSystemDirectory() (string, error) {
 		}
 		n = l
 	}
+}
+
+// func PtInRect(rect *RECT, pt POINT) (in bool) {
+// 	// Pack X and Y into a single uintptr - each coordinate is 32 bits
+// 	ptVal := uintptr(pt.X) | uintptr(pt.Y)<<32
+// 	r0, _, _ := syscall.Syscall(procPtInRect.Addr(), 2, uintptr(unsafe.Pointer(rect)), ptVal, 0)
+// 	in = r0 != 0
+// 	return
+// }
+
+// var procPtInRect = moduser32.NewProc("PtInRect")
+
+func PtInRect(lprc *RECT, pt POINT) bool {
+	// Check if the rectangle is normalized
+	if lprc.Right <= lprc.Left || lprc.Bottom <= lprc.Top {
+		return false
+	}
+
+	// Check if the point lies within the rectangle
+	if pt.X >= lprc.Left && pt.X < lprc.Right &&
+		pt.Y >= lprc.Top && pt.Y < lprc.Bottom {
+		return true
+	}
+
+	return false
 }

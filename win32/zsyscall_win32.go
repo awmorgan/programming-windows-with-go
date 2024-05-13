@@ -69,6 +69,7 @@ var (
 	procGetSystemDirectoryW = modkernel32.NewProc("GetSystemDirectoryW")
 	procLoadLibraryExW      = modkernel32.NewProc("LoadLibraryExW")
 	procBeginPaint          = moduser32.NewProc("BeginPaint")
+	procCopyRect            = moduser32.NewProc("CopyRect")
 	procCreateWindowExW     = moduser32.NewProc("CreateWindowExW")
 	procDefWindowProcW      = moduser32.NewProc("DefWindowProcW")
 	procDispatchMessageW    = moduser32.NewProc("DispatchMessageW")
@@ -82,20 +83,27 @@ var (
 	procGetScrollInfo       = moduser32.NewProc("GetScrollInfo")
 	procGetScrollPos        = moduser32.NewProc("GetScrollPos")
 	procGetSystemMetrics    = moduser32.NewProc("GetSystemMetrics")
+	procInflateRect         = moduser32.NewProc("InflateRect")
+	procIntersectRect       = moduser32.NewProc("IntersectRect")
 	procInvalidateRect      = moduser32.NewProc("InvalidateRect")
 	procInvertRect          = moduser32.NewProc("InvertRect")
+	procIsRectEmpty         = moduser32.NewProc("IsRectEmpty")
 	procLoadCursorW         = moduser32.NewProc("LoadCursorW")
 	procLoadIconW           = moduser32.NewProc("LoadIconW")
 	procMessageBoxW         = moduser32.NewProc("MessageBoxW")
+	procOffsetRect          = moduser32.NewProc("OffsetRect")
 	procPostQuitMessage     = moduser32.NewProc("PostQuitMessage")
 	procRegisterClassW      = moduser32.NewProc("RegisterClassW")
 	procReleaseDC           = moduser32.NewProc("ReleaseDC")
 	procScrollWindow        = moduser32.NewProc("ScrollWindow")
+	procSetRect             = moduser32.NewProc("SetRect")
+	procSetRectEmpty        = moduser32.NewProc("SetRectEmpty")
 	procSetScrollInfo       = moduser32.NewProc("SetScrollInfo")
 	procSetScrollPos        = moduser32.NewProc("SetScrollPos")
 	procSetScrollRange      = moduser32.NewProc("SetScrollRange")
 	procShowWindow          = moduser32.NewProc("ShowWindow")
 	procTranslateMessage    = moduser32.NewProc("TranslateMessage")
+	procUnionRect           = moduser32.NewProc("UnionRect")
 	procUpdateWindow        = moduser32.NewProc("UpdateWindow")
 	procPlaySoundW          = modwinmm.NewProc("PlaySoundW")
 )
@@ -328,6 +336,12 @@ func BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) {
 	return
 }
 
+func CopyRect(dst *RECT, src *RECT) (ok bool) {
+	r0, _, _ := syscall.Syscall(procCopyRect.Addr(), 2, uintptr(unsafe.Pointer(dst)), uintptr(unsafe.Pointer(src)), 0)
+	ok = r0 != 0
+	return
+}
+
 func CreateWindowEx(exstyle uint32, className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(className)
@@ -444,6 +458,18 @@ func GetSystemMetrics(nIndex int32) (ret int32) {
 	return
 }
 
+func InflateRect(rect *RECT, x int32, y int32) (ok bool) {
+	r0, _, _ := syscall.Syscall(procInflateRect.Addr(), 3, uintptr(unsafe.Pointer(rect)), uintptr(x), uintptr(y))
+	ok = r0 != 0
+	return
+}
+
+func IntersectRect(dst *RECT, src1 *RECT, src2 *RECT) (intersect bool) {
+	r0, _, _ := syscall.Syscall(procIntersectRect.Addr(), 3, uintptr(unsafe.Pointer(dst)), uintptr(unsafe.Pointer(src1)), uintptr(unsafe.Pointer(src2)))
+	intersect = r0 != 0
+	return
+}
+
 func InvalidateRect(hwnd HWND, rect *RECT, erase bool) (err error) {
 	var _p0 uint32
 	if erase {
@@ -459,6 +485,12 @@ func InvalidateRect(hwnd HWND, rect *RECT, erase bool) (err error) {
 func InvertRect(hdc HDC, lprc *RECT) (ok bool) {
 	r0, _, _ := syscall.Syscall(procInvertRect.Addr(), 2, uintptr(hdc), uintptr(unsafe.Pointer(lprc)), 0)
 	ok = r0 != 0
+	return
+}
+
+func IsRectEmpty(rect *RECT) (empty bool) {
+	r0, _, _ := syscall.Syscall(procIsRectEmpty.Addr(), 1, uintptr(unsafe.Pointer(rect)), 0, 0)
+	empty = r0 != 0
 	return
 }
 
@@ -521,6 +553,12 @@ func _MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret 
 	return
 }
 
+func OffsetRect(rect *RECT, x int32, y int32) (ok bool) {
+	r0, _, _ := syscall.Syscall(procOffsetRect.Addr(), 3, uintptr(unsafe.Pointer(rect)), uintptr(x), uintptr(y))
+	ok = r0 != 0
+	return
+}
+
 func PostQuitMessage(exitCode int32) {
 	syscall.Syscall(procPostQuitMessage.Addr(), 1, uintptr(exitCode), 0, 0)
 	return
@@ -549,6 +587,18 @@ func ScrollWindow(hwnd HWND, dx int32, dy int32, rect *RECT, clipRect *RECT) (ok
 	if ok == false {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func SetRect(rect *RECT, left int32, top int32, right int32, bottom int32) (ok bool) {
+	r0, _, _ := syscall.Syscall6(procSetRect.Addr(), 5, uintptr(unsafe.Pointer(rect)), uintptr(left), uintptr(top), uintptr(right), uintptr(bottom), 0)
+	ok = r0 != 0
+	return
+}
+
+func SetRectEmpty(rect *RECT) (ok bool) {
+	r0, _, _ := syscall.Syscall(procSetRectEmpty.Addr(), 1, uintptr(unsafe.Pointer(rect)), 0, 0)
+	ok = r0 != 0
 	return
 }
 
@@ -597,6 +647,12 @@ func ShowWindow(hwnd HWND, nCmdShow int32) (wasVisible bool) {
 func TranslateMessage(msg *MSG) (translated bool) {
 	r0, _, _ := syscall.Syscall(procTranslateMessage.Addr(), 1, uintptr(unsafe.Pointer(msg)), 0, 0)
 	translated = r0 != 0
+	return
+}
+
+func UnionRect(dst *RECT, src1 *RECT, src2 *RECT) (nonempty bool) {
+	r0, _, _ := syscall.Syscall(procUnionRect.Addr(), 3, uintptr(unsafe.Pointer(dst)), uintptr(unsafe.Pointer(src1)), uintptr(unsafe.Pointer(src2)))
+	nonempty = r0 != 0
 	return
 }
 
