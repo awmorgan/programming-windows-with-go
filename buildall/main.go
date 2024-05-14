@@ -39,7 +39,7 @@ func main() {
 	// Read the output and filter the packages
 	var tobuild []string
 	for _, line := range strings.Split(out.String(), "\n") {
-		if line != "" {
+		if line != "" && !strings.Contains(line, "buildall") {
 			tobuild = append(tobuild, line)
 		}
 	}
@@ -54,7 +54,7 @@ func main() {
 			exePath := "bin/" + filepath.Base(pkg) + ".exe" // Put executables in a 'bin' directory
 
 			// Run "go build -v" command specifying output directly
-			cmd := exec.Command("go", "build", "-v", "-o", exePath, pkg)
+			cmd := exec.Command("go", "build", "-o", exePath, pkg)
 			cmd.Stderr = os.Stderr
 			err := cmd.Run()
 			if err != nil {
