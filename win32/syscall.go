@@ -39,6 +39,7 @@ package win32
 //sys	MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) [failretval==0] = user32.MessageBoxW
 //sys	MoveToEx(hdc HDC, x int32, y int32, lpPoint *POINT) (ok bool) = gdi32.MoveToEx
 //sys	OffsetRect(rect *RECT, x int32, y int32) (ok bool) = user32.OffsetRect
+//sys	PeekMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32, removeMsg uint32) (msgAvail bool) = user32.PeekMessageW
 //sys	PlaySound(sound string, hmod uintptr, flags uint32) (err error) [failretval==0] = winmm.PlaySoundW
 //sys	PolyBezier(hdc HDC, pt []POINT) (ok bool) = gdi32.PolyBezier
 //sys	Polygon(hdc HDC, pt []POINT) (ok bool) = gdi32.Polygon

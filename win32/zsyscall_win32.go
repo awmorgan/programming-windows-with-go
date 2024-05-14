@@ -92,6 +92,7 @@ var (
 	procLoadIconW           = moduser32.NewProc("LoadIconW")
 	procMessageBoxW         = moduser32.NewProc("MessageBoxW")
 	procOffsetRect          = moduser32.NewProc("OffsetRect")
+	procPeekMessageW        = moduser32.NewProc("PeekMessageW")
 	procPostQuitMessage     = moduser32.NewProc("PostQuitMessage")
 	procRegisterClassW      = moduser32.NewProc("RegisterClassW")
 	procReleaseDC           = moduser32.NewProc("ReleaseDC")
@@ -556,6 +557,12 @@ func _MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret 
 func OffsetRect(rect *RECT, x int32, y int32) (ok bool) {
 	r0, _, _ := syscall.Syscall(procOffsetRect.Addr(), 3, uintptr(unsafe.Pointer(rect)), uintptr(x), uintptr(y))
 	ok = r0 != 0
+	return
+}
+
+func PeekMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32, removeMsg uint32) (msgAvail bool) {
+	r0, _, _ := syscall.Syscall6(procPeekMessageW.Addr(), 5, uintptr(unsafe.Pointer(msg)), uintptr(hwnd), uintptr(msgFilterMin), uintptr(msgFilterMax), uintptr(removeMsg), 0)
+	msgAvail = r0 != 0
 	return
 }
 
