@@ -41,7 +41,9 @@ var (
 	moduser32   = NewLazySystemDLL("user32.dll")
 	modwinmm    = NewLazySystemDLL("winmm.dll")
 
+	procCreateSolidBrush    = modgdi32.NewProc("CreateSolidBrush")
 	procDPtoLP              = modgdi32.NewProc("DPtoLP")
+	procDeleteObject        = modgdi32.NewProc("DeleteObject")
 	procEllipse             = modgdi32.NewProc("Ellipse")
 	procGetDeviceCaps       = modgdi32.NewProc("GetDeviceCaps")
 	procGetStockObject      = modgdi32.NewProc("GetStockObject")
@@ -109,12 +111,24 @@ var (
 	procPlaySoundW          = modwinmm.NewProc("PlaySoundW")
 )
 
+func CreateSolidBrush(color COLORREF) (hbr HBRUSH) {
+	r0, _, _ := syscall.Syscall(procCreateSolidBrush.Addr(), 1, uintptr(color), 0, 0)
+	hbr = HBRUSH(r0)
+	return
+}
+
 func DPtoLP(hdc HDC, pt []POINT) (ok bool) {
 	var _p0 *POINT
 	if len(pt) > 0 {
 		_p0 = &pt[0]
 	}
 	r0, _, _ := syscall.Syscall(procDPtoLP.Addr(), 3, uintptr(hdc), uintptr(unsafe.Pointer(_p0)), uintptr(len(pt)))
+	ok = r0 != 0
+	return
+}
+
+func DeleteObject(hObject HGDIOBJ) (ok bool) {
+	r0, _, _ := syscall.Syscall(procDeleteObject.Addr(), 1, uintptr(hObject), 0, 0)
 	ok = r0 != 0
 	return
 }
