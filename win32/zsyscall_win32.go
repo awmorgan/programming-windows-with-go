@@ -41,75 +41,151 @@ var (
 	moduser32   = NewLazySystemDLL("user32.dll")
 	modwinmm    = NewLazySystemDLL("winmm.dll")
 
-	procCreateSolidBrush    = modgdi32.NewProc("CreateSolidBrush")
-	procDPtoLP              = modgdi32.NewProc("DPtoLP")
-	procDeleteObject        = modgdi32.NewProc("DeleteObject")
-	procEllipse             = modgdi32.NewProc("Ellipse")
-	procGetDeviceCaps       = modgdi32.NewProc("GetDeviceCaps")
-	procGetStockObject      = modgdi32.NewProc("GetStockObject")
-	procGetTextMetricsW     = modgdi32.NewProc("GetTextMetricsW")
-	procLineTo              = modgdi32.NewProc("LineTo")
-	procMoveToEx            = modgdi32.NewProc("MoveToEx")
-	procPolyBezier          = modgdi32.NewProc("PolyBezier")
-	procPolygon             = modgdi32.NewProc("Polygon")
-	procPolyline            = modgdi32.NewProc("Polyline")
-	procRectangle           = modgdi32.NewProc("Rectangle")
-	procRestoreDC           = modgdi32.NewProc("RestoreDC")
-	procRoundRect           = modgdi32.NewProc("RoundRect")
-	procSaveDC              = modgdi32.NewProc("SaveDC")
-	procSelectObject        = modgdi32.NewProc("SelectObject")
-	procSetMapMode          = modgdi32.NewProc("SetMapMode")
-	procSetPolyFillMode     = modgdi32.NewProc("SetPolyFillMode")
-	procSetTextAlign        = modgdi32.NewProc("SetTextAlign")
-	procSetViewportExtEx    = modgdi32.NewProc("SetViewportExtEx")
-	procSetWindowExtEx      = modgdi32.NewProc("SetWindowExtEx")
-	procTextOutW            = modgdi32.NewProc("TextOutW")
-	procFreeLibrary         = modkernel32.NewProc("FreeLibrary")
-	procGetModuleHandleW    = modkernel32.NewProc("GetModuleHandleW")
-	procGetProcAddress      = modkernel32.NewProc("GetProcAddress")
-	procGetStartupInfoW     = modkernel32.NewProc("GetStartupInfoW")
-	procGetSystemDirectoryW = modkernel32.NewProc("GetSystemDirectoryW")
-	procLoadLibraryExW      = modkernel32.NewProc("LoadLibraryExW")
-	procBeginPaint          = moduser32.NewProc("BeginPaint")
-	procCopyRect            = moduser32.NewProc("CopyRect")
-	procCreateWindowExW     = moduser32.NewProc("CreateWindowExW")
-	procDefWindowProcW      = moduser32.NewProc("DefWindowProcW")
-	procDispatchMessageW    = moduser32.NewProc("DispatchMessageW")
-	procDrawTextW           = moduser32.NewProc("DrawTextW")
-	procEndPaint            = moduser32.NewProc("EndPaint")
-	procFillRect            = moduser32.NewProc("FillRect")
-	procFrameRect           = moduser32.NewProc("FrameRect")
-	procGetClientRect       = moduser32.NewProc("GetClientRect")
-	procGetDC               = moduser32.NewProc("GetDC")
-	procGetMessageW         = moduser32.NewProc("GetMessageW")
-	procGetScrollInfo       = moduser32.NewProc("GetScrollInfo")
-	procGetScrollPos        = moduser32.NewProc("GetScrollPos")
-	procGetSystemMetrics    = moduser32.NewProc("GetSystemMetrics")
-	procInflateRect         = moduser32.NewProc("InflateRect")
-	procIntersectRect       = moduser32.NewProc("IntersectRect")
-	procInvalidateRect      = moduser32.NewProc("InvalidateRect")
-	procInvertRect          = moduser32.NewProc("InvertRect")
-	procIsRectEmpty         = moduser32.NewProc("IsRectEmpty")
-	procLoadCursorW         = moduser32.NewProc("LoadCursorW")
-	procLoadIconW           = moduser32.NewProc("LoadIconW")
-	procMessageBoxW         = moduser32.NewProc("MessageBoxW")
-	procOffsetRect          = moduser32.NewProc("OffsetRect")
-	procPeekMessageW        = moduser32.NewProc("PeekMessageW")
-	procPostQuitMessage     = moduser32.NewProc("PostQuitMessage")
-	procRegisterClassW      = moduser32.NewProc("RegisterClassW")
-	procReleaseDC           = moduser32.NewProc("ReleaseDC")
-	procScrollWindow        = moduser32.NewProc("ScrollWindow")
-	procSetRect             = moduser32.NewProc("SetRect")
-	procSetRectEmpty        = moduser32.NewProc("SetRectEmpty")
-	procSetScrollInfo       = moduser32.NewProc("SetScrollInfo")
-	procSetScrollPos        = moduser32.NewProc("SetScrollPos")
-	procSetScrollRange      = moduser32.NewProc("SetScrollRange")
-	procShowWindow          = moduser32.NewProc("ShowWindow")
-	procTranslateMessage    = moduser32.NewProc("TranslateMessage")
-	procUnionRect           = moduser32.NewProc("UnionRect")
-	procUpdateWindow        = moduser32.NewProc("UpdateWindow")
-	procPlaySoundW          = modwinmm.NewProc("PlaySoundW")
+	procCombineRgn                = modgdi32.NewProc("CombineRgn")
+	procCreateEllipticRgn         = modgdi32.NewProc("CreateEllipticRgn")
+	procCreateEllipticRgnIndirect = modgdi32.NewProc("CreateEllipticRgnIndirect")
+	procCreatePolyPolygonRgn      = modgdi32.NewProc("CreatePolyPolygonRgn")
+	procCreatePolygonRgn          = modgdi32.NewProc("CreatePolygonRgn")
+	procCreateRectRgn             = modgdi32.NewProc("CreateRectRgn")
+	procCreateRectRgnIndirect     = modgdi32.NewProc("CreateRectRgnIndirect")
+	procCreateRoundRectRgn        = modgdi32.NewProc("CreateRoundRectRgn")
+	procCreateSolidBrush          = modgdi32.NewProc("CreateSolidBrush")
+	procDPtoLP                    = modgdi32.NewProc("DPtoLP")
+	procDeleteObject              = modgdi32.NewProc("DeleteObject")
+	procEllipse                   = modgdi32.NewProc("Ellipse")
+	procExcludeClipRect           = modgdi32.NewProc("ExcludeClipRect")
+	procFillRgn                   = modgdi32.NewProc("FillRgn")
+	procFrameRgn                  = modgdi32.NewProc("FrameRgn")
+	procGetDeviceCaps             = modgdi32.NewProc("GetDeviceCaps")
+	procGetStockObject            = modgdi32.NewProc("GetStockObject")
+	procGetTextMetricsW           = modgdi32.NewProc("GetTextMetricsW")
+	procIntersectClipRect         = modgdi32.NewProc("IntersectClipRect")
+	procInvertRgn                 = modgdi32.NewProc("InvertRgn")
+	procLineTo                    = modgdi32.NewProc("LineTo")
+	procMoveToEx                  = modgdi32.NewProc("MoveToEx")
+	procOffsetClipRgn             = modgdi32.NewProc("OffsetClipRgn")
+	procPaintRgn                  = modgdi32.NewProc("PaintRgn")
+	procPolyBezier                = modgdi32.NewProc("PolyBezier")
+	procPolygon                   = modgdi32.NewProc("Polygon")
+	procPolyline                  = modgdi32.NewProc("Polyline")
+	procRectangle                 = modgdi32.NewProc("Rectangle")
+	procRestoreDC                 = modgdi32.NewProc("RestoreDC")
+	procRoundRect                 = modgdi32.NewProc("RoundRect")
+	procSaveDC                    = modgdi32.NewProc("SaveDC")
+	procSelectClipRgn             = modgdi32.NewProc("SelectClipRgn")
+	procSelectObject              = modgdi32.NewProc("SelectObject")
+	procSetMapMode                = modgdi32.NewProc("SetMapMode")
+	procSetPolyFillMode           = modgdi32.NewProc("SetPolyFillMode")
+	procSetTextAlign              = modgdi32.NewProc("SetTextAlign")
+	procSetViewportExtEx          = modgdi32.NewProc("SetViewportExtEx")
+	procSetWindowExtEx            = modgdi32.NewProc("SetWindowExtEx")
+	procTextOutW                  = modgdi32.NewProc("TextOutW")
+	procFreeLibrary               = modkernel32.NewProc("FreeLibrary")
+	procGetModuleHandleW          = modkernel32.NewProc("GetModuleHandleW")
+	procGetProcAddress            = modkernel32.NewProc("GetProcAddress")
+	procGetStartupInfoW           = modkernel32.NewProc("GetStartupInfoW")
+	procGetSystemDirectoryW       = modkernel32.NewProc("GetSystemDirectoryW")
+	procLoadLibraryExW            = modkernel32.NewProc("LoadLibraryExW")
+	procBeginPaint                = moduser32.NewProc("BeginPaint")
+	procCopyRect                  = moduser32.NewProc("CopyRect")
+	procCreateWindowExW           = moduser32.NewProc("CreateWindowExW")
+	procDefWindowProcW            = moduser32.NewProc("DefWindowProcW")
+	procDispatchMessageW          = moduser32.NewProc("DispatchMessageW")
+	procDrawTextW                 = moduser32.NewProc("DrawTextW")
+	procEndPaint                  = moduser32.NewProc("EndPaint")
+	procFillRect                  = moduser32.NewProc("FillRect")
+	procFrameRect                 = moduser32.NewProc("FrameRect")
+	procGetClientRect             = moduser32.NewProc("GetClientRect")
+	procGetDC                     = moduser32.NewProc("GetDC")
+	procGetMessageW               = moduser32.NewProc("GetMessageW")
+	procGetScrollInfo             = moduser32.NewProc("GetScrollInfo")
+	procGetScrollPos              = moduser32.NewProc("GetScrollPos")
+	procGetSystemMetrics          = moduser32.NewProc("GetSystemMetrics")
+	procGetUpdateRect             = moduser32.NewProc("GetUpdateRect")
+	procInflateRect               = moduser32.NewProc("InflateRect")
+	procIntersectRect             = moduser32.NewProc("IntersectRect")
+	procInvalidateRect            = moduser32.NewProc("InvalidateRect")
+	procInvalidateRgn             = moduser32.NewProc("InvalidateRgn")
+	procInvertRect                = moduser32.NewProc("InvertRect")
+	procIsRectEmpty               = moduser32.NewProc("IsRectEmpty")
+	procLoadCursorW               = moduser32.NewProc("LoadCursorW")
+	procLoadIconW                 = moduser32.NewProc("LoadIconW")
+	procMessageBoxW               = moduser32.NewProc("MessageBoxW")
+	procOffsetRect                = moduser32.NewProc("OffsetRect")
+	procPeekMessageW              = moduser32.NewProc("PeekMessageW")
+	procPostQuitMessage           = moduser32.NewProc("PostQuitMessage")
+	procRegisterClassW            = moduser32.NewProc("RegisterClassW")
+	procReleaseDC                 = moduser32.NewProc("ReleaseDC")
+	procScrollWindow              = moduser32.NewProc("ScrollWindow")
+	procSetRect                   = moduser32.NewProc("SetRect")
+	procSetRectEmpty              = moduser32.NewProc("SetRectEmpty")
+	procSetScrollInfo             = moduser32.NewProc("SetScrollInfo")
+	procSetScrollPos              = moduser32.NewProc("SetScrollPos")
+	procSetScrollRange            = moduser32.NewProc("SetScrollRange")
+	procShowWindow                = moduser32.NewProc("ShowWindow")
+	procTranslateMessage          = moduser32.NewProc("TranslateMessage")
+	procUnionRect                 = moduser32.NewProc("UnionRect")
+	procUpdateWindow              = moduser32.NewProc("UpdateWindow")
+	procValidateRect              = moduser32.NewProc("ValidateRect")
+	procValidateRgn               = moduser32.NewProc("ValidateRgn")
+	procPlaySoundW                = modwinmm.NewProc("PlaySoundW")
 )
+
+func CombineRgn(dest HRGN, src1 HRGN, src2 HRGN, mode int32) (ret int32) {
+	r0, _, _ := syscall.Syscall6(procCombineRgn.Addr(), 4, uintptr(dest), uintptr(src1), uintptr(src2), uintptr(mode), 0, 0)
+	ret = int32(r0)
+	return
+}
+
+func CreateEllipticRgn(x1 int32, y1 int32, x2 int32, y2 int32) (hrgn HRGN) {
+	r0, _, _ := syscall.Syscall6(procCreateEllipticRgn.Addr(), 4, uintptr(x1), uintptr(y1), uintptr(x2), uintptr(y2), 0, 0)
+	hrgn = HRGN(r0)
+	return
+}
+
+func CreateEllipticRgnIndirect(rect *RECT) (hrgn HRGN) {
+	r0, _, _ := syscall.Syscall(procCreateEllipticRgnIndirect.Addr(), 1, uintptr(unsafe.Pointer(rect)), 0, 0)
+	hrgn = HRGN(r0)
+	return
+}
+
+func CreatePolyPolygonRgn(pt []POINT, lpPolyCounts *int32, nCount int32, fnPolyFillMode int32) (hrgn HRGN) {
+	var _p0 *POINT
+	if len(pt) > 0 {
+		_p0 = &pt[0]
+	}
+	r0, _, _ := syscall.Syscall6(procCreatePolyPolygonRgn.Addr(), 5, uintptr(unsafe.Pointer(_p0)), uintptr(len(pt)), uintptr(unsafe.Pointer(lpPolyCounts)), uintptr(nCount), uintptr(fnPolyFillMode), 0)
+	hrgn = HRGN(r0)
+	return
+}
+
+func CreatePolygonRgn(pt []POINT, cPoints int32, fnPolyFillMode int32) (hrgn HRGN) {
+	var _p0 *POINT
+	if len(pt) > 0 {
+		_p0 = &pt[0]
+	}
+	r0, _, _ := syscall.Syscall6(procCreatePolygonRgn.Addr(), 4, uintptr(unsafe.Pointer(_p0)), uintptr(len(pt)), uintptr(cPoints), uintptr(fnPolyFillMode), 0, 0)
+	hrgn = HRGN(r0)
+	return
+}
+
+func CreateRectRgn(x1 int32, y1 int32, x2 int32, y2 int32) (hrgn HRGN) {
+	r0, _, _ := syscall.Syscall6(procCreateRectRgn.Addr(), 4, uintptr(x1), uintptr(y1), uintptr(x2), uintptr(y2), 0, 0)
+	hrgn = HRGN(r0)
+	return
+}
+
+func CreateRectRgnIndirect(rect *RECT) (hrgn HRGN) {
+	r0, _, _ := syscall.Syscall(procCreateRectRgnIndirect.Addr(), 1, uintptr(unsafe.Pointer(rect)), 0, 0)
+	hrgn = HRGN(r0)
+	return
+}
+
+func CreateRoundRectRgn(x1 int32, y1 int32, x2 int32, y2 int32, width int32, height int32) (hrgn HRGN) {
+	r0, _, _ := syscall.Syscall6(procCreateRoundRectRgn.Addr(), 6, uintptr(x1), uintptr(y1), uintptr(x2), uintptr(y2), uintptr(width), uintptr(height))
+	hrgn = HRGN(r0)
+	return
+}
 
 func CreateSolidBrush(color COLORREF) (hbr HBRUSH) {
 	r0, _, _ := syscall.Syscall(procCreateSolidBrush.Addr(), 1, uintptr(color), 0, 0)
@@ -139,6 +215,24 @@ func Ellipse(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bool
 	return
 }
 
+func ExcludeClipRect(hdc HDC, left int32, top int32, right int32, bottom int32) (ret int32) {
+	r0, _, _ := syscall.Syscall6(procExcludeClipRect.Addr(), 5, uintptr(hdc), uintptr(left), uintptr(top), uintptr(right), uintptr(bottom), 0)
+	ret = int32(r0)
+	return
+}
+
+func FillRgn(hdc HDC, hrgn HRGN, hbr HBRUSH) (ok bool) {
+	r0, _, _ := syscall.Syscall(procFillRgn.Addr(), 3, uintptr(hdc), uintptr(hrgn), uintptr(hbr))
+	ok = r0 != 0
+	return
+}
+
+func FrameRgn(hdc HDC, hrgn HRGN, hbr HBRUSH, width int32, height int32) (ok bool) {
+	r0, _, _ := syscall.Syscall6(procFrameRgn.Addr(), 5, uintptr(hdc), uintptr(hrgn), uintptr(hbr), uintptr(width), uintptr(height), 0)
+	ok = r0 != 0
+	return
+}
+
 func GetDeviceCaps(hdc HDC, index int32) (ret int32) {
 	r0, _, _ := syscall.Syscall(procGetDeviceCaps.Addr(), 2, uintptr(hdc), uintptr(index), 0)
 	ret = int32(r0)
@@ -159,6 +253,18 @@ func GetTextMetrics(hdc HDC, tm *TEXTMETRIC) (err error) {
 	return
 }
 
+func IntersectClipRect(hdc HDC, left int32, top int32, right int32, bottom int32) (ret int32) {
+	r0, _, _ := syscall.Syscall6(procIntersectClipRect.Addr(), 5, uintptr(hdc), uintptr(left), uintptr(top), uintptr(right), uintptr(bottom), 0)
+	ret = int32(r0)
+	return
+}
+
+func InvertRgn(hdc HDC, hrgn HRGN) (ok bool) {
+	r0, _, _ := syscall.Syscall(procInvertRgn.Addr(), 2, uintptr(hdc), uintptr(hrgn), 0)
+	ok = r0 != 0
+	return
+}
+
 func LineTo(hdc HDC, x int32, y int32) (ok bool) {
 	r0, _, _ := syscall.Syscall(procLineTo.Addr(), 3, uintptr(hdc), uintptr(x), uintptr(y))
 	ok = r0 != 0
@@ -167,6 +273,18 @@ func LineTo(hdc HDC, x int32, y int32) (ok bool) {
 
 func MoveToEx(hdc HDC, x int32, y int32, lpPoint *POINT) (ok bool) {
 	r0, _, _ := syscall.Syscall6(procMoveToEx.Addr(), 4, uintptr(hdc), uintptr(x), uintptr(y), uintptr(unsafe.Pointer(lpPoint)), 0, 0)
+	ok = r0 != 0
+	return
+}
+
+func OffsetClipRgn(hdc HDC, x int32, y int32) (ret int32) {
+	r0, _, _ := syscall.Syscall(procOffsetClipRgn.Addr(), 3, uintptr(hdc), uintptr(x), uintptr(y))
+	ret = int32(r0)
+	return
+}
+
+func PaintRgn(hdc HDC, hrgn HRGN) (ok bool) {
+	r0, _, _ := syscall.Syscall(procPaintRgn.Addr(), 2, uintptr(hdc), uintptr(hrgn), 0)
 	ok = r0 != 0
 	return
 }
@@ -222,6 +340,12 @@ func RoundRect(hdc HDC, left int32, top int32, right int32, bottom int32, width 
 func SaveDC(hdc HDC) (ret int32) {
 	r0, _, _ := syscall.Syscall(procSaveDC.Addr(), 1, uintptr(hdc), 0, 0)
 	ret = int32(r0)
+	return
+}
+
+func SelectClipRgn(hdc HDC, hrgn HRGN) (mode int32) {
+	r0, _, _ := syscall.Syscall(procSelectClipRgn.Addr(), 2, uintptr(hdc), uintptr(hrgn), 0)
+	mode = int32(r0)
 	return
 }
 
@@ -473,6 +597,16 @@ func GetSystemMetrics(nIndex int32) (ret int32) {
 	return
 }
 
+func GetUpdateRect(hwnd HWND, rect *RECT, erase bool) (notEmpty bool) {
+	var _p0 uint32
+	if erase {
+		_p0 = 1
+	}
+	r0, _, _ := syscall.Syscall(procGetUpdateRect.Addr(), 3, uintptr(hwnd), uintptr(unsafe.Pointer(rect)), uintptr(_p0))
+	notEmpty = r0 != 0
+	return
+}
+
 func InflateRect(rect *RECT, x int32, y int32) (ok bool) {
 	r0, _, _ := syscall.Syscall(procInflateRect.Addr(), 3, uintptr(unsafe.Pointer(rect)), uintptr(x), uintptr(y))
 	ok = r0 != 0
@@ -494,6 +628,15 @@ func InvalidateRect(hwnd HWND, rect *RECT, erase bool) (err error) {
 	if r1 == 0 {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func InvalidateRgn(hwnd HWND, hrgn HRGN, erase bool) {
+	var _p0 uint32
+	if erase {
+		_p0 = 1
+	}
+	syscall.Syscall(procInvalidateRgn.Addr(), 3, uintptr(hwnd), uintptr(hrgn), uintptr(_p0))
 	return
 }
 
@@ -679,6 +822,18 @@ func UnionRect(dst *RECT, src1 *RECT, src2 *RECT) (nonempty bool) {
 
 func UpdateWindow(hwnd HWND) (ok bool) {
 	r0, _, _ := syscall.Syscall(procUpdateWindow.Addr(), 1, uintptr(hwnd), 0, 0)
+	ok = r0 != 0
+	return
+}
+
+func ValidateRect(hwnd HWND, rect *RECT) (ok bool) {
+	r0, _, _ := syscall.Syscall(procValidateRect.Addr(), 2, uintptr(hwnd), uintptr(unsafe.Pointer(rect)), 0)
+	ok = r0 != 0
+	return
+}
+
+func ValidateRgn(hwnd HWND, hrgn HRGN) (ok bool) {
+	r0, _, _ := syscall.Syscall(procValidateRgn.Addr(), 2, uintptr(hwnd), uintptr(hrgn), 0)
 	ok = r0 != 0
 	return
 }
