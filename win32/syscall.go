@@ -73,6 +73,7 @@ package win32
 //sys	ScrollWindow(hwnd HWND, dx int32, dy int32, rect *RECT, clipRect *RECT) (ok bool, err error) [failretval==false] = user32.ScrollWindow
 //sys	SelectClipRgn(hdc HDC, hrgn HRGN) (mode int32) = gdi32.SelectClipRgn
 //sys	SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) = gdi32.SelectObject
+//sys	SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) = user32.SetCursor
 //sys	SetMapMode(hdc HDC, iMapMode int32) (ret int32) = gdi32.SetMapMode
 //sys	SetPolyFillMode(hdc HDC, mode int32) (ret int32) = gdi32.SetPolyFillMode
 //sys	SetRect(rect *RECT, left int32, top int32, right int32, bottom int32) (ok bool) = user32.SetRect
@@ -83,6 +84,7 @@ package win32
 //sys	SetTextAlign(hdc HDC, align uint32) (ret uint32) = gdi32.SetTextAlign
 //sys	SetViewportExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) = gdi32.SetViewportExtEx
 //sys	SetWindowExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) = gdi32.SetWindowExtEx
+//sys	ShowCursor(show bool) (count int32) = user32.ShowCursor
 //sys	ShowWindow(hwnd HWND, nCmdShow int32) (wasVisible bool) = user32.ShowWindow
 //sys	TextOut(hdc HDC, x int32, y int32, text string, n int) (err error) [failretval==0] = gdi32.TextOutW
 //sys	TranslateMessage(msg *MSG) (translated bool) = user32.TranslateMessage

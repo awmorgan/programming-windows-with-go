@@ -117,11 +117,13 @@ var (
 	procRegisterClassW            = moduser32.NewProc("RegisterClassW")
 	procReleaseDC                 = moduser32.NewProc("ReleaseDC")
 	procScrollWindow              = moduser32.NewProc("ScrollWindow")
+	procSetCursor                 = moduser32.NewProc("SetCursor")
 	procSetRect                   = moduser32.NewProc("SetRect")
 	procSetRectEmpty              = moduser32.NewProc("SetRectEmpty")
 	procSetScrollInfo             = moduser32.NewProc("SetScrollInfo")
 	procSetScrollPos              = moduser32.NewProc("SetScrollPos")
 	procSetScrollRange            = moduser32.NewProc("SetScrollRange")
+	procShowCursor                = moduser32.NewProc("ShowCursor")
 	procShowWindow                = moduser32.NewProc("ShowWindow")
 	procTranslateMessage          = moduser32.NewProc("TranslateMessage")
 	procUnionRect                 = moduser32.NewProc("UnionRect")
@@ -754,6 +756,12 @@ func ScrollWindow(hwnd HWND, dx int32, dy int32, rect *RECT, clipRect *RECT) (ok
 	return
 }
 
+func SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) {
+	r0, _, _ := syscall.Syscall(procSetCursor.Addr(), 1, uintptr(hCursor), 0, 0)
+	hCursorOld = HCURSOR(r0)
+	return
+}
+
 func SetRect(rect *RECT, left int32, top int32, right int32, bottom int32) (ok bool) {
 	r0, _, _ := syscall.Syscall6(procSetRect.Addr(), 5, uintptr(unsafe.Pointer(rect)), uintptr(left), uintptr(top), uintptr(right), uintptr(bottom), 0)
 	ok = r0 != 0
@@ -799,6 +807,16 @@ func SetScrollRange(hwnd HWND, nBar int32, nMinPos int32, nMaxPos int32, bRedraw
 	if ret == 0 {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func ShowCursor(show bool) (count int32) {
+	var _p0 uint32
+	if show {
+		_p0 = 1
+	}
+	r0, _, _ := syscall.Syscall(procShowCursor.Addr(), 1, uintptr(_p0), 0, 0)
+	count = int32(r0)
 	return
 }
 
