@@ -39,6 +39,8 @@ func main() {
 		HbrBackground: win32.WhiteBrush(),
 		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
+	wc.HCursor = win32.LoadCursorNew(0, win32.IDC_ARROW1())
+
 	if _, err := win32.RegisterClass(&wc); err != nil {
 		errMsg := fmt.Sprintf("RegisterClass failed: %v", err)
 		win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)

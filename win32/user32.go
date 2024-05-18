@@ -318,6 +318,54 @@ const (
 	IDC_SIZE        = 32640
 )
 
+// resourceID type to encapsulate the resource identifier
+type resourceID struct {
+	id uint16
+}
+
+// Function to mimic MAKEINTRESOURCEW
+func (r resourceID) Ptr() *uint16 {
+	return &r.id
+}
+
+// Internal constant representing the resource identifier
+var idcArrow = resourceID{id: 32512}
+
+// Public function to access the constant resource identifier
+func IDC_ARROW1() *uint16 {
+	return idcArrow.Ptr()
+}
+
+func LoadCursorNew(hInstance HINSTANCE, lpCursorName *uint16) HCURSOR {
+	h, err := _LoadCursor(hInstance, lpCursorName)
+	if err != nil {
+		panic(err)
+	}
+	return h
+}
+
+const (
+	// IDC_ARROW_new       = (*uint16)(unsafe.Pointer(uintptr(32512)))
+	// IDC_ARROW_new       = (unsafe.Pointer(uintptr(32512)))
+	IDC_ARROW_new = uintptr(32512)
+	// IDC_ARROW_new1      = unsafe.Pointer(uintptr(32512))
+	IDC_IBEAM_new       = 32513
+	IDC_WAIT_new        = 32514
+	IDC_CROSS_new       = 32515
+	IDC_UPARROW_new     = 32516
+	IDC_SIZENWSE_new    = 32642
+	IDC_SIZENESW_new    = 32643
+	IDC_SIZEWE_new      = 32644
+	IDC_SIZENS_new      = 32645
+	IDC_SIZEALL_new     = 32646
+	IDC_NO_new          = 32648
+	IDC_HAND_new        = 32649
+	IDC_APPSTARTING_new = 32650
+	IDC_HELP_new        = 32651
+	IDC_ICON_new        = 32641
+	IDC_SIZE_new        = 32640
+)
+
 // GetSystemMetrics constants
 const (
 	SM_CXSCREEN             = 0
