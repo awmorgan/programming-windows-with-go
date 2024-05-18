@@ -178,6 +178,9 @@ func StringToUTF16Ptr(s string) *uint16 {
 	return p
 }
 
+func _MAKEINTRESOURCE(id uintptr) *uint16 {
+	return (*uint16)(unsafe.Pointer(id))
+}
 
 func loadIconFromID(id uintptr) HICON {
 	h, err := _LoadIcon(0, _MAKEINTRESOURCE(id))
