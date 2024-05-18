@@ -206,6 +206,10 @@ func ArrowCursor() HCURSOR {
 	return loadCursorFromID(IDC_ARROW)
 }
 
+func WaitCursor() HCURSOR {
+	return loadCursorFromID(IDC_WAIT)
+}
+
 // func BoolToBOOL(value bool) BOOL {
 // 	if value {
 // 		return 1
