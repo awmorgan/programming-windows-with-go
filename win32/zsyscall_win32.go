@@ -78,6 +78,7 @@ var (
 	procSetPolyFillMode           = modgdi32.NewProc("SetPolyFillMode")
 	procSetTextAlign              = modgdi32.NewProc("SetTextAlign")
 	procSetViewportExtEx          = modgdi32.NewProc("SetViewportExtEx")
+	procSetViewportOrgEx          = modgdi32.NewProc("SetViewportOrgEx")
 	procSetWindowExtEx            = modgdi32.NewProc("SetWindowExtEx")
 	procTextOutW                  = modgdi32.NewProc("TextOutW")
 	procFreeLibrary               = modkernel32.NewProc("FreeLibrary")
@@ -377,6 +378,12 @@ func SetTextAlign(hdc HDC, align uint32) (ret uint32) {
 
 func SetViewportExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) {
 	r0, _, _ := syscall.Syscall6(procSetViewportExtEx.Addr(), 4, uintptr(hdc), uintptr(x), uintptr(y), uintptr(unsafe.Pointer(size)), 0, 0)
+	ok = r0 != 0
+	return
+}
+
+func SetViewportOrgEx(hdc HDC, x int32, y int32, pt *POINT) (ok bool) {
+	r0, _, _ := syscall.Syscall6(procSetViewportOrgEx.Addr(), 4, uintptr(hdc), uintptr(x), uintptr(y), uintptr(unsafe.Pointer(pt)), 0, 0)
 	ok = r0 != 0
 	return
 }

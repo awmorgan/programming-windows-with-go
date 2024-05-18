@@ -95,7 +95,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 	case win32.WM_PAINT:
 		ps := win32.PAINTSTRUCT{}
 		hdc := win32.BeginPaint(hwnd, &ps)
-		win32.SetViewportExtEx(hdc, cxClient/2, cyClient/2, nil)
+		win32.SetViewportOrgEx(hdc, cxClient/2, cyClient/2, nil)
 		win32.SelectClipRgn(hdc, hRgnClip)
 
 		fRadius := math.Hypot(float64(cxClient)/2.0, float64(cyClient)/2.0)
