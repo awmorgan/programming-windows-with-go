@@ -51,19 +51,19 @@ func main() {
 }
 
 var (
-	cxClientMax, cyClientMax int32
-	cxClient, cyClient       int32
-	cyChar                   int32
-	cLinesMax, cLines        int32
-	pmsg                     []win32.MSG
-	rectScroll               win32.RECT
+	cyClientMax        int32
+	cxClient, cyClient int32
+	cyChar             int32
+	cLinesMax, cLines  int32
+	pmsg               []win32.MSG
+	rectScroll         win32.RECT
 )
 
 func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
 	switch msg {
 	case win32.WM_CREATE, win32.WM_DISPLAYCHANGE:
 		// Get maximum size of client area.
-		cxClientMax = win32.GetSystemMetrics(win32.SM_CXMAXIMIZED)
+		// cxClientMax = win32.GetSystemMetrics(win32.SM_CXMAXIMIZED)
 		cyClientMax = win32.GetSystemMetrics(win32.SM_CYMAXIMIZED)
 
 		// Get character size for the fixed-pitch font.
