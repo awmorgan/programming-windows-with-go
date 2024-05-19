@@ -118,6 +118,7 @@ var (
 	procRegisterClassW            = moduser32.NewProc("RegisterClassW")
 	procReleaseDC                 = moduser32.NewProc("ReleaseDC")
 	procScrollWindow              = moduser32.NewProc("ScrollWindow")
+	procSendMessageW              = moduser32.NewProc("SendMessageW")
 	procSetCursor                 = moduser32.NewProc("SetCursor")
 	procSetRect                   = moduser32.NewProc("SetRect")
 	procSetRectEmpty              = moduser32.NewProc("SetRectEmpty")
@@ -760,6 +761,12 @@ func ScrollWindow(hwnd HWND, dx int32, dy int32, rect *RECT, clipRect *RECT) (ok
 	if ok == false {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func SendMessage(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (lResult uintptr) {
+	r0, _, _ := syscall.Syscall6(procSendMessageW.Addr(), 4, uintptr(hwnd), uintptr(msg), uintptr(wParam), uintptr(lParam), 0, 0)
+	lResult = uintptr(r0)
 	return
 }
 
