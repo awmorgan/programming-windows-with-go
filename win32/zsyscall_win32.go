@@ -74,6 +74,7 @@ var (
 	procSaveDC                    = modgdi32.NewProc("SaveDC")
 	procSelectClipRgn             = modgdi32.NewProc("SelectClipRgn")
 	procSelectObject              = modgdi32.NewProc("SelectObject")
+	procSetBkMode                 = modgdi32.NewProc("SetBkMode")
 	procSetMapMode                = modgdi32.NewProc("SetMapMode")
 	procSetPolyFillMode           = modgdi32.NewProc("SetPolyFillMode")
 	procSetTextAlign              = modgdi32.NewProc("SetTextAlign")
@@ -98,6 +99,7 @@ var (
 	procFrameRect                 = moduser32.NewProc("FrameRect")
 	procGetClientRect             = moduser32.NewProc("GetClientRect")
 	procGetDC                     = moduser32.NewProc("GetDC")
+	procGetKeyNameTextW           = moduser32.NewProc("GetKeyNameTextW")
 	procGetMessageW               = moduser32.NewProc("GetMessageW")
 	procGetScrollInfo             = moduser32.NewProc("GetScrollInfo")
 	procGetScrollPos              = moduser32.NewProc("GetScrollPos")
@@ -359,6 +361,12 @@ func SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) {
 	return
 }
 
+func SetBkMode(hdc HDC, mode int32) (prevMode int32) {
+	r0, _, _ := syscall.Syscall(procSetBkMode.Addr(), 2, uintptr(hdc), uintptr(mode), 0)
+	prevMode = int32(r0)
+	return
+}
+
 func SetMapMode(hdc HDC, iMapMode int32) (ret int32) {
 	r0, _, _ := syscall.Syscall(procSetMapMode.Addr(), 2, uintptr(hdc), uintptr(iMapMode), 0)
 	ret = int32(r0)
@@ -571,6 +579,12 @@ func GetClientRect(hwnd HWND, rect *RECT) (err error) {
 func GetDC(hwnd HWND) (hdc HDC) {
 	r0, _, _ := syscall.Syscall(procGetDC.Addr(), 1, uintptr(hwnd), 0, 0)
 	hdc = HDC(r0)
+	return
+}
+
+func GetKeyNameText(lparam uintptr, buffer *uint16, size int32) (ret int32) {
+	r0, _, _ := syscall.Syscall(procGetKeyNameTextW.Addr(), 3, uintptr(lparam), uintptr(unsafe.Pointer(buffer)), uintptr(size))
+	ret = int32(r0)
 	return
 }
 

@@ -30,6 +30,7 @@ package win32
 //sys	GetClientRect(hwnd HWND, rect *RECT) (err error) [failretval==0] = user32.GetClientRect
 //sys	GetDC(hwnd HWND) (hdc HDC) = user32.GetDC
 //sys	GetDeviceCaps(hdc HDC, index int32) (ret int32) = gdi32.GetDeviceCaps
+//sys	GetKeyNameText(lparam uintptr, buffer *uint16, size int32) (ret int32) = user32.GetKeyNameTextW
 //sys	GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) [failretval==-1] = user32.GetMessageW
 //sys	getModuleHandle(moduleName *uint16) (hModule HMODULE, err error) [failretval==0] = kernel32.GetModuleHandleW
 //sys	GetProcAddress(module HANDLE, procname string) (proc uintptr, err error)
@@ -74,6 +75,7 @@ package win32
 //sys	SelectClipRgn(hdc HDC, hrgn HRGN) (mode int32) = gdi32.SelectClipRgn
 //sys	SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) = gdi32.SelectObject
 //sys	SendMessage(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (lResult uintptr) = user32.SendMessageW
+//sys	SetBkMode(hdc HDC, mode int32) (prevMode int32) = gdi32.SetBkMode
 //sys	SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) = user32.SetCursor
 //sys	SetMapMode(hdc HDC, iMapMode int32) (ret int32) = gdi32.SetMapMode
 //sys	SetPolyFillMode(hdc HDC, mode int32) (ret int32) = gdi32.SetPolyFillMode

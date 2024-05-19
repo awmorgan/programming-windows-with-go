@@ -178,6 +178,19 @@ func StringToUTF16Ptr(s string) *uint16 {
 	return p
 }
 
+func Utf16PtrToString(p *uint16) string {
+	if p == nil {
+		return ""
+	}
+	end := unsafe.Pointer(p)
+	n := 0
+	for *(*uint16)(end) != 0 {
+		end = unsafe.Pointer(uintptr(end) + unsafe.Sizeof(*p))
+		n++
+	}
+	return syscall.UTF16ToString(unsafe.Slice(p, n))
+}
+
 func _MAKEINTRESOURCE(id uintptr) *uint16 {
 	return (*uint16)(unsafe.Pointer(id))
 }
