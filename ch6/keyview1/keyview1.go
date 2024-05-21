@@ -183,7 +183,6 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 				s += "   Up"
 			}
 			win32.TextOut(hdc, 0, (cyClient/cyChar-1-i)*cyChar, s, len(s))
-			fmt.Println(s)
 		}
 
 		win32.EndPaint(hwnd, &ps)
