@@ -582,8 +582,12 @@ func GetDC(hwnd HWND) (hdc HDC) {
 	return
 }
 
-func GetKeyNameText(lparam uintptr, buffer *uint16, size int32) (ret int32) {
-	r0, _, _ := syscall.Syscall(procGetKeyNameTextW.Addr(), 3, uintptr(lparam), uintptr(unsafe.Pointer(buffer)), uintptr(size))
+func GetKeyNameText(lparam uintptr, buffer []uint16) (ret int32) {
+	var _p0 *uint16
+	if len(buffer) > 0 {
+		_p0 = &buffer[0]
+	}
+	r0, _, _ := syscall.Syscall(procGetKeyNameTextW.Addr(), 3, uintptr(lparam), uintptr(unsafe.Pointer(_p0)), uintptr(len(buffer)))
 	ret = int32(r0)
 	return
 }

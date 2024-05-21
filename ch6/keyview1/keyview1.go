@@ -110,7 +110,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		cLines = min(cLines+1, cLinesMax)
 
 		// Scroll up the display.
-		win32.ScrollWindow(hwnd, 0, -cyChar, nil, nil)
+		win32.ScrollWindow(hwnd, 0, -cyChar, &rectScroll, &rectScroll)
 
 	case win32.WM_PAINT:
 		ps := win32.PAINTSTRUCT{}
@@ -123,60 +123,65 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		win32.TextOut(hdc, 0, 0, top, len(top))
 		win32.TextOut(hdc, 0, 0, und, len(und))
 
-		var fmtStr = [...]string{
-			"%-13s %3d %-15s%c%6d %4d %3d %3d %4d %4d",
-			"%-13s            0x%04X%1s%c %6d %4d %3d %3d %4s %4s",
-		}
-
-		var messages = [...]string{
-			"WM_KEYDOWN", "WM_KEYUP", "WM_CHAR", "WM_DEADCHAR",
-			"WM_SYSKEYDOWN", "WM_SYSKEYUP", "WM_SYSCHAR", "WM_SYSDEADCHAR",
-		}
-
-		yesNo := func(flag uint32) string {
-			if flag != 0 {
-				return "Yes"
-			}
-			return "No"
-		}
-
-		upDown := func(flag uint32) string {
-			if flag != 0 {
-				return "Up"
-			}
-			return "Down"
-		}
-
 		for i := int32(0); i < min(cLines, cyClient/cyChar-1); i++ {
-			var szKeyName [32]uint16
-			iType := 0
-			if pmsg[i].Message == win32.WM_CHAR || pmsg[i].Message == win32.WM_SYSCHAR ||
-				pmsg[i].Message == win32.WM_DEADCHAR || pmsg[i].Message == win32.WM_SYSDEADCHAR {
-				iType = 1
+			var u16KeyName [32]uint16
+			win32.GetKeyNameText(pmsg[i].LParam, u16KeyName[:])
+			sKeyName := win32.Utf16PtrToString(&u16KeyName[0])
+
+			var message string
+			var isCharMsg bool
+			switch pmsg[i].Message {
+			case win32.WM_KEYDOWN:
+				message = "WM_KEYDOWN"
+			case win32.WM_KEYUP:
+				message = "WM_KEYUP"
+			case win32.WM_CHAR:
+				message = "WM_CHAR"
+				isCharMsg = true
+			case win32.WM_DEADCHAR:
+				message = "WM_DEADCHAR"
+				isCharMsg = true
+			case win32.WM_SYSKEYDOWN:
+				message = "WM_SYSKEYDOWN"
+			case win32.WM_SYSKEYUP:
+				message = "WM_SYSKEYUP"
+			case win32.WM_SYSCHAR:
+				message = "WM_SYSCHAR"
+				isCharMsg = true
+			case win32.WM_SYSDEADCHAR:
+				message = "WM_SYSDEADCHAR"
+				isCharMsg = true
 			}
 
-			win32.GetKeyNameText(pmsg[i].LParam, &szKeyName[0], int32(len(szKeyName)))
-			s := fmt.Sprintf(fmtStr[iType], messages[pmsg[i].Message-win32.WM_KEYDOWN],
-				pmsg[i].WParam, func() string {
-					if iType == 1 {
-						return " "
-					} else {
-						return win32.Utf16PtrToString(&szKeyName[0])
-					}
-				}(),
-				func() uint16 {
-					if iType == 1 {
-						return uint16(pmsg[i].WParam)
-					} else {
-						return ' '
-					}
-				}(),
-				win32.LOWORD(pmsg[i].LParam), win32.HIWORD(pmsg[i].LParam),
-				yesNo(uint32(pmsg[i].LParam)&0x0100_0000),
-				yesNo(uint32(pmsg[i].LParam)&0x2000_0000),
-				upDown(uint32(pmsg[i].LParam)&0x4000_0000),
-				upDown(uint32(pmsg[i].LParam)&0x8000_0000))
+			s := fmt.Sprintf("%-13s", message)
+			if isCharMsg {
+				s += fmt.Sprintf("            0x%04X %c", pmsg[i].WParam, pmsg[i].WParam)
 
+			} else {
+				s += fmt.Sprintf(" %3d %-15s", pmsg[i].WParam, sKeyName)
+			}
+			s += fmt.Sprintf(" %6d %4d",
+				win32.LOWORD(pmsg[i].LParam), win32.HIWORD(pmsg[i].LParam)&0xFF)
+			if pmsg[i].LParam&0x0100_0000 != 0 {
+				s += " Yes"
+			} else {
+				s += "  No"
+			}
+			if pmsg[i].LParam&0x2000_0000 != 0 {
+				s += " Yes"
+			} else {
+				s += "  No"
+			}
+			if pmsg[i].LParam&0x4000_0000 != 0 {
+				s += " Down"
+			} else {
+				s += "   Up"
+			}
+			if pmsg[i].LParam&0x8000_0000 != 0 {
+				s += " Down"
+			} else {
+				s += "   Up"
+			}
 			win32.TextOut(hdc, 0, (cyClient/cyChar-1-i)*cyChar, s, len(s))
 			fmt.Println(s)
 		}

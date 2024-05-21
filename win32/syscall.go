@@ -30,7 +30,7 @@ package win32
 //sys	GetClientRect(hwnd HWND, rect *RECT) (err error) [failretval==0] = user32.GetClientRect
 //sys	GetDC(hwnd HWND) (hdc HDC) = user32.GetDC
 //sys	GetDeviceCaps(hdc HDC, index int32) (ret int32) = gdi32.GetDeviceCaps
-//sys	GetKeyNameText(lparam uintptr, buffer *uint16, size int32) (ret int32) = user32.GetKeyNameTextW
+//sys	GetKeyNameText(lparam uintptr, buffer []uint16) (ret int32) = user32.GetKeyNameTextW
 //sys	GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) [failretval==-1] = user32.GetMessageW
 //sys	getModuleHandle(moduleName *uint16) (hModule HMODULE, err error) [failretval==0] = kernel32.GetModuleHandleW
 //sys	GetProcAddress(module HANDLE, procname string) (proc uintptr, err error)
