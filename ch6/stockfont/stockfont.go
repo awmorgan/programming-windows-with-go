@@ -113,7 +113,44 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		hdc := win32.BeginPaint(hwnd, &ps)
 
 		win32.SelectObject(hdc, win32.GetStockObject(stockfont[iFont].idStockFont))
-		// win32.GetTextFace
+		var faceName [win32.LF_FACESIZE]uint16
+		win32.GetTextFace(hdc, win32.LF_FACESIZE, &faceName[0])
+		var tm win32.TEXTMETRIC
+		win32.GetTextMetrics(hdc, &tm)
+		cxGrid := max(3*tm.TmAveCharWidth, 2*tm.TmMaxCharWidth)
+		cyGrid := tm.TmHeight + 3
+		s := fmt.Sprintf("%s: Face Name: %s, CharSet = %d",
+			stockfont[iFont].szStockFont, win32.Utf16PtrToString(&faceName[0]), tm.TmCharSet)
+		win32.TextOut(hdc, 0, 0, s, len(s))
+		win32.SetTextAlign(hdc, win32.TA_TOP|win32.TA_CENTER)
+
+		// vertical and horizontal lines
+		for i := int32(0); i < 17; i++ {
+			win32.MoveToEx(hdc, (i+2)*cxGrid, 2*cyGrid, nil)
+			win32.LineTo(hdc, (i+2)*cxGrid, 19*cyGrid)
+
+			win32.MoveToEx(hdc, cxGrid, (i+3)*cyGrid, nil)
+			win32.LineTo(hdc, 18*cxGrid, (i+3)*cyGrid)
+		}
+
+		// vertical and horizontal headings
+		for i := int32(0); i < 16; i++ {
+			s := fmt.Sprintf("%X-", i)
+			win32.TextOut(hdc, (2*i+5)*cxGrid/2, 2*cyGrid+2, s, len(s))
+			s = fmt.Sprintf("-%X", i)
+			win32.TextOut(hdc, 3*cxGrid/2, (i+3)*cyGrid+2, s, len(s))
+		}
+
+		// characters
+		for y := int32(0); y < 16; y++ {
+			for x := int32(0); x < 16; x++ {
+				ch := byte(x*16 + y)
+				s := string(ch)
+				win32.TextOut(hdc, (2*x+5)*cxGrid/2,
+					(y+3)*cyGrid+2, s, len(s))
+			}
+		}
+
 		win32.EndPaint(hwnd, &ps)
 		return 0
 

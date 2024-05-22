@@ -58,6 +58,7 @@ var (
 	procFrameRgn                  = modgdi32.NewProc("FrameRgn")
 	procGetDeviceCaps             = modgdi32.NewProc("GetDeviceCaps")
 	procGetStockObject            = modgdi32.NewProc("GetStockObject")
+	procGetTextFaceW              = modgdi32.NewProc("GetTextFaceW")
 	procGetTextMetricsW           = modgdi32.NewProc("GetTextMetricsW")
 	procIntersectClipRect         = modgdi32.NewProc("IntersectClipRect")
 	procInvertRgn                 = modgdi32.NewProc("InvertRgn")
@@ -248,6 +249,12 @@ func GetDeviceCaps(hdc HDC, index int32) (ret int32) {
 func GetStockObject(fnObject int32) (ret HGDIOBJ) {
 	r0, _, _ := syscall.Syscall(procGetStockObject.Addr(), 1, uintptr(fnObject), 0, 0)
 	ret = HGDIOBJ(r0)
+	return
+}
+
+func GetTextFace(hdc HDC, n int32, faceName *uint16) (nOut int32) {
+	r0, _, _ := syscall.Syscall(procGetTextFaceW.Addr(), 3, uintptr(hdc), uintptr(n), uintptr(unsafe.Pointer(faceName)))
+	nOut = int32(r0)
 	return
 }
 

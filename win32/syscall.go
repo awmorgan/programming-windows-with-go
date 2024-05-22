@@ -40,6 +40,7 @@ package win32
 //sys	GetStockObject(fnObject int32) (ret HGDIOBJ) = gdi32.GetStockObject
 //sys	getSystemDirectory(dir *uint16, dirLen uint32) (len uint32, err error) = kernel32.GetSystemDirectoryW
 //sys	GetSystemMetrics(nIndex int32) (ret int32) = user32.GetSystemMetrics
+//sys	GetTextFace(hdc HDC, n int32, faceName *uint16) (nOut int32) = gdi32.GetTextFaceW
 //sys	GetTextMetrics(hdc HDC, tm *TEXTMETRIC) (err error) [failretval==0] = gdi32.GetTextMetricsW
 //sys	GetUpdateRect(hwnd HWND, rect *RECT, erase bool) (notEmpty bool) = user32.GetUpdateRect
 //sys	InflateRect(rect *RECT, x int32, y int32) (ok bool) = user32.InflateRect
