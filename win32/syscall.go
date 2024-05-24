@@ -86,6 +86,7 @@ package win32
 //sys	SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) = user32.SetCursor
 //sys	SetFocus(hwnd HWND) (hwndPrev HWND, err error) [failretval==0] = user32.SetFocus
 //sys	SetMapMode(hdc HDC, iMapMode int32) (ret int32) = gdi32.SetMapMode
+//sys	SetPixel(hdc HDC, x int32, y int32, color COLORREF) (prevColor COLORREF) = gdi32.SetPixel
 //sys	SetPolyFillMode(hdc HDC, mode int32) (ret int32) = gdi32.SetPolyFillMode
 //sys	SetRect(rect *RECT, left int32, top int32, right int32, bottom int32) (ok bool) = user32.SetRect
 //sys	SetRectEmpty(rect *RECT) (ok bool) = user32.SetRectEmpty

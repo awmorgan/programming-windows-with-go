@@ -78,6 +78,7 @@ var (
 	procSelectObject              = modgdi32.NewProc("SelectObject")
 	procSetBkMode                 = modgdi32.NewProc("SetBkMode")
 	procSetMapMode                = modgdi32.NewProc("SetMapMode")
+	procSetPixel                  = modgdi32.NewProc("SetPixel")
 	procSetPolyFillMode           = modgdi32.NewProc("SetPolyFillMode")
 	procSetTextAlign              = modgdi32.NewProc("SetTextAlign")
 	procSetViewportExtEx          = modgdi32.NewProc("SetViewportExtEx")
@@ -391,6 +392,12 @@ func SetBkMode(hdc HDC, mode int32) (prevMode int32) {
 func SetMapMode(hdc HDC, iMapMode int32) (ret int32) {
 	r0, _, _ := syscall.Syscall(procSetMapMode.Addr(), 2, uintptr(hdc), uintptr(iMapMode), 0)
 	ret = int32(r0)
+	return
+}
+
+func SetPixel(hdc HDC, x int32, y int32, color COLORREF) (prevColor COLORREF) {
+	r0, _, _ := syscall.Syscall6(procSetPixel.Addr(), 4, uintptr(hdc), uintptr(x), uintptr(y), uintptr(color), 0, 0)
+	prevColor = COLORREF(r0)
 	return
 }
 
