@@ -57,6 +57,7 @@ var (
 	cLinesMax, cLines  int32
 	pmsg               []win32.MSG
 	rectScroll         win32.RECT
+	charset            int32 = win32.DEFAULT_CHARSET
 )
 
 func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
@@ -70,13 +71,13 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 
 		// Get character size for the fixed-pitch font.
 		hdc := win32.GetDC(hwnd)
-		f := win32.createF
-		win32.SelectObject(hdc, win32.GetStockObject(win32.SYSTEM_FIXED_FONT))
+		f := win32.CreateFont(0, 0, 0, 0, 0, 0, 0, 0, charset, 0, 0, 0, win32.FIXED_PITCH, nil)
+		win32.SelectObject(hdc, win32.HGDIOBJ(f))
 		textMetric := win32.TEXTMETRIC{}
 		win32.GetTextMetrics(hdc, &textMetric)
 		// cxChar = textMetric.TmAveCharWidth
 		cyChar = textMetric.TmHeight
-
+		win32.DeleteObject(win32.SelectObject(hdc, win32.GetStockObject(win32.SYSTEM_FONT)))
 		win32.ReleaseDC(hwnd, hdc)
 
 		// Allocate memory for display lines.
@@ -98,6 +99,9 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		rectScroll.Bottom = cyChar * (cyClient / cyChar)
 
 		win32.InvalidateRect(hwnd, nil, true)
+		if msg == win32.WM_INPUTLANGCHANGE {
+			return 1
+		}
 		return 0
 
 	case win32.WM_KEYDOWN, win32.WM_KEYUP, win32.WM_CHAR, win32.WM_DEADCHAR,

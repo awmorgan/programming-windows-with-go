@@ -44,6 +44,7 @@ var (
 	procCombineRgn                = modgdi32.NewProc("CombineRgn")
 	procCreateEllipticRgn         = modgdi32.NewProc("CreateEllipticRgn")
 	procCreateEllipticRgnIndirect = modgdi32.NewProc("CreateEllipticRgnIndirect")
+	procCreateFontW               = modgdi32.NewProc("CreateFontW")
 	procCreatePolyPolygonRgn      = modgdi32.NewProc("CreatePolyPolygonRgn")
 	procCreatePolygonRgn          = modgdi32.NewProc("CreatePolygonRgn")
 	procCreateRectRgn             = modgdi32.NewProc("CreateRectRgn")
@@ -153,6 +154,12 @@ func CreateEllipticRgn(x1 int32, y1 int32, x2 int32, y2 int32) (hrgn HRGN) {
 func CreateEllipticRgnIndirect(rect *RECT) (hrgn HRGN) {
 	r0, _, _ := syscall.Syscall(procCreateEllipticRgnIndirect.Addr(), 1, uintptr(unsafe.Pointer(rect)), 0, 0)
 	hrgn = HRGN(r0)
+	return
+}
+
+func CreateFont(height int32, width int32, escapement int32, orientation int32, weight int32, italic int32, underline int32, strikeOut int32, charset int32, outputPrecision int32, clipPrecision int32, quality int32, pitchAndFamily int32, face *uint16) (hfont HFONT) {
+	r0, _, _ := syscall.Syscall15(procCreateFontW.Addr(), 14, uintptr(height), uintptr(width), uintptr(escapement), uintptr(orientation), uintptr(weight), uintptr(italic), uintptr(underline), uintptr(strikeOut), uintptr(charset), uintptr(outputPrecision), uintptr(clipPrecision), uintptr(quality), uintptr(pitchAndFamily), uintptr(unsafe.Pointer(face)), 0)
+	hfont = HFONT(r0)
 	return
 }
 

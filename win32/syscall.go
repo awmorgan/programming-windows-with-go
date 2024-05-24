@@ -7,6 +7,7 @@ package win32
 //sys	CopyRect(dst *RECT, src *RECT) (ok bool) = user32.CopyRect
 //sys	CreateEllipticRgn(x1 int32, y1 int32, x2 int32, y2 int32) (hrgn HRGN) = gdi32.CreateEllipticRgn
 //sys	CreateEllipticRgnIndirect(rect *RECT) (hrgn HRGN) = gdi32.CreateEllipticRgnIndirect
+//sys	CreateFont(height int32, width int32, escapement int32, orientation int32, weight int32, italic int32, underline int32, strikeOut int32, charset int32, outputPrecision int32, clipPrecision int32, quality int32, pitchAndFamily int32, face *uint16) (hfont HFONT) = gdi32.CreateFontW
 //sys	CreatePolygonRgn(pt []POINT, cPoints int32, fnPolyFillMode int32) (hrgn HRGN) = gdi32.CreatePolygonRgn
 //sys	CreatePolyPolygonRgn(pt []POINT, lpPolyCounts *int32, nCount int32, fnPolyFillMode int32) (hrgn HRGN) = gdi32.CreatePolyPolygonRgn
 //sys	CreateRectRgn(x1 int32, y1 int32, x2 int32, y2 int32) (hrgn HRGN) = gdi32.CreateRectRgn
