@@ -92,8 +92,10 @@ var (
 	procLoadLibraryExW            = modkernel32.NewProc("LoadLibraryExW")
 	procBeginPaint                = moduser32.NewProc("BeginPaint")
 	procCopyRect                  = moduser32.NewProc("CopyRect")
+	procCreateCaret               = moduser32.NewProc("CreateCaret")
 	procCreateWindowExW           = moduser32.NewProc("CreateWindowExW")
 	procDefWindowProcW            = moduser32.NewProc("DefWindowProcW")
+	procDestroyCaret              = moduser32.NewProc("DestroyCaret")
 	procDispatchMessageW          = moduser32.NewProc("DispatchMessageW")
 	procDrawTextW                 = moduser32.NewProc("DrawTextW")
 	procEndPaint                  = moduser32.NewProc("EndPaint")
@@ -101,12 +103,14 @@ var (
 	procFrameRect                 = moduser32.NewProc("FrameRect")
 	procGetClientRect             = moduser32.NewProc("GetClientRect")
 	procGetDC                     = moduser32.NewProc("GetDC")
+	procGetFocus                  = moduser32.NewProc("GetFocus")
 	procGetKeyNameTextW           = moduser32.NewProc("GetKeyNameTextW")
 	procGetMessageW               = moduser32.NewProc("GetMessageW")
 	procGetScrollInfo             = moduser32.NewProc("GetScrollInfo")
 	procGetScrollPos              = moduser32.NewProc("GetScrollPos")
 	procGetSystemMetrics          = moduser32.NewProc("GetSystemMetrics")
 	procGetUpdateRect             = moduser32.NewProc("GetUpdateRect")
+	procHideCaret                 = moduser32.NewProc("HideCaret")
 	procInflateRect               = moduser32.NewProc("InflateRect")
 	procIntersectRect             = moduser32.NewProc("IntersectRect")
 	procInvalidateRect            = moduser32.NewProc("InvalidateRect")
@@ -123,12 +127,15 @@ var (
 	procReleaseDC                 = moduser32.NewProc("ReleaseDC")
 	procScrollWindow              = moduser32.NewProc("ScrollWindow")
 	procSendMessageW              = moduser32.NewProc("SendMessageW")
+	procSetCaretPos               = moduser32.NewProc("SetCaretPos")
 	procSetCursor                 = moduser32.NewProc("SetCursor")
+	procSetFocus                  = moduser32.NewProc("SetFocus")
 	procSetRect                   = moduser32.NewProc("SetRect")
 	procSetRectEmpty              = moduser32.NewProc("SetRectEmpty")
 	procSetScrollInfo             = moduser32.NewProc("SetScrollInfo")
 	procSetScrollPos              = moduser32.NewProc("SetScrollPos")
 	procSetScrollRange            = moduser32.NewProc("SetScrollRange")
+	procShowCaret                 = moduser32.NewProc("ShowCaret")
 	procShowCursor                = moduser32.NewProc("ShowCursor")
 	procShowWindow                = moduser32.NewProc("ShowWindow")
 	procTranslateMessage          = moduser32.NewProc("TranslateMessage")
@@ -513,6 +520,15 @@ func CopyRect(dst *RECT, src *RECT) (ok bool) {
 	return
 }
 
+func CreateCaret(hwnd HWND, hBitmap HBITMAP, width int32, height int32) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall6(procCreateCaret.Addr(), 4, uintptr(hwnd), uintptr(hBitmap), uintptr(width), uintptr(height), 0, 0)
+	ok = r0 != 0
+	if ok == false {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func CreateWindowEx(exstyle uint32, className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(className)
@@ -539,6 +555,12 @@ func _CreateWindowEx(exstyle uint32, className *uint16, windowName *uint16, styl
 func DefWindowProc(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (ret uintptr) {
 	r0, _, _ := syscall.Syscall6(procDefWindowProcW.Addr(), 4, uintptr(hwnd), uintptr(msg), uintptr(wParam), uintptr(lParam), 0, 0)
 	ret = uintptr(r0)
+	return
+}
+
+func DestroyCaret() (destroyed bool) {
+	r0, _, _ := syscall.Syscall(procDestroyCaret.Addr(), 0, 0, 0, 0)
+	destroyed = r0 != 0
 	return
 }
 
@@ -596,6 +618,12 @@ func GetDC(hwnd HWND) (hdc HDC) {
 	return
 }
 
+func GetFocus() (hwnd HWND) {
+	r0, _, _ := syscall.Syscall(procGetFocus.Addr(), 0, 0, 0, 0)
+	hwnd = HWND(r0)
+	return
+}
+
 func GetKeyNameText(lparam uintptr, buffer []uint16) (ret int32) {
 	var _p0 *uint16
 	if len(buffer) > 0 {
@@ -646,6 +674,15 @@ func GetUpdateRect(hwnd HWND, rect *RECT, erase bool) (notEmpty bool) {
 	}
 	r0, _, _ := syscall.Syscall(procGetUpdateRect.Addr(), 3, uintptr(hwnd), uintptr(unsafe.Pointer(rect)), uintptr(_p0))
 	notEmpty = r0 != 0
+	return
+}
+
+func HideCaret(hwnd HWND) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall(procHideCaret.Addr(), 1, uintptr(hwnd), 0, 0)
+	ok = r0 != 0
+	if ok == false {
+		err = errnoErr(e1)
+	}
 	return
 }
 
@@ -802,9 +839,27 @@ func SendMessage(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (lResult
 	return
 }
 
+func SetCaretPos(x int32, y int32) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall(procSetCaretPos.Addr(), 2, uintptr(x), uintptr(y), 0)
+	ok = r0 != 0
+	if ok == false {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) {
 	r0, _, _ := syscall.Syscall(procSetCursor.Addr(), 1, uintptr(hCursor), 0, 0)
 	hCursorOld = HCURSOR(r0)
+	return
+}
+
+func SetFocus(hwnd HWND) (hwndPrev HWND, err error) {
+	r0, _, e1 := syscall.Syscall(procSetFocus.Addr(), 1, uintptr(hwnd), 0, 0)
+	hwndPrev = HWND(r0)
+	if hwndPrev == 0 {
+		err = errnoErr(e1)
+	}
 	return
 }
 
@@ -851,6 +906,15 @@ func SetScrollRange(hwnd HWND, nBar int32, nMinPos int32, nMaxPos int32, bRedraw
 	r0, _, e1 := syscall.Syscall6(procSetScrollRange.Addr(), 5, uintptr(hwnd), uintptr(nBar), uintptr(nMinPos), uintptr(nMaxPos), uintptr(_p0), 0)
 	ret = BOOL(r0)
 	if ret == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func ShowCaret(hwnd HWND) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall(procShowCaret.Addr(), 1, uintptr(hwnd), 0, 0)
+	ok = r0 != 0
+	if ok == false {
 		err = errnoErr(e1)
 	}
 	return
