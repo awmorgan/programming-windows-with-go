@@ -167,7 +167,7 @@ func LOWORD(dw uintptr) int32 {
 }
 
 func HIWORD(dw uintptr) int32 {
-	return int32(uint16(dw >> 16 & 0xffff))
+	return int32(dw >> 16 & 0xffff)
 }
 
 func StringToUTF16Ptr(s string) *uint16 {
