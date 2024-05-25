@@ -10,6 +10,7 @@ package win32
 //sys	CreateEllipticRgn(x1 int32, y1 int32, x2 int32, y2 int32) (hrgn HRGN) = gdi32.CreateEllipticRgn
 //sys	CreateEllipticRgnIndirect(rect *RECT) (hrgn HRGN) = gdi32.CreateEllipticRgnIndirect
 //sys	CreateFont(height int32, width int32, escapement int32, orientation int32, weight int32, italic int32, underline int32, strikeOut int32, charset int32, outputPrecision int32, clipPrecision int32, quality int32, pitchAndFamily int32, face *uint16) (hfont HFONT) = gdi32.CreateFontW
+//sys	CreatePen(style int32, width int32, color COLORREF) (hpen HPEN) = gdi32.CreatePen
 //sys	CreatePolygonRgn(pt []POINT, cPoints int32, fnPolyFillMode int32) (hrgn HRGN) = gdi32.CreatePolygonRgn
 //sys	CreatePolyPolygonRgn(pt []POINT, lpPolyCounts *int32, nCount int32, fnPolyFillMode int32) (hrgn HRGN) = gdi32.CreatePolyPolygonRgn
 //sys	CreateRectRgn(x1 int32, y1 int32, x2 int32, y2 int32) (hrgn HRGN) = gdi32.CreateRectRgn
@@ -35,10 +36,12 @@ package win32
 //sys	GetCursorPos(pt *POINT) (ok bool, err error) [failretval==false] = user32.GetCursorPos
 //sys	GetDC(hwnd HWND) (hdc HDC) = user32.GetDC
 //sys	GetDeviceCaps(hdc HDC, index int32) (ret int32) = gdi32.GetDeviceCaps
+//sys	GetDlgItem(hwnd HWND, id int32) (hwndChild HWND, err error) [failretval==0] = user32.GetDlgItem
 //sys	GetFocus() (hwnd HWND) = user32.GetFocus
 //sys	GetKeyNameText(lparam uintptr, buffer []uint16) (ret int32) = user32.GetKeyNameTextW
 //sys	GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) [failretval==-1] = user32.GetMessageW
 //sys	getModuleHandle(moduleName *uint16) (hModule HMODULE, err error) [failretval==0] = kernel32.GetModuleHandleW
+//sys	GetParent(hwnd HWND) (parent HWND, err error) [failretval==0] = user32.GetParent
 //sys	GetProcAddress(module HANDLE, procname string) (proc uintptr, err error)
 //sys	GetScrollInfo(hwnd HWND, nBar int32, si *SCROLLINFO) (ok bool, err error) [failretval==false] = user32.GetScrollInfo
 //sys	GetScrollPos(hwnd HWND, nBar int32) (ret int32, err error) [failretval==0] = user32.GetScrollPos

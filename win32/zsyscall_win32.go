@@ -45,6 +45,7 @@ var (
 	procCreateEllipticRgn         = modgdi32.NewProc("CreateEllipticRgn")
 	procCreateEllipticRgnIndirect = modgdi32.NewProc("CreateEllipticRgnIndirect")
 	procCreateFontW               = modgdi32.NewProc("CreateFontW")
+	procCreatePen                 = modgdi32.NewProc("CreatePen")
 	procCreatePolyPolygonRgn      = modgdi32.NewProc("CreatePolyPolygonRgn")
 	procCreatePolygonRgn          = modgdi32.NewProc("CreatePolygonRgn")
 	procCreateRectRgn             = modgdi32.NewProc("CreateRectRgn")
@@ -106,9 +107,11 @@ var (
 	procGetClientRect             = moduser32.NewProc("GetClientRect")
 	procGetCursorPos              = moduser32.NewProc("GetCursorPos")
 	procGetDC                     = moduser32.NewProc("GetDC")
+	procGetDlgItem                = moduser32.NewProc("GetDlgItem")
 	procGetFocus                  = moduser32.NewProc("GetFocus")
 	procGetKeyNameTextW           = moduser32.NewProc("GetKeyNameTextW")
 	procGetMessageW               = moduser32.NewProc("GetMessageW")
+	procGetParent                 = moduser32.NewProc("GetParent")
 	procGetScrollInfo             = moduser32.NewProc("GetScrollInfo")
 	procGetScrollPos              = moduser32.NewProc("GetScrollPos")
 	procGetSystemMetrics          = moduser32.NewProc("GetSystemMetrics")
@@ -176,6 +179,12 @@ func CreateEllipticRgnIndirect(rect *RECT) (hrgn HRGN) {
 func CreateFont(height int32, width int32, escapement int32, orientation int32, weight int32, italic int32, underline int32, strikeOut int32, charset int32, outputPrecision int32, clipPrecision int32, quality int32, pitchAndFamily int32, face *uint16) (hfont HFONT) {
 	r0, _, _ := syscall.Syscall15(procCreateFontW.Addr(), 14, uintptr(height), uintptr(width), uintptr(escapement), uintptr(orientation), uintptr(weight), uintptr(italic), uintptr(underline), uintptr(strikeOut), uintptr(charset), uintptr(outputPrecision), uintptr(clipPrecision), uintptr(quality), uintptr(pitchAndFamily), uintptr(unsafe.Pointer(face)), 0)
 	hfont = HFONT(r0)
+	return
+}
+
+func CreatePen(style int32, width int32, color COLORREF) (hpen HPEN) {
+	r0, _, _ := syscall.Syscall(procCreatePen.Addr(), 3, uintptr(style), uintptr(width), uintptr(color))
+	hpen = HPEN(r0)
 	return
 }
 
@@ -648,6 +657,15 @@ func GetDC(hwnd HWND) (hdc HDC) {
 	return
 }
 
+func GetDlgItem(hwnd HWND, id int32) (hwndChild HWND, err error) {
+	r0, _, e1 := syscall.Syscall(procGetDlgItem.Addr(), 2, uintptr(hwnd), uintptr(id), 0)
+	hwndChild = HWND(r0)
+	if hwndChild == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func GetFocus() (hwnd HWND) {
 	r0, _, _ := syscall.Syscall(procGetFocus.Addr(), 0, 0, 0, 0)
 	hwnd = HWND(r0)
@@ -668,6 +686,15 @@ func GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (
 	r0, _, e1 := syscall.Syscall6(procGetMessageW.Addr(), 4, uintptr(unsafe.Pointer(msg)), uintptr(hwnd), uintptr(msgFilterMin), uintptr(msgFilterMax), 0, 0)
 	ret = int32(r0)
 	if ret == -1 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func GetParent(hwnd HWND) (parent HWND, err error) {
+	r0, _, e1 := syscall.Syscall(procGetParent.Addr(), 1, uintptr(hwnd), 0, 0)
+	parent = HWND(r0)
+	if parent == 0 {
 		err = errnoErr(e1)
 	}
 	return
