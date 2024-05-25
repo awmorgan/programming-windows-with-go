@@ -113,6 +113,7 @@ var (
 	procGetScrollPos              = moduser32.NewProc("GetScrollPos")
 	procGetSystemMetrics          = moduser32.NewProc("GetSystemMetrics")
 	procGetUpdateRect             = moduser32.NewProc("GetUpdateRect")
+	procGetWindowLongPtrW         = moduser32.NewProc("GetWindowLongPtrW")
 	procHideCaret                 = moduser32.NewProc("HideCaret")
 	procInflateRect               = moduser32.NewProc("InflateRect")
 	procIntersectRect             = moduser32.NewProc("IntersectRect")
@@ -124,6 +125,7 @@ var (
 	procLoadIconW                 = moduser32.NewProc("LoadIconW")
 	procMessageBeep               = moduser32.NewProc("MessageBeep")
 	procMessageBoxW               = moduser32.NewProc("MessageBoxW")
+	procMoveWindow                = moduser32.NewProc("MoveWindow")
 	procOffsetRect                = moduser32.NewProc("OffsetRect")
 	procPeekMessageW              = moduser32.NewProc("PeekMessageW")
 	procPostQuitMessage           = moduser32.NewProc("PostQuitMessage")
@@ -141,6 +143,7 @@ var (
 	procSetScrollInfo             = moduser32.NewProc("SetScrollInfo")
 	procSetScrollPos              = moduser32.NewProc("SetScrollPos")
 	procSetScrollRange            = moduser32.NewProc("SetScrollRange")
+	procSetWindowLongPtrW         = moduser32.NewProc("SetWindowLongPtrW")
 	procShowCaret                 = moduser32.NewProc("ShowCaret")
 	procShowCursor                = moduser32.NewProc("ShowCursor")
 	procShowWindow                = moduser32.NewProc("ShowWindow")
@@ -704,6 +707,15 @@ func GetUpdateRect(hwnd HWND, rect *RECT, erase bool) (notEmpty bool) {
 	return
 }
 
+func GetWindowLongPtr(hwnd HWND, index int32) (ret uintptr, err error) {
+	r0, _, e1 := syscall.Syscall(procGetWindowLongPtrW.Addr(), 2, uintptr(hwnd), uintptr(index), 0)
+	ret = uintptr(r0)
+	if ret == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func HideCaret(hwnd HWND) (ok bool, err error) {
 	r0, _, e1 := syscall.Syscall(procHideCaret.Addr(), 1, uintptr(hwnd), 0, 0)
 	ok = r0 != 0
@@ -821,6 +833,19 @@ func _MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret 
 	r0, _, e1 := syscall.Syscall6(procMessageBoxW.Addr(), 4, uintptr(hwnd), uintptr(unsafe.Pointer(text)), uintptr(unsafe.Pointer(caption)), uintptr(boxtype), 0, 0)
 	ret = int32(r0)
 	if ret == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func MoveWindow(hwnd HWND, x int32, y int32, width int32, height int32, repaint bool) (ok bool, err error) {
+	var _p0 uint32
+	if repaint {
+		_p0 = 1
+	}
+	r0, _, e1 := syscall.Syscall6(procMoveWindow.Addr(), 6, uintptr(hwnd), uintptr(x), uintptr(y), uintptr(width), uintptr(height), uintptr(_p0))
+	ok = r0 != 0
+	if ok == false {
 		err = errnoErr(e1)
 	}
 	return
@@ -957,6 +982,15 @@ func SetScrollRange(hwnd HWND, nBar int32, nMinPos int32, nMaxPos int32, bRedraw
 	r0, _, e1 := syscall.Syscall6(procSetScrollRange.Addr(), 5, uintptr(hwnd), uintptr(nBar), uintptr(nMinPos), uintptr(nMaxPos), uintptr(_p0), 0)
 	ret = BOOL(r0)
 	if ret == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func SetWindowLongPtr(hwnd HWND, index int32, value uintptr) (prev uintptr, err error) {
+	r0, _, e1 := syscall.Syscall(procSetWindowLongPtrW.Addr(), 3, uintptr(hwnd), uintptr(index), uintptr(value))
+	prev = uintptr(r0)
+	if prev == 0 {
 		err = errnoErr(e1)
 	}
 	return

@@ -49,6 +49,7 @@ package win32
 //sys	GetTextFace(hdc HDC, n int32, faceName *uint16) (nOut int32) = gdi32.GetTextFaceW
 //sys	GetTextMetrics(hdc HDC, tm *TEXTMETRIC) (err error) [failretval==0] = gdi32.GetTextMetricsW
 //sys	GetUpdateRect(hwnd HWND, rect *RECT, erase bool) (notEmpty bool) = user32.GetUpdateRect
+//sys	GetWindowLongPtr(hwnd HWND, index int32) (ret uintptr, err error) [failretval==0] = user32.GetWindowLongPtrW
 //sys	HideCaret(hwnd HWND) (ok bool, err error) [failretval==false] = user32.HideCaret
 //sys	InflateRect(rect *RECT, x int32, y int32) (ok bool) = user32.InflateRect
 //sys	IntersectClipRect(hdc HDC, left int32, top int32, right int32, bottom int32) (ret int32) = gdi32.IntersectClipRect
@@ -65,6 +66,7 @@ package win32
 //sys	MessageBeep(uType uint32) (ok bool, err error) [failretval==false] = user32.MessageBeep
 //sys	MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) [failretval==0] = user32.MessageBoxW
 //sys	MoveToEx(hdc HDC, x int32, y int32, lpPoint *POINT) (ok bool) = gdi32.MoveToEx
+//sys	MoveWindow(hwnd HWND, x int32, y int32, width int32, height int32, repaint bool) (ok bool, err error) [failretval==false] = user32.MoveWindow
 //sys	OffsetClipRgn(hdc HDC, x int32, y int32) (ret int32) = gdi32.OffsetClipRgn
 //sys	OffsetRect(rect *RECT, x int32, y int32) (ok bool) = user32.OffsetRect
 //sys	PaintRgn(hdc HDC, hrgn HRGN) (ok bool) = gdi32.PaintRgn
@@ -102,6 +104,7 @@ package win32
 //sys	SetViewportExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) = gdi32.SetViewportExtEx
 //sys	SetViewportOrgEx(hdc HDC, x int32, y int32, pt *POINT) (ok bool) = gdi32.SetViewportOrgEx
 //sys	SetWindowExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) = gdi32.SetWindowExtEx
+//sys	SetWindowLongPtr(hwnd HWND, index int32, value uintptr) (prev uintptr, err error) [failretval==0] = user32.SetWindowLongPtrW
 //sys	ShowCaret(hwnd HWND) (ok bool, err error) [failretval==false] = user32.ShowCaret
 //sys	ShowCursor(show bool) (count int32) = user32.ShowCursor
 //sys	ShowWindow(hwnd HWND, nCmdShow int32) (wasVisible bool) = user32.ShowWindow
