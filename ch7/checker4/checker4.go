@@ -157,7 +157,7 @@ func childwndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result u
 		return 0
 
 	case win32.WM_SETFOCUS:
-		idFocus, _ = win32.GetWindowLongPtr(hwnd, 0)
+		idFocus, _ = win32.GetWindowLongPtr(hwnd, win32.GWLP_ID)
 		fallthrough
 
 	case win32.WM_KILLFOCUS:
