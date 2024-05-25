@@ -34,7 +34,7 @@ func main() {
 	wc.LpszClassName = win32.StringToUTF16Ptr(childClassName)
 	win32.RegisterClass(&wc)
 
-	hwnd, _ := win32.CreateWindow(appName, "Cheker4 Mouse Hit-Test Demo",
+	hwnd, _ := win32.CreateWindow(appName, "Checker4 Mouse Hit-Test Demo",
 		win32.WS_OVERLAPPEDWINDOW,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
