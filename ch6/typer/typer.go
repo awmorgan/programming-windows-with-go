@@ -85,8 +85,8 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 
 	case win32.WM_SIZE:
 		if msg == win32.WM_SIZE {
-			cxClient = int32(win32.LOWORD(lParam))
-			cyClient = int32(win32.HIWORD(lParam))
+			cxClient = win32.LOWORD(lParam)
+			cyClient = win32.HIWORD(lParam)
 		}
 		cxBuffer = max(1, cxClient/cxChar)
 		cyBuffer = max(1, cyClient/cyChar)

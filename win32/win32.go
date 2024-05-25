@@ -162,12 +162,12 @@ type (
 // 	return uint32(uint32(lo) | ((uint32(hi)) << 16))
 // }
 
-func LOWORD(dw uintptr) uint16 {
-	return uint16(dw)
+func LOWORD(dw uintptr) int32 {
+	return int32(dw & 0xffff)
 }
 
-func HIWORD(dw uintptr) uint16 {
-	return uint16(dw >> 16 & 0xffff)
+func HIWORD(dw uintptr) int32 {
+	return int32(uint16(dw >> 16 & 0xffff))
 }
 
 func StringToUTF16Ptr(s string) *uint16 {

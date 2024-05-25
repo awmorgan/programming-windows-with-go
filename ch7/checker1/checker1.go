@@ -1,14 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 	"x/win32"
 )
 
+const divisions = 5
+
 func main() {
 	runtime.LockOSThread() // Windows messages are delivered to the thread that created the window.
-	appName := "winmain"
+	appName := "Checker1"
 	wc := win32.WNDCLASS{
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
@@ -19,65 +22,81 @@ func main() {
 		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
 	if _, err := win32.RegisterClass(&wc); err != nil {
-		errMsg := "RegisterClass failed: " + err.Error()
+		errMsg := fmt.Sprintf("RegisterClass failed: %v", err)
 		win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)
 		return
 	}
-	hwnd, _ := win32.CreateWindow(appName, "winmain",
+	hwnd, _ := win32.CreateWindow(appName, "Cheker1 Mouse Hit-Test Demo",
 		win32.WS_OVERLAPPEDWINDOW,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
 		0, 0, win32.HInstance(), 0)
+
 	win32.ShowWindow(hwnd, win32.NCmdShow())
 	win32.UpdateWindow(hwnd)
 	msg := win32.MSG{}
 	for {
 		ret, err := win32.GetMessage(&msg, 0, 0, 0)
 		if err != nil {
-			errMsg := "GetMessage failed: " + err.Error()
+			errMsg := fmt.Sprintf("GetMessage failed: %v", err)
 			win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)
 			os.Exit(1)
 		}
 		if ret == 0 {
 			os.Exit(int(msg.WParam))
 		}
+
 		win32.TranslateMessage(&msg)
 		win32.DispatchMessage(&msg)
 	}
 }
 
-var cxClient, cyClient int32
+var fstate [divisions][divisions]bool
+var cxBlock, cyBlock int32
 
 func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
-
 	switch msg {
 	case win32.WM_SIZE:
-		cxClient = win32.LOWORD(lParam)
-		cyClient = win32.HIWORD(lParam)
+		cxBlock = win32.LOWORD(lParam) / divisions
+		cyBlock = win32.HIWORD(lParam) / divisions
+
+	case win32.WM_LBUTTONDOWN:
+		// nCount = 0
+		win32.InvalidateRect(hwnd, nil, true)
 		return 0
 
-	case win32.WM_CREATE:
+	case win32.WM_MOUSEMOVE:
+		// if wParam&win32.MK_LBUTTON == win32.MK_LBUTTON && nCount < maxpoints {
+		// 	lw := win32.LOWORD(lParam)
+		// 	hw := win32.HIWORD(lParam)
+		// 	pt[nCount].X = lw
+		// 	pt[nCount].Y = hw
+		// 	nCount++
+		// 	hdc := win32.GetDC(hwnd)
+		// 	win32.SetPixel(hdc, lw, hw, 0)
+		// 	win32.ReleaseDC(hwnd, hdc)
+		// }
 		return 0
+
+	case win32.WM_LBUTTONUP:
+		win32.InvalidateRect(hwnd, nil, false)
 
 	case win32.WM_PAINT:
 		ps := win32.PAINTSTRUCT{}
-		hdc := win32.BeginPaint(hwnd, &ps)
+		win32.BeginPaint(hwnd, &ps)
 
-		win32.Rectangle(hdc, cxClient/8, cyClient/8,
-			7*cxClient/8, 7*cyClient/8)
+		win32.SetCursor(win32.WaitCursor())
+		win32.ShowCursor(true)
 
-		win32.MoveToEx(hdc, 0, 0, nil)
-		win32.LineTo(hdc, cxClient, cyClient)
+		// for i := 0; i < nCount-1; i++ {
+		// 	for j := i + 1; j < nCount; j++ {
+		// 		win32.MoveToEx(ps.Hdc, pt[i].X, pt[i].Y, nil)
+		// 		win32.LineTo(ps.Hdc, pt[j].X, pt[j].Y)
+		// 	}
+		// }
 
-		win32.MoveToEx(hdc, 0, cyClient, nil)
-		win32.LineTo(hdc, cxClient, 0)
-
-		win32.Ellipse(hdc, cxClient/8, cyClient/8,
-			7*cxClient/8, 7*cyClient/8)
-
-		win32.RoundRect(hdc, cxClient/4, cyClient/4,
-			3*cxClient/4, 3*cyClient/4,
-			cxClient/4, cyClient/4)
+		win32.ShowCursor(false)
+		win32.SetCursor(win32.ArrowCursor())
 
 		win32.EndPaint(hwnd, &ps)
 		return 0

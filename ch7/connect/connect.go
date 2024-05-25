@@ -65,8 +65,8 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 
 	case win32.WM_MOUSEMOVE:
 		if wParam&win32.MK_LBUTTON == win32.MK_LBUTTON && nCount < maxpoints {
-			lw := int32(win32.LOWORD(lParam))
-			hw := int32(win32.HIWORD(lParam))
+			lw := win32.LOWORD(lParam)
+			hw := win32.HIWORD(lParam)
 			pt[nCount].X = lw
 			pt[nCount].Y = hw
 			nCount++

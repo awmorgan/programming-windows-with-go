@@ -61,8 +61,8 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 
 	switch msg {
 	case win32.WM_SIZE:
-		cxClient = int32(win32.LOWORD(lParam))
-		cyClient = int32(win32.HIWORD(lParam))
+		cxClient = win32.LOWORD(lParam)
+		cyClient = win32.HIWORD(lParam)
 
 		apt[0].X = cxClient / 4
 		apt[0].Y = cyClient / 2
@@ -85,12 +85,12 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 			DrawBezier(hdc, apt[:])
 
 			if wParam&win32.MK_LBUTTON != 0 {
-				apt[1].X = int32(win32.LOWORD(lParam))
-				apt[1].Y = int32(win32.HIWORD(lParam))
+				apt[1].X = win32.LOWORD(lParam)
+				apt[1].Y = win32.HIWORD(lParam)
 			}
 			if wParam&win32.MK_RBUTTON != 0 {
-				apt[2].X = int32(win32.LOWORD(lParam))
-				apt[2].Y = int32(win32.HIWORD(lParam))
+				apt[2].X = win32.LOWORD(lParam)
+				apt[2].Y = win32.HIWORD(lParam)
 			}
 
 			win32.SelectObject(hdc, win32.GetStockObject(win32.BLACK_PEN))

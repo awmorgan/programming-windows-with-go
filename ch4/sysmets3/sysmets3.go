@@ -76,8 +76,8 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		iMaxWidth = 40*cxChar + 22*cxCaps
 		return 0
 	case win32.WM_SIZE:
-		cxClient = int32(win32.LOWORD(lParam))
-		cyClient = int32(win32.HIWORD(lParam))
+		cxClient = win32.LOWORD(lParam)
+		cyClient = win32.HIWORD(lParam)
 
 		// set vertical scroll bar range and page size
 		si.CbSize = uint32(unsafe.Sizeof(si))

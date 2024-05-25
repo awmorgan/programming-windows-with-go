@@ -57,8 +57,8 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 
 	switch msg {
 	case win32.WM_SIZE:
-		cxClient = int32(win32.LOWORD(lParam))
-		cyClient = int32(win32.HIWORD(lParam))
+		cxClient = win32.LOWORD(lParam)
+		cyClient = win32.HIWORD(lParam)
 
 		hCursor := win32.SetCursor(win32.WaitCursor())
 		win32.ShowCursor(true)

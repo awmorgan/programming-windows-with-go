@@ -88,7 +88,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		case win32.SB_LINEDOWN, win32.SB_PAGEDOWN:
 			iFont++
 		case win32.SB_THUMBPOSITION:
-			iFont = int32(win32.HIWORD(wParam))
+			iFont = win32.HIWORD(wParam)
 		}
 		iFont = max(0, min(iFont, cFonts-1))
 		win32.SetScrollPos(hwnd, win32.SB_VERT, iFont, true)
