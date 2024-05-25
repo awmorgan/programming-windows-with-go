@@ -92,6 +92,7 @@ var (
 	procGetSystemDirectoryW       = modkernel32.NewProc("GetSystemDirectoryW")
 	procLoadLibraryExW            = modkernel32.NewProc("LoadLibraryExW")
 	procBeginPaint                = moduser32.NewProc("BeginPaint")
+	procClientToScreen            = moduser32.NewProc("ClientToScreen")
 	procCopyRect                  = moduser32.NewProc("CopyRect")
 	procCreateCaret               = moduser32.NewProc("CreateCaret")
 	procCreateWindowExW           = moduser32.NewProc("CreateWindowExW")
@@ -103,6 +104,7 @@ var (
 	procFillRect                  = moduser32.NewProc("FillRect")
 	procFrameRect                 = moduser32.NewProc("FrameRect")
 	procGetClientRect             = moduser32.NewProc("GetClientRect")
+	procGetCursorPos              = moduser32.NewProc("GetCursorPos")
 	procGetDC                     = moduser32.NewProc("GetDC")
 	procGetFocus                  = moduser32.NewProc("GetFocus")
 	procGetKeyNameTextW           = moduser32.NewProc("GetKeyNameTextW")
@@ -127,10 +129,12 @@ var (
 	procPostQuitMessage           = moduser32.NewProc("PostQuitMessage")
 	procRegisterClassW            = moduser32.NewProc("RegisterClassW")
 	procReleaseDC                 = moduser32.NewProc("ReleaseDC")
+	procScreenToClient            = moduser32.NewProc("ScreenToClient")
 	procScrollWindow              = moduser32.NewProc("ScrollWindow")
 	procSendMessageW              = moduser32.NewProc("SendMessageW")
 	procSetCaretPos               = moduser32.NewProc("SetCaretPos")
 	procSetCursor                 = moduser32.NewProc("SetCursor")
+	procSetCursorPos              = moduser32.NewProc("SetCursorPos")
 	procSetFocus                  = moduser32.NewProc("SetFocus")
 	procSetRect                   = moduser32.NewProc("SetRect")
 	procSetRectEmpty              = moduser32.NewProc("SetRectEmpty")
@@ -522,6 +526,12 @@ func BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) {
 	return
 }
 
+func ClientToScreen(hwnd HWND, pt *POINT) (ok bool) {
+	r0, _, _ := syscall.Syscall(procClientToScreen.Addr(), 2, uintptr(hwnd), uintptr(unsafe.Pointer(pt)), 0)
+	ok = r0 != 0
+	return
+}
+
 func CopyRect(dst *RECT, src *RECT) (ok bool) {
 	r0, _, _ := syscall.Syscall(procCopyRect.Addr(), 2, uintptr(unsafe.Pointer(dst)), uintptr(unsafe.Pointer(src)), 0)
 	ok = r0 != 0
@@ -615,6 +625,15 @@ func FrameRect(hdc HDC, lprc *RECT, hbr HBRUSH) (ok bool) {
 func GetClientRect(hwnd HWND, rect *RECT) (err error) {
 	r1, _, e1 := syscall.Syscall(procGetClientRect.Addr(), 2, uintptr(hwnd), uintptr(unsafe.Pointer(rect)), 0)
 	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func GetCursorPos(pt *POINT) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall(procGetCursorPos.Addr(), 1, uintptr(unsafe.Pointer(pt)), 0, 0)
+	ok = r0 != 0
+	if ok == false {
 		err = errnoErr(e1)
 	}
 	return
@@ -841,6 +860,12 @@ func ReleaseDC(hwnd HWND, hdc HDC) (err error) {
 	return
 }
 
+func ScreenToClient(hwnd HWND, pt *POINT) (ok bool) {
+	r0, _, _ := syscall.Syscall(procScreenToClient.Addr(), 2, uintptr(hwnd), uintptr(unsafe.Pointer(pt)), 0)
+	ok = r0 != 0
+	return
+}
+
 func ScrollWindow(hwnd HWND, dx int32, dy int32, rect *RECT, clipRect *RECT) (ok bool, err error) {
 	r0, _, e1 := syscall.Syscall6(procScrollWindow.Addr(), 5, uintptr(hwnd), uintptr(dx), uintptr(dy), uintptr(unsafe.Pointer(rect)), uintptr(unsafe.Pointer(clipRect)), 0)
 	ok = r0 != 0
@@ -868,6 +893,15 @@ func SetCaretPos(x int32, y int32) (ok bool, err error) {
 func SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) {
 	r0, _, _ := syscall.Syscall(procSetCursor.Addr(), 1, uintptr(hCursor), 0, 0)
 	hCursorOld = HCURSOR(r0)
+	return
+}
+
+func SetCursorPos(x int32, y int32) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall(procSetCursorPos.Addr(), 2, uintptr(x), uintptr(y), 0)
+	ok = r0 != 0
+	if ok == false {
+		err = errnoErr(e1)
+	}
 	return
 }
 

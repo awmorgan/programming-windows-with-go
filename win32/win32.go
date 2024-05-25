@@ -158,9 +158,9 @@ type (
 // 	return byte(w >> 8 & 0xff)
 // }
 
-// func MAKELONG(lo, hi uint16) uint32 {
-// 	return uint32(uint32(lo) | ((uint32(hi)) << 16))
-// }
+func MAKELONG(lo, hi int32) uint32 {
+	return uint32(uint32(lo) | ((uint32(hi)) << 16))
+}
 
 func LOWORD(dw uintptr) int32 {
 	return int32(dw & 0xffff)

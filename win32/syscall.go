@@ -3,6 +3,7 @@ package win32
 //go:generate go run x/win32/mkwinsyscall -output zsyscall_win32.go syscall.go
 
 //sys	BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) = user32.BeginPaint
+//sys	ClientToScreen(hwnd HWND, pt *POINT) (ok bool) = user32.ClientToScreen
 //sys	CombineRgn(dest HRGN, src1 HRGN, src2 HRGN, mode int32) (ret int32) = gdi32.CombineRgn
 //sys	CopyRect(dst *RECT, src *RECT) (ok bool) = user32.CopyRect
 //sys	CreateCaret(hwnd HWND, hBitmap HBITMAP, width int32, height int32) (ok bool, err error) [failretval==false] = user32.CreateCaret
@@ -31,6 +32,7 @@ package win32
 //sys	FrameRgn(hdc HDC, hrgn HRGN, hbr HBRUSH, width int32, height int32) (ok bool) = gdi32.FrameRgn
 //sys	FreeLibrary(handle HANDLE) (err error)
 //sys	GetClientRect(hwnd HWND, rect *RECT) (err error) [failretval==0] = user32.GetClientRect
+//sys	GetCursorPos(pt *POINT) (ok bool, err error) [failretval==false] = user32.GetCursorPos
 //sys	GetDC(hwnd HWND) (hdc HDC) = user32.GetDC
 //sys	GetDeviceCaps(hdc HDC, index int32) (ret int32) = gdi32.GetDeviceCaps
 //sys	GetFocus() (hwnd HWND) = user32.GetFocus
@@ -78,6 +80,7 @@ package win32
 //sys	RestoreDC(hdc HDC, saved int32) (ok bool) = gdi32.RestoreDC
 //sys	RoundRect(hdc HDC, left int32, top int32, right int32, bottom int32, width int32, height int32) (ok bool) = gdi32.RoundRect
 //sys	SaveDC(hdc HDC) (ret int32) = gdi32.SaveDC
+//sys	ScreenToClient(hwnd HWND, pt *POINT) (ok bool) = user32.ScreenToClient
 //sys	ScrollWindow(hwnd HWND, dx int32, dy int32, rect *RECT, clipRect *RECT) (ok bool, err error) [failretval==false] = user32.ScrollWindow
 //sys	SelectClipRgn(hdc HDC, hrgn HRGN) (mode int32) = gdi32.SelectClipRgn
 //sys	SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) = gdi32.SelectObject
@@ -85,6 +88,7 @@ package win32
 //sys	SetBkMode(hdc HDC, mode int32) (prevMode int32) = gdi32.SetBkMode
 //sys	SetCaretPos(x int32, y int32) (ok bool, err error) [failretval==false] = user32.SetCaretPos
 //sys	SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) = user32.SetCursor
+//sys	SetCursorPos(x int32, y int32) (ok bool, err error) [failretval==false] = user32.SetCursorPos
 //sys	SetFocus(hwnd HWND) (hwndPrev HWND, err error) [failretval==0] = user32.SetFocus
 //sys	SetMapMode(hdc HDC, iMapMode int32) (ret int32) = gdi32.SetMapMode
 //sys	SetPixel(hdc HDC, x int32, y int32, color COLORREF) (prevColor COLORREF) = gdi32.SetPixel
