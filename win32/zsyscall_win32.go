@@ -120,6 +120,7 @@ var (
 	procIsRectEmpty               = moduser32.NewProc("IsRectEmpty")
 	procLoadCursorW               = moduser32.NewProc("LoadCursorW")
 	procLoadIconW                 = moduser32.NewProc("LoadIconW")
+	procMessageBeep               = moduser32.NewProc("MessageBeep")
 	procMessageBoxW               = moduser32.NewProc("MessageBoxW")
 	procOffsetRect                = moduser32.NewProc("OffsetRect")
 	procPeekMessageW              = moduser32.NewProc("PeekMessageW")
@@ -769,6 +770,15 @@ func _LoadIcon(hInstance HINSTANCE, iconName *uint16) (hIcon HICON, err error) {
 	r0, _, e1 := syscall.Syscall(procLoadIconW.Addr(), 2, uintptr(hInstance), uintptr(unsafe.Pointer(iconName)), 0)
 	hIcon = HICON(r0)
 	if hIcon == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func MessageBeep(uType uint32) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall(procMessageBeep.Addr(), 1, uintptr(uType), 0, 0)
+	ok = r0 != 0
+	if ok == false {
 		err = errnoErr(e1)
 	}
 	return

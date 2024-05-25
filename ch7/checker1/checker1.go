@@ -59,45 +59,41 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 	case win32.WM_SIZE:
 		cxBlock = win32.LOWORD(lParam) / divisions
 		cyBlock = win32.HIWORD(lParam) / divisions
+		return 0
 
 	case win32.WM_LBUTTONDOWN:
-		// nCount = 0
-		win32.InvalidateRect(hwnd, nil, true)
-		return 0
+		x := win32.LOWORD(lParam) / cxBlock
+		y := win32.HIWORD(lParam) / cyBlock
 
-	case win32.WM_MOUSEMOVE:
-		// if wParam&win32.MK_LBUTTON == win32.MK_LBUTTON && nCount < maxpoints {
-		// 	lw := win32.LOWORD(lParam)
-		// 	hw := win32.HIWORD(lParam)
-		// 	pt[nCount].X = lw
-		// 	pt[nCount].Y = hw
-		// 	nCount++
-		// 	hdc := win32.GetDC(hwnd)
-		// 	win32.SetPixel(hdc, lw, hw, 0)
-		// 	win32.ReleaseDC(hwnd, hdc)
-		// }
+		if x < divisions && y < divisions {
+			fstate[x][y] = !fstate[x][y]
+			r := win32.RECT{
+				Left:   x * cxBlock,
+				Top:    y * cyBlock,
+				Right:  (x + 1) * cxBlock,
+				Bottom: (y + 1) * cyBlock,
+			}
+			win32.InvalidateRect(hwnd, &r, false)
+		} else {
+			win32.MessageBeep(0)
+		}
 		return 0
-
-	case win32.WM_LBUTTONUP:
-		win32.InvalidateRect(hwnd, nil, false)
 
 	case win32.WM_PAINT:
 		ps := win32.PAINTSTRUCT{}
 		win32.BeginPaint(hwnd, &ps)
-
-		win32.SetCursor(win32.WaitCursor())
-		win32.ShowCursor(true)
-
-		// for i := 0; i < nCount-1; i++ {
-		// 	for j := i + 1; j < nCount; j++ {
-		// 		win32.MoveToEx(ps.Hdc, pt[i].X, pt[i].Y, nil)
-		// 		win32.LineTo(ps.Hdc, pt[j].X, pt[j].Y)
-		// 	}
-		// }
-
-		win32.ShowCursor(false)
-		win32.SetCursor(win32.ArrowCursor())
-
+		for x := int32(0); x < divisions; x++ {
+			for y := int32(0); y < divisions; y++ {
+				win32.Rectangle(ps.Hdc, x*cxBlock, y*cyBlock,
+					(x+1)*cxBlock, (y+1)*cyBlock)
+				if fstate[x][y] {
+					win32.MoveToEx(ps.Hdc, x*cxBlock, y*cyBlock, nil)
+					win32.LineTo(ps.Hdc, (x+1)*cxBlock, (y+1)*cyBlock)
+					win32.MoveToEx(ps.Hdc, x*cxBlock, (y+1)*cyBlock, nil)
+					win32.LineTo(ps.Hdc, (x+1)*cxBlock, y*cyBlock)
+				}
+			}
+		}
 		win32.EndPaint(hwnd, &ps)
 		return 0
 
