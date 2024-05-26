@@ -79,7 +79,17 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		iMaxWidth = 40*cxChar + 22*cxCaps
 		fallthrough // for mouse wheel information
 	case win32.WM_SETTINGCHANGE:
-		//todo
+		p := uintptr(unsafe.Pointer(&scrollLines))
+		win32.SystemParametersInfo(win32.SPI_GETWHEELSCROLLLINES, 0, p, 0)
+		// scrollLines usually equals 3 or 0 (for no scrolling)
+		// WHEEL_DELTA = 120, so deltaPerLine is 40
+		if scrollLines != 0 {
+			deltaPerLine = win32.WHEEL_DELTA / scrollLines
+		} else {
+			deltaPerLine = 0
+		}
+		return 0
+
 	case win32.WM_SIZE:
 		cxClient = win32.LOWORD(lParam)
 		cyClient = win32.HIWORD(lParam)
@@ -195,6 +205,21 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		}
 		return 0
 
+	case win32.WM_MOUSEWHEEL:
+		if deltaPerLine == 0 {
+			break
+		}
+		accumDelta += win32.HIWORD(wParam)
+		for accumDelta >= deltaPerLine {
+			win32.SendMessage(hwnd, win32.WM_VSCROLL, win32.SB_LINEUP, 0)
+			accumDelta -= deltaPerLine
+		}
+		for accumDelta <= -deltaPerLine {
+			win32.SendMessage(hwnd, win32.WM_VSCROLL, win32.SB_LINEDOWN, 0)
+			accumDelta += deltaPerLine
+		}
+		return 0
+		
 	case win32.WM_PAINT:
 		hdc = win32.BeginPaint(hwnd, &ps)
 
