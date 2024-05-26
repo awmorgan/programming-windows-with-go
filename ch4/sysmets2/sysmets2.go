@@ -5,6 +5,7 @@ import (
 	"os"
 	"runtime"
 	"x/win32"
+	"x/sysmets"
 )
 
 var cxChar, cxCaps, cyChar, cyClient, iVscrollPos int32
@@ -24,7 +25,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		}
 		cyChar = int32(tm.TmHeight + tm.TmExternalLeading)
 		win32.ReleaseDC(hwnd, hdc)
-		win32.SetScrollRange(hwnd, win32.SB_VERT, 0, int32(win32.NUMLINES-1), false)
+		win32.SetScrollRange(hwnd, win32.SB_VERT, 0, int32(sysmets.NUMLINES-1), false)
 		win32.SetScrollPos(hwnd, win32.SB_VERT, iVscrollPos, true)
 		return 0
 	case win32.WM_SIZE:
@@ -43,7 +44,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		case win32.SB_THUMBPOSITION:
 			iVscrollPos = win32.HIWORD(wParam)
 		}
-		iVscrollPos = max(0, min(iVscrollPos, int32(win32.NUMLINES-1)))
+		iVscrollPos = max(0, min(iVscrollPos, int32(sysmets.NUMLINES-1)))
 		currentPos, _ := win32.GetScrollPos(hwnd, win32.SB_VERT)
 		if iVscrollPos != currentPos {
 			win32.SetScrollPos(hwnd, win32.SB_VERT, iVscrollPos, true)
@@ -52,7 +53,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		return 0
 	case win32.WM_PAINT:
 		hdc = win32.BeginPaint(hwnd, &ps)
-		for i, sm := range win32.Sysmetrics {
+		for i, sm := range sysmets.Sysmetrics {
 			y := cyChar * (int32(i) - iVscrollPos)
 			win32.TextOut(hdc, 0, y, sm.Label, len(sm.Label))
 			win32.TextOut(hdc, 22*cxCaps, y, sm.Desc, len(sm.Desc))

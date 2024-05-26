@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"x/sysmets"
 	"x/win32"
 )
 
@@ -26,7 +27,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 	case win32.WM_PAINT:
 		var ps win32.PAINTSTRUCT
 		hdc := win32.BeginPaint(hwnd, &ps)
-		for i, sm := range win32.Sysmetrics {
+		for i, sm := range sysmets.Sysmetrics {
 			win32.TextOut(hdc, 0, cyChar*int32(i), sm.Label, len(sm.Label))
 			win32.TextOut(hdc, 22*cxCaps, cyChar*int32(i), sm.Desc, len(sm.Desc))
 			win32.SetTextAlign(hdc, win32.TA_RIGHT|win32.TA_TOP)
