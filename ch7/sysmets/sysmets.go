@@ -11,7 +11,7 @@ import (
 
 func main() {
 	runtime.LockOSThread() // Windows messages are delivered to the thread that created the window.
-	appName := "Sysmets4"
+	appName := "Sysmets"
 	wc := win32.WNDCLASS{
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
@@ -26,7 +26,7 @@ func main() {
 		win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)
 		return
 	}
-	hwnd, _ := win32.CreateWindow(appName, "Get System Metrics No. 4",
+	hwnd, _ := win32.CreateWindow(appName, "Get System Metrics",
 		win32.WS_OVERLAPPEDWINDOW|win32.WS_VSCROLL|win32.WS_HSCROLL,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
@@ -53,6 +53,7 @@ func main() {
 }
 
 var cxChar, cxCaps, cyChar, cxClient, cyClient, iMaxWidth int32
+var deltaPerLine, accumDelta int32
 
 func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
 	var hdc win32.HDC
@@ -60,6 +61,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 	var ps win32.PAINTSTRUCT
 	var si win32.SCROLLINFO
 	var tm win32.TEXTMETRIC
+	var scrollLines int32
 	switch msg {
 	case win32.WM_CREATE:
 		hdc = win32.GetDC(hwnd)
@@ -75,7 +77,9 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		win32.ReleaseDC(hwnd, hdc)
 		// save the width of the three columns
 		iMaxWidth = 40*cxChar + 22*cxCaps
-		return 0
+		fallthrough // for mouse wheel information
+	case win32.WM_SETTINGCHANGE:
+		//todo
 	case win32.WM_SIZE:
 		cxClient = win32.LOWORD(lParam)
 		cyClient = win32.HIWORD(lParam)

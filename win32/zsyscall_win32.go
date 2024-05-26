@@ -153,6 +153,7 @@ var (
 	procShowCaret                 = moduser32.NewProc("ShowCaret")
 	procShowCursor                = moduser32.NewProc("ShowCursor")
 	procShowWindow                = moduser32.NewProc("ShowWindow")
+	procSystemParametersInfoW     = moduser32.NewProc("SystemParametersInfoW")
 	procTranslateMessage          = moduser32.NewProc("TranslateMessage")
 	procUnionRect                 = moduser32.NewProc("UnionRect")
 	procUpdateWindow              = moduser32.NewProc("UpdateWindow")
@@ -559,10 +560,9 @@ func CopyRect(dst *RECT, src *RECT) (ok bool) {
 	return
 }
 
-func CreateCaret(hwnd HWND, hBitmap HBITMAP, width int32, height int32) (ok bool, err error) {
-	r0, _, e1 := syscall.Syscall6(procCreateCaret.Addr(), 4, uintptr(hwnd), uintptr(hBitmap), uintptr(width), uintptr(height), 0, 0)
-	ok = r0 != 0
-	if ok == false {
+func CreateCaret(hwnd HWND, hBitmap HBITMAP, width int32, height int32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procCreateCaret.Addr(), 4, uintptr(hwnd), uintptr(hBitmap), uintptr(width), uintptr(height), 0, 0)
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -651,10 +651,9 @@ func GetClientRect(hwnd HWND, rect *RECT) (err error) {
 	return
 }
 
-func GetCursorPos(pt *POINT) (ok bool, err error) {
-	r0, _, e1 := syscall.Syscall(procGetCursorPos.Addr(), 1, uintptr(unsafe.Pointer(pt)), 0, 0)
-	ok = r0 != 0
-	if ok == false {
+func GetCursorPos(pt *POINT) (err error) {
+	r1, _, e1 := syscall.Syscall(procGetCursorPos.Addr(), 1, uintptr(unsafe.Pointer(pt)), 0, 0)
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -709,10 +708,9 @@ func GetParent(hwnd HWND) (parent HWND, err error) {
 	return
 }
 
-func GetScrollInfo(hwnd HWND, nBar int32, si *SCROLLINFO) (ok bool, err error) {
-	r0, _, e1 := syscall.Syscall(procGetScrollInfo.Addr(), 3, uintptr(hwnd), uintptr(nBar), uintptr(unsafe.Pointer(si)))
-	ok = r0 != 0
-	if ok == false {
+func GetScrollInfo(hwnd HWND, nBar int32, si *SCROLLINFO) (err error) {
+	r1, _, e1 := syscall.Syscall(procGetScrollInfo.Addr(), 3, uintptr(hwnd), uintptr(nBar), uintptr(unsafe.Pointer(si)))
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -752,10 +750,9 @@ func GetWindowLongPtr(hwnd HWND, index int32) (ret uintptr, err error) {
 	return
 }
 
-func HideCaret(hwnd HWND) (ok bool, err error) {
-	r0, _, e1 := syscall.Syscall(procHideCaret.Addr(), 1, uintptr(hwnd), 0, 0)
-	ok = r0 != 0
-	if ok == false {
+func HideCaret(hwnd HWND) (err error) {
+	r1, _, e1 := syscall.Syscall(procHideCaret.Addr(), 1, uintptr(hwnd), 0, 0)
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -842,10 +839,9 @@ func _LoadIcon(hInstance HINSTANCE, iconName *uint16) (hIcon HICON, err error) {
 	return
 }
 
-func MessageBeep(uType uint32) (ok bool, err error) {
-	r0, _, e1 := syscall.Syscall(procMessageBeep.Addr(), 1, uintptr(uType), 0, 0)
-	ok = r0 != 0
-	if ok == false {
+func MessageBeep(uType uint32) (err error) {
+	r1, _, e1 := syscall.Syscall(procMessageBeep.Addr(), 1, uintptr(uType), 0, 0)
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -874,14 +870,13 @@ func _MessageBox(hwnd HWND, text *uint16, caption *uint16, boxtype uint32) (ret 
 	return
 }
 
-func MoveWindow(hwnd HWND, x int32, y int32, width int32, height int32, repaint bool) (ok bool, err error) {
+func MoveWindow(hwnd HWND, x int32, y int32, width int32, height int32, repaint bool) (err error) {
 	var _p0 uint32
 	if repaint {
 		_p0 = 1
 	}
-	r0, _, e1 := syscall.Syscall6(procMoveWindow.Addr(), 6, uintptr(hwnd), uintptr(x), uintptr(y), uintptr(width), uintptr(height), uintptr(_p0))
-	ok = r0 != 0
-	if ok == false {
+	r1, _, e1 := syscall.Syscall6(procMoveWindow.Addr(), 6, uintptr(hwnd), uintptr(x), uintptr(y), uintptr(width), uintptr(height), uintptr(_p0))
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -913,10 +908,9 @@ func RegisterClass(wc *WNDCLASS) (atom ATOM, err error) {
 	return
 }
 
-func ReleaseCapture() (ok bool, err error) {
-	r0, _, e1 := syscall.Syscall(procReleaseCapture.Addr(), 0, 0, 0, 0)
-	ok = r0 != 0
-	if ok == false {
+func ReleaseCapture() (err error) {
+	r1, _, e1 := syscall.Syscall(procReleaseCapture.Addr(), 0, 0, 0, 0)
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -936,10 +930,9 @@ func ScreenToClient(hwnd HWND, pt *POINT) (ok bool) {
 	return
 }
 
-func ScrollWindow(hwnd HWND, dx int32, dy int32, rect *RECT, clipRect *RECT) (ok bool, err error) {
-	r0, _, e1 := syscall.Syscall6(procScrollWindow.Addr(), 5, uintptr(hwnd), uintptr(dx), uintptr(dy), uintptr(unsafe.Pointer(rect)), uintptr(unsafe.Pointer(clipRect)), 0)
-	ok = r0 != 0
-	if ok == false {
+func ScrollWindow(hwnd HWND, dx int32, dy int32, rect *RECT, clipRect *RECT) (err error) {
+	r1, _, e1 := syscall.Syscall6(procScrollWindow.Addr(), 5, uintptr(hwnd), uintptr(dx), uintptr(dy), uintptr(unsafe.Pointer(rect)), uintptr(unsafe.Pointer(clipRect)), 0)
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -957,10 +950,9 @@ func SetCapture(hwnd HWND) (prev HWND) {
 	return
 }
 
-func SetCaretPos(x int32, y int32) (ok bool, err error) {
-	r0, _, e1 := syscall.Syscall(procSetCaretPos.Addr(), 2, uintptr(x), uintptr(y), 0)
-	ok = r0 != 0
-	if ok == false {
+func SetCaretPos(x int32, y int32) (err error) {
+	r1, _, e1 := syscall.Syscall(procSetCaretPos.Addr(), 2, uintptr(x), uintptr(y), 0)
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -972,10 +964,9 @@ func SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) {
 	return
 }
 
-func SetCursorPos(x int32, y int32) (ok bool, err error) {
-	r0, _, e1 := syscall.Syscall(procSetCursorPos.Addr(), 2, uintptr(x), uintptr(y), 0)
-	ok = r0 != 0
-	if ok == false {
+func SetCursorPos(x int32, y int32) (err error) {
+	r1, _, e1 := syscall.Syscall(procSetCursorPos.Addr(), 2, uintptr(x), uintptr(y), 0)
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -1025,14 +1016,13 @@ func SetScrollPos(hwnd HWND, nBar int32, nPos int32, bRedraw bool) (ret int32, e
 	return
 }
 
-func SetScrollRange(hwnd HWND, nBar int32, nMinPos int32, nMaxPos int32, bRedraw bool) (ret BOOL, err error) {
+func SetScrollRange(hwnd HWND, nBar int32, nMinPos int32, nMaxPos int32, bRedraw bool) (err error) {
 	var _p0 uint32
 	if bRedraw {
 		_p0 = 1
 	}
-	r0, _, e1 := syscall.Syscall6(procSetScrollRange.Addr(), 5, uintptr(hwnd), uintptr(nBar), uintptr(nMinPos), uintptr(nMaxPos), uintptr(_p0), 0)
-	ret = BOOL(r0)
-	if ret == 0 {
+	r1, _, e1 := syscall.Syscall6(procSetScrollRange.Addr(), 5, uintptr(hwnd), uintptr(nBar), uintptr(nMinPos), uintptr(nMaxPos), uintptr(_p0), 0)
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -1047,10 +1037,9 @@ func SetWindowLongPtr(hwnd HWND, index int32, value uintptr) (prev uintptr, err 
 	return
 }
 
-func ShowCaret(hwnd HWND) (ok bool, err error) {
-	r0, _, e1 := syscall.Syscall(procShowCaret.Addr(), 1, uintptr(hwnd), 0, 0)
-	ok = r0 != 0
-	if ok == false {
+func ShowCaret(hwnd HWND) (err error) {
+	r1, _, e1 := syscall.Syscall(procShowCaret.Addr(), 1, uintptr(hwnd), 0, 0)
+	if r1 == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -1069,6 +1058,14 @@ func ShowCursor(show bool) (count int32) {
 func ShowWindow(hwnd HWND, nCmdShow int32) (wasVisible bool) {
 	r0, _, _ := syscall.Syscall(procShowWindow.Addr(), 2, uintptr(hwnd), uintptr(nCmdShow), 0)
 	wasVisible = r0 != 0
+	return
+}
+
+func SystemParametersInfo(uiAction uint32, uiParam uint32, pvParam uintptr, fWinIni uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procSystemParametersInfoW.Addr(), 4, uintptr(uiAction), uintptr(uiParam), uintptr(pvParam), uintptr(fWinIni), 0, 0)
+	if r1 == 0 {
+		err = errnoErr(e1)
+	}
 	return
 }
 
