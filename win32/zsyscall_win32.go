@@ -81,6 +81,7 @@ var (
 	procSetMapMode                = modgdi32.NewProc("SetMapMode")
 	procSetPixel                  = modgdi32.NewProc("SetPixel")
 	procSetPolyFillMode           = modgdi32.NewProc("SetPolyFillMode")
+	procSetROP2                   = modgdi32.NewProc("SetROP2")
 	procSetTextAlign              = modgdi32.NewProc("SetTextAlign")
 	procSetViewportExtEx          = modgdi32.NewProc("SetViewportExtEx")
 	procSetViewportOrgEx          = modgdi32.NewProc("SetViewportOrgEx")
@@ -421,6 +422,12 @@ func SetPixel(hdc HDC, x int32, y int32, color COLORREF) (prevColor COLORREF) {
 func SetPolyFillMode(hdc HDC, mode int32) (ret int32) {
 	r0, _, _ := syscall.Syscall(procSetPolyFillMode.Addr(), 2, uintptr(hdc), uintptr(mode), 0)
 	ret = int32(r0)
+	return
+}
+
+func SetROP2(hdc HDC, mode int32) (prevMode int32) {
+	r0, _, _ := syscall.Syscall(procSetROP2.Addr(), 2, uintptr(hdc), uintptr(mode), 0)
+	prevMode = int32(r0)
 	return
 }
 

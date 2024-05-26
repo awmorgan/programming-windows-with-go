@@ -219,6 +219,10 @@ func ArrowCursor() HCURSOR {
 	return loadCursorFromID(IDC_ARROW)
 }
 
+func CrossCursor() HCURSOR {
+	return loadCursorFromID(IDC_CROSS)
+}
+
 func WaitCursor() HCURSOR {
 	return loadCursorFromID(IDC_WAIT)
 }
