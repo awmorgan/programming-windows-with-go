@@ -54,14 +54,14 @@ func main() {
 
 func displayDigit(hdc win32.HDC, number int) {
 	sevenSegment := [10][7]int{
-		{1, 1, 1, 1, 1, 1, 0}, // 0
-		{0, 1, 1, 0, 0, 0, 0}, // 1
-		{1, 1, 0, 1, 1, 0, 1}, // 2
-		{1, 1, 1, 1, 0, 0, 1}, // 3
-		{0, 1, 1, 0, 0, 1, 1}, // 4
-		{1, 0, 1, 1, 0, 1, 1}, // 5
-		{1, 0, 1, 1, 1, 1, 1}, // 6
-		{1, 1, 1, 0, 0, 0, 0}, // 7
+		{1, 1, 1, 0, 1, 1, 1}, // 0
+		{0, 0, 1, 0, 0, 1, 0}, // 1
+		{1, 0, 1, 1, 1, 0, 1}, // 2
+		{1, 0, 1, 1, 0, 1, 1}, // 3
+		{0, 1, 1, 1, 0, 1, 0}, // 4
+		{1, 1, 0, 1, 0, 1, 1}, // 5
+		{1, 1, 0, 1, 1, 1, 1}, // 6
+		{1, 0, 1, 0, 0, 1, 0}, // 7
 		{1, 1, 1, 1, 1, 1, 1}, // 8
 		{1, 1, 1, 1, 0, 1, 1}, // 9
 	}
@@ -120,13 +120,13 @@ func displayTime(hdc win32.HDC, _24h bool, suppress bool) {
 }
 
 var _24hour, suppress bool
-var hbrushRed win32.HBRUSH
+var hbrushRed win32.HGDIOBJ
 var cxClient, cyClient int32
 
 func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
 	switch msg {
 	case win32.WM_CREATE:
-		hbrushRed = win32.CreateSolidBrush(win32.RGB(255, 0, 0))
+		hbrushRed = win32.HGDIOBJ(win32.CreateSolidBrush(win32.RGB(255, 0, 0)))
 		win32.SetTimer(hwnd, ID_TIMER, 1000, 0)
 		fallthrough
 	case win32.WM_SETTINGCHANGE:
@@ -165,7 +165,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		win32.SetWindowOrgEx(hdc, 138, 36, nil)
 		win32.SetViewportOrgEx(hdc, cxClient/2, cyClient/2, nil)
 		win32.SelectObject(hdc, win32.GetStockObject(win32.NULL_PEN))
-		win32.SelectObject(hdc, win32.HGDIOBJ(hbrushRed))
+		win32.SelectObject(hdc, hbrushRed)
 
 		displayTime(hdc, _24hour, suppress)
 		win32.EndPaint(hwnd, &ps)
@@ -173,6 +173,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 
 	case win32.WM_DESTROY:
 		win32.KillTimer(hwnd, ID_TIMER)
+		win32.DeleteObject(hbrushRed)
 		win32.PostQuitMessage(0)
 		return 0
 	}
