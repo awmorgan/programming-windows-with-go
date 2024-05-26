@@ -33,6 +33,11 @@ const (
 	LOCALE_SYSTEM_DEFAULT     LCID = 0x0800
 )
 
+const (
+	LOCALE_ITIME   = 0x23
+	LOCALE_ITLZERO = 0x25
+)
+
 // LCTYPE constants
 const (
 	LOCALE_SDECIMAL          LCTYPE = 14

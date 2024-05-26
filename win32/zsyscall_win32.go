@@ -67,6 +67,7 @@ var (
 	procLineTo                    = modgdi32.NewProc("LineTo")
 	procMoveToEx                  = modgdi32.NewProc("MoveToEx")
 	procOffsetClipRgn             = modgdi32.NewProc("OffsetClipRgn")
+	procOffsetWindowOrgEx         = modgdi32.NewProc("OffsetWindowOrgEx")
 	procPaintRgn                  = modgdi32.NewProc("PaintRgn")
 	procPolyBezier                = modgdi32.NewProc("PolyBezier")
 	procPolygon                   = modgdi32.NewProc("Polygon")
@@ -86,8 +87,11 @@ var (
 	procSetViewportExtEx          = modgdi32.NewProc("SetViewportExtEx")
 	procSetViewportOrgEx          = modgdi32.NewProc("SetViewportOrgEx")
 	procSetWindowExtEx            = modgdi32.NewProc("SetWindowExtEx")
+	procSetWindowOrgEx            = modgdi32.NewProc("SetWindowOrgEx")
 	procTextOutW                  = modgdi32.NewProc("TextOutW")
 	procFreeLibrary               = modkernel32.NewProc("FreeLibrary")
+	procGetLocalTime              = modkernel32.NewProc("GetLocalTime")
+	procGetLocaleInfoW            = modkernel32.NewProc("GetLocaleInfoW")
 	procGetModuleHandleW          = modkernel32.NewProc("GetModuleHandleW")
 	procGetProcAddress            = modkernel32.NewProc("GetProcAddress")
 	procGetStartupInfoW           = modkernel32.NewProc("GetStartupInfoW")
@@ -334,6 +338,12 @@ func OffsetClipRgn(hdc HDC, x int32, y int32) (ret int32) {
 	return
 }
 
+func OffsetWindowOrgEx(hdc HDC, x int32, y int32, pt *POINT) (ok bool) {
+	r0, _, _ := syscall.Syscall6(procOffsetWindowOrgEx.Addr(), 4, uintptr(hdc), uintptr(x), uintptr(y), uintptr(unsafe.Pointer(pt)), 0, 0)
+	ok = r0 != 0
+	return
+}
+
 func PaintRgn(hdc HDC, hrgn HRGN) (ok bool) {
 	r0, _, _ := syscall.Syscall(procPaintRgn.Addr(), 2, uintptr(hdc), uintptr(hrgn), 0)
 	ok = r0 != 0
@@ -460,6 +470,12 @@ func SetWindowExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) {
 	return
 }
 
+func SetWindowOrgEx(hdc HDC, x int32, y int32, pt *POINT) (ok bool) {
+	r0, _, _ := syscall.Syscall6(procSetWindowOrgEx.Addr(), 4, uintptr(hdc), uintptr(x), uintptr(y), uintptr(unsafe.Pointer(pt)), 0, 0)
+	ok = r0 != 0
+	return
+}
+
 func TextOut(hdc HDC, x int32, y int32, text string, n int) (err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(text)
@@ -480,6 +496,20 @@ func _TextOut(hdc HDC, x int32, y int32, text *uint16, n int) (err error) {
 func FreeLibrary(handle HANDLE) (err error) {
 	r1, _, e1 := syscall.Syscall(procFreeLibrary.Addr(), 1, uintptr(handle), 0, 0)
 	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func GetLocalTime(lpSystemTime *SYSTEMTIME) {
+	syscall.Syscall(procGetLocalTime.Addr(), 1, uintptr(unsafe.Pointer(lpSystemTime)), 0, 0)
+	return
+}
+
+func GetLocaleInfo(locale LCID, lctype LCTYPE, lcdata *uint16, n int) (cch int32, err error) {
+	r0, _, e1 := syscall.Syscall6(procGetLocaleInfoW.Addr(), 4, uintptr(locale), uintptr(lctype), uintptr(unsafe.Pointer(lcdata)), uintptr(n), 0, 0)
+	cch = int32(r0)
+	if cch == 0 {
 		err = errnoErr(e1)
 	}
 	return

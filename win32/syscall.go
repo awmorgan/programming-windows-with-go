@@ -39,6 +39,8 @@ package win32
 //sys	GetDlgItem(hwnd HWND, id int32) (hwndChild HWND, err error) [failretval==0] = user32.GetDlgItem
 //sys	GetFocus() (hwnd HWND) = user32.GetFocus
 //sys	GetKeyNameText(lparam uintptr, buffer []uint16) (ret int32) = user32.GetKeyNameTextW
+//sys	GetLocaleInfo(locale LCID, lctype LCTYPE, lcdata *uint16, n int) (cch int32, err error) [failretval==0] = kernel32.GetLocaleInfoW
+//sys	GetLocalTime(lpSystemTime *SYSTEMTIME)  = kernel32.GetLocalTime
 //sys	GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) [failretval==-1] = user32.GetMessageW
 //sys	getModuleHandle(moduleName *uint16) (hModule HMODULE, err error) [failretval==0] = kernel32.GetModuleHandleW
 //sys	GetParent(hwnd HWND) (parent HWND, err error) [failretval==0] = user32.GetParent
@@ -73,6 +75,7 @@ package win32
 //sys	MoveWindow(hwnd HWND, x int32, y int32, width int32, height int32, repaint bool) (err error) [failretval==0] = user32.MoveWindow
 //sys	OffsetClipRgn(hdc HDC, x int32, y int32) (ret int32) = gdi32.OffsetClipRgn
 //sys	OffsetRect(rect *RECT, x int32, y int32) (ok bool) = user32.OffsetRect
+//sys	OffsetWindowOrgEx(hdc HDC, x int32, y int32, pt *POINT) (ok bool) = gdi32.OffsetWindowOrgEx
 //sys	PaintRgn(hdc HDC, hrgn HRGN) (ok bool) = gdi32.PaintRgn
 //sys	PeekMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32, removeMsg uint32) (msgAvail bool) = user32.PeekMessageW
 //sys	PlaySound(sound string, hmod uintptr, flags uint32) (err error) [failretval==0] = winmm.PlaySoundW
@@ -113,6 +116,7 @@ package win32
 //sys	SetViewportOrgEx(hdc HDC, x int32, y int32, pt *POINT) (ok bool) = gdi32.SetViewportOrgEx
 //sys	SetWindowExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) = gdi32.SetWindowExtEx
 //sys	SetWindowLongPtr(hwnd HWND, index int32, value uintptr) (prev uintptr, err error) [failretval==0] = user32.SetWindowLongPtrW
+//sys	SetWindowOrgEx(hdc HDC, x int32, y int32, pt *POINT) (ok bool) = gdi32.SetWindowOrgEx
 //sys	ShowCaret(hwnd HWND) (err error) [failretval==0] = user32.ShowCaret
 //sys	ShowCursor(show bool) (count int32) = user32.ShowCursor
 //sys	ShowWindow(hwnd HWND, nCmdShow int32) (wasVisible bool) = user32.ShowWindow
