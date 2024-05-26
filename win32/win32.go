@@ -82,6 +82,10 @@ func NewWndProc(f func(hwnd HWND, msg uint32, wParam, lParam uintptr) uintptr) u
 	return syscall.NewCallback(f)
 }
 
+func NewTimerProc(f func(hwnd HWND, msg uint32, timerID uintptr, time uintptr) uintptr ) uintptr {
+	return syscall.NewCallback(f)
+}
+
 func CreateWindow(className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) {
 	return CreateWindowEx(0, className, windowName, style, x, y, width, height, parent, menu, instance, param)
 }
