@@ -209,7 +209,12 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		if deltaPerLine == 0 {
 			break
 		}
-		accumDelta += win32.HIWORD(wParam)
+		val := win32.HIWORD(wParam)
+		if val & 0x8000 != 0 {
+			// sign extend
+			val -= 0x10000
+		}
+		accumDelta += val
 		for accumDelta >= deltaPerLine {
 			win32.SendMessage(hwnd, win32.WM_VSCROLL, win32.SB_LINEUP, 0)
 			accumDelta -= deltaPerLine
@@ -219,7 +224,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 			accumDelta += deltaPerLine
 		}
 		return 0
-		
+
 	case win32.WM_PAINT:
 		hdc = win32.BeginPaint(hwnd, &ps)
 
