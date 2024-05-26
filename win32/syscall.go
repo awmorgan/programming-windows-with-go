@@ -62,6 +62,7 @@ package win32
 //sys	InvertRect( hdc HDC, lprc *RECT ) (ok bool) = user32.InvertRect
 //sys	InvertRgn(hdc HDC, hrgn HRGN) (ok bool) = gdi32.InvertRgn
 //sys	IsRectEmpty(rect *RECT) (empty bool) = user32.IsRectEmpty
+//sys	KillTimer(hwnd HWND, id uintptr) (err error) [failretval==0] = user32.KillTimer
 //sys	LineTo(hdc HDC, x int32, y int32) (ok bool) = gdi32.LineTo
 //sys	LoadCursor(hInstance HINSTANCE, cursorName string) (hCursor HCURSOR, err error) [failretval==0] = user32.LoadCursorW
 //sys	LoadIcon(hInstance HINSTANCE, iconName string) (hIcon HICON, err error) [failretval==0] = user32.LoadIconW
@@ -107,6 +108,7 @@ package win32
 //sys	SetScrollPos(hwnd HWND, nBar int32, nPos int32, bRedraw bool) (ret int32, err error) [failretval==0] = user32.SetScrollPos
 //sys	SetScrollRange(hwnd HWND, nBar int32, nMinPos int32, nMaxPos int32, bRedraw bool) (err error) [failretval==0] = user32.SetScrollRange
 //sys	SetTextAlign(hdc HDC, align uint32) (ret uint32) = gdi32.SetTextAlign
+//sys	SetTimer(hwnd HWND, id uintptr, elapse uint32, proc uintptr) (timerID uintptr, err error) [failretval==0] = user32.SetTimer
 //sys	SetViewportExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) = gdi32.SetViewportExtEx
 //sys	SetViewportOrgEx(hdc HDC, x int32, y int32, pt *POINT) (ok bool) = gdi32.SetViewportOrgEx
 //sys	SetWindowExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) = gdi32.SetWindowExtEx

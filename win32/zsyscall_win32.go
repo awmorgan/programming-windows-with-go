@@ -125,6 +125,7 @@ var (
 	procInvalidateRgn             = moduser32.NewProc("InvalidateRgn")
 	procInvertRect                = moduser32.NewProc("InvertRect")
 	procIsRectEmpty               = moduser32.NewProc("IsRectEmpty")
+	procKillTimer                 = moduser32.NewProc("KillTimer")
 	procLoadCursorW               = moduser32.NewProc("LoadCursorW")
 	procLoadIconW                 = moduser32.NewProc("LoadIconW")
 	procMessageBeep               = moduser32.NewProc("MessageBeep")
@@ -149,6 +150,7 @@ var (
 	procSetScrollInfo             = moduser32.NewProc("SetScrollInfo")
 	procSetScrollPos              = moduser32.NewProc("SetScrollPos")
 	procSetScrollRange            = moduser32.NewProc("SetScrollRange")
+	procSetTimer                  = moduser32.NewProc("SetTimer")
 	procSetWindowLongPtrW         = moduser32.NewProc("SetWindowLongPtrW")
 	procShowCaret                 = moduser32.NewProc("ShowCaret")
 	procShowCursor                = moduser32.NewProc("ShowCursor")
@@ -803,6 +805,14 @@ func IsRectEmpty(rect *RECT) (empty bool) {
 	return
 }
 
+func KillTimer(hwnd HWND, id uintptr) (err error) {
+	r1, _, e1 := syscall.Syscall(procKillTimer.Addr(), 2, uintptr(hwnd), uintptr(id), 0)
+	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func LoadCursor(hInstance HINSTANCE, cursorName string) (hCursor HCURSOR, err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(cursorName)
@@ -1023,6 +1033,15 @@ func SetScrollRange(hwnd HWND, nBar int32, nMinPos int32, nMaxPos int32, bRedraw
 	}
 	r1, _, e1 := syscall.Syscall6(procSetScrollRange.Addr(), 5, uintptr(hwnd), uintptr(nBar), uintptr(nMinPos), uintptr(nMaxPos), uintptr(_p0), 0)
 	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func SetTimer(hwnd HWND, id uintptr, elapse uint32, proc uintptr) (timerID uintptr, err error) {
+	r0, _, e1 := syscall.Syscall6(procSetTimer.Addr(), 4, uintptr(hwnd), uintptr(id), uintptr(elapse), uintptr(proc), 0, 0)
+	timerID = uintptr(r0)
+	if timerID == 0 {
 		err = errnoErr(e1)
 	}
 	return
