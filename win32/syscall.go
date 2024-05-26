@@ -81,6 +81,7 @@ package win32
 //sys	PostQuitMessage(exitCode int32) = user32.PostQuitMessage
 //sys	Rectangle(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bool) = gdi32.Rectangle
 //sys	RegisterClass(wc *WNDCLASS) (atom ATOM, err error) [failretval==0] = user32.RegisterClassW
+//sys	ReleaseCapture() (ok bool, err error) [failretval==false] = user32.ReleaseCapture
 //sys	ReleaseDC(hwnd HWND, hdc HDC) (err error) [failretval==0] = user32.ReleaseDC
 //sys	RestoreDC(hdc HDC, saved int32) (ok bool) = gdi32.RestoreDC
 //sys	RoundRect(hdc HDC, left int32, top int32, right int32, bottom int32, width int32, height int32) (ok bool) = gdi32.RoundRect
@@ -91,6 +92,7 @@ package win32
 //sys	SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) = gdi32.SelectObject
 //sys	SendMessage(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (lResult uintptr) = user32.SendMessageW
 //sys	SetBkMode(hdc HDC, mode int32) (prevMode int32) = gdi32.SetBkMode
+//sys	SetCapture(hwnd HWND) (prev HWND) = user32.SetCapture
 //sys	SetCaretPos(x int32, y int32) (ok bool, err error) [failretval==false] = user32.SetCaretPos
 //sys	SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) = user32.SetCursor
 //sys	SetCursorPos(x int32, y int32) (ok bool, err error) [failretval==false] = user32.SetCursorPos

@@ -134,10 +134,12 @@ var (
 	procPeekMessageW              = moduser32.NewProc("PeekMessageW")
 	procPostQuitMessage           = moduser32.NewProc("PostQuitMessage")
 	procRegisterClassW            = moduser32.NewProc("RegisterClassW")
+	procReleaseCapture            = moduser32.NewProc("ReleaseCapture")
 	procReleaseDC                 = moduser32.NewProc("ReleaseDC")
 	procScreenToClient            = moduser32.NewProc("ScreenToClient")
 	procScrollWindow              = moduser32.NewProc("ScrollWindow")
 	procSendMessageW              = moduser32.NewProc("SendMessageW")
+	procSetCapture                = moduser32.NewProc("SetCapture")
 	procSetCaretPos               = moduser32.NewProc("SetCaretPos")
 	procSetCursor                 = moduser32.NewProc("SetCursor")
 	procSetCursorPos              = moduser32.NewProc("SetCursorPos")
@@ -911,6 +913,15 @@ func RegisterClass(wc *WNDCLASS) (atom ATOM, err error) {
 	return
 }
 
+func ReleaseCapture() (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall(procReleaseCapture.Addr(), 0, 0, 0, 0)
+	ok = r0 != 0
+	if ok == false {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func ReleaseDC(hwnd HWND, hdc HDC) (err error) {
 	r1, _, e1 := syscall.Syscall(procReleaseDC.Addr(), 2, uintptr(hwnd), uintptr(hdc), 0)
 	if r1 == 0 {
@@ -937,6 +948,12 @@ func ScrollWindow(hwnd HWND, dx int32, dy int32, rect *RECT, clipRect *RECT) (ok
 func SendMessage(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (lResult uintptr) {
 	r0, _, _ := syscall.Syscall6(procSendMessageW.Addr(), 4, uintptr(hwnd), uintptr(msg), uintptr(wParam), uintptr(lParam), 0, 0)
 	lResult = uintptr(r0)
+	return
+}
+
+func SetCapture(hwnd HWND) (prev HWND) {
+	r0, _, _ := syscall.Syscall(procSetCapture.Addr(), 1, uintptr(hwnd), 0, 0)
+	prev = HWND(r0)
 	return
 }
 
