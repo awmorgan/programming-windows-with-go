@@ -26,6 +26,7 @@ package win32
 //sys	DestroyCaret() (destroyed bool) = user32.DestroyCaret
 //sys	DispatchMessage(msg *MSG) = user32.DispatchMessageW
 //sys	DPtoLP(hdc HDC, pt []POINT ) (ok bool) = gdi32.DPtoLP
+//sys	DrawFocusRect(hdc HDC, lprc *RECT) (ok bool) = user32.DrawFocusRect
 //sys	DrawText(hdc HDC, text string, n int32, rect *RECT, format uint32) (ret int32, err error) [failretval==0] = user32.DrawTextW
 //sys	Ellipse(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bool) = gdi32.Ellipse
 //sys	EndPaint(hwnd HWND, ps *PAINTSTRUCT) = user32.EndPaint
@@ -60,6 +61,7 @@ package win32
 //sys	GetTextMetrics(hdc HDC, tm *TEXTMETRIC) (err error) [failretval==0] = gdi32.GetTextMetricsW
 //sys	GetUpdateRect(hwnd HWND, rect *RECT, erase bool) (notEmpty bool) = user32.GetUpdateRect
 //sys	GetWindowLongPtr(hwnd HWND, index int32) (ret uintptr, err error) [failretval==0] = user32.GetWindowLongPtrW
+//sys	GetWindowRect(hwnd HWND, rect *RECT) (ok bool, err error) [failretval==false] = user32.GetWindowRect
 //sys	HideCaret(hwnd HWND) (err error) [failretval==0] = user32.HideCaret
 //sys	InflateRect(rect *RECT, x int32, y int32) (ok bool) = user32.InflateRect
 //sys	IntersectClipRect(hdc HDC, left int32, top int32, right int32, bottom int32) (ret int32) = gdi32.IntersectClipRect

@@ -109,6 +109,7 @@ var (
 	procDefWindowProcW            = moduser32.NewProc("DefWindowProcW")
 	procDestroyCaret              = moduser32.NewProc("DestroyCaret")
 	procDispatchMessageW          = moduser32.NewProc("DispatchMessageW")
+	procDrawFocusRect             = moduser32.NewProc("DrawFocusRect")
 	procDrawTextW                 = moduser32.NewProc("DrawTextW")
 	procEndPaint                  = moduser32.NewProc("EndPaint")
 	procFillRect                  = moduser32.NewProc("FillRect")
@@ -127,6 +128,7 @@ var (
 	procGetSystemMetrics          = moduser32.NewProc("GetSystemMetrics")
 	procGetUpdateRect             = moduser32.NewProc("GetUpdateRect")
 	procGetWindowLongPtrW         = moduser32.NewProc("GetWindowLongPtrW")
+	procGetWindowRect             = moduser32.NewProc("GetWindowRect")
 	procHideCaret                 = moduser32.NewProc("HideCaret")
 	procInflateRect               = moduser32.NewProc("InflateRect")
 	procIntersectRect             = moduser32.NewProc("IntersectRect")
@@ -669,6 +671,12 @@ func DispatchMessage(msg *MSG) {
 	return
 }
 
+func DrawFocusRect(hdc HDC, lprc *RECT) (ok bool) {
+	r0, _, _ := syscall.Syscall(procDrawFocusRect.Addr(), 2, uintptr(hdc), uintptr(unsafe.Pointer(lprc)), 0)
+	ok = r0 != 0
+	return
+}
+
 func DrawText(hdc HDC, text string, n int32, rect *RECT, format uint32) (ret int32, err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(text)
@@ -812,6 +820,15 @@ func GetWindowLongPtr(hwnd HWND, index int32) (ret uintptr, err error) {
 	r0, _, e1 := syscall.Syscall(procGetWindowLongPtrW.Addr(), 2, uintptr(hwnd), uintptr(index), 0)
 	ret = uintptr(r0)
 	if ret == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func GetWindowRect(hwnd HWND, rect *RECT) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall(procGetWindowRect.Addr(), 2, uintptr(hwnd), uintptr(unsafe.Pointer(rect)), 0)
+	ok = r0 != 0
+	if ok == false {
 		err = errnoErr(e1)
 	}
 	return
