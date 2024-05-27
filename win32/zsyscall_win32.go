@@ -116,6 +116,7 @@ var (
 	procGetClientRect             = moduser32.NewProc("GetClientRect")
 	procGetCursorPos              = moduser32.NewProc("GetCursorPos")
 	procGetDC                     = moduser32.NewProc("GetDC")
+	procGetDialogBaseUnits        = moduser32.NewProc("GetDialogBaseUnits")
 	procGetDlgItem                = moduser32.NewProc("GetDlgItem")
 	procGetFocus                  = moduser32.NewProc("GetFocus")
 	procGetKeyNameTextW           = moduser32.NewProc("GetKeyNameTextW")
@@ -722,6 +723,12 @@ func GetCursorPos(pt *POINT) (err error) {
 func GetDC(hwnd HWND) (hdc HDC) {
 	r0, _, _ := syscall.Syscall(procGetDC.Addr(), 1, uintptr(hwnd), 0, 0)
 	hdc = HDC(r0)
+	return
+}
+
+func GetDialogBaseUnits() (base int32) {
+	r0, _, _ := syscall.Syscall(procGetDialogBaseUnits.Addr(), 0, 0, 0, 0)
+	base = int32(r0)
 	return
 }
 

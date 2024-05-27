@@ -39,6 +39,7 @@ package win32
 //sys	GetCursorPos(pt *POINT) (err error) [failretval==0] = user32.GetCursorPos
 //sys	GetDC(hwnd HWND) (hdc HDC) = user32.GetDC
 //sys	GetDeviceCaps(hdc HDC, index int32) (ret int32) = gdi32.GetDeviceCaps
+//sys	GetDialogBaseUnits() (base int32) = user32.GetDialogBaseUnits
 //sys	GetDlgItem(hwnd HWND, id int32) (hwndChild HWND, err error) [failretval==0] = user32.GetDlgItem
 //sys	GetFocus() (hwnd HWND) = user32.GetFocus
 //sys	GetKeyNameText(lparam uintptr, buffer []uint16) (ret int32) = user32.GetKeyNameTextW
