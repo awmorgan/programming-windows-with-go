@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,8 +12,15 @@ import (
 )
 
 func main() {
+	nodelete := flag.Bool("nodelete", false, "do not delete the 'bin' directory")
+	flag.Parse()
+
 	// Deferred removal of the 'bin' directory if it exists
 	defer func() {
+		if *nodelete {
+			fmt.Printf("Skipping removal of 'bin' directory\n")
+			return
+		}
 		fmt.Printf("Removing 'bin' directory\n")
 		if _, err := os.Stat("bin"); err == nil {
 			err = os.RemoveAll("bin") // Remove the 'bin' directory
