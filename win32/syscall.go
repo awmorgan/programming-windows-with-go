@@ -7,9 +7,11 @@ package win32
 //sys	CombineRgn(dest HRGN, src1 HRGN, src2 HRGN, mode int32) (ret int32) = gdi32.CombineRgn
 //sys	CopyRect(dst *RECT, src *RECT) (ok bool) = user32.CopyRect
 //sys	CreateCaret(hwnd HWND, hBitmap HBITMAP, width int32, height int32) (err error) [failretval==0] = user32.CreateCaret
+//sys	CreateDC(driver *uint16, device *uint16, port *uint16, pdm *DEVMODE) (hdc HDC) = gdi32.CreateDCW
 //sys	CreateEllipticRgn(x1 int32, y1 int32, x2 int32, y2 int32) (hrgn HRGN) = gdi32.CreateEllipticRgn
 //sys	CreateEllipticRgnIndirect(rect *RECT) (hrgn HRGN) = gdi32.CreateEllipticRgnIndirect
 //sys	CreateFont(height int32, width int32, escapement int32, orientation int32, weight int32, italic int32, underline int32, strikeOut int32, charset int32, outputPrecision int32, clipPrecision int32, quality int32, pitchAndFamily int32, face *uint16) (hfont HFONT) = gdi32.CreateFontW
+//sys	CreateIC( driver *uint16, device *uint16, port *uint16, pdm *DEVMODE) (hdc HDC) = gdi32.CreateICW
 //sys	CreatePen(style int32, width int32, color COLORREF) (hpen HPEN) = gdi32.CreatePen
 //sys	CreatePolygonRgn(pt []POINT, cPoints int32, fnPolyFillMode int32) (hrgn HRGN) = gdi32.CreatePolygonRgn
 //sys	CreatePolyPolygonRgn(pt []POINT, lpPolyCounts *int32, nCount int32, fnPolyFillMode int32) (hrgn HRGN) = gdi32.CreatePolyPolygonRgn
@@ -19,6 +21,7 @@ package win32
 //sys	CreateSolidBrush(color COLORREF) (hbr HBRUSH) = gdi32.CreateSolidBrush
 //sys	CreateWindowEx(exstyle uint32, className string, windowName string, style uint32, x int32, y int32, width int32, height int32, parent HWND, menu HMENU, instance HINSTANCE, param uintptr) (hwnd HWND, err error) [failretval==0] = user32.CreateWindowExW
 //sys	DefWindowProc(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (ret uintptr) = user32.DefWindowProcW
+//sys	DeleteDC(hdc HDC) (ok bool) = gdi32.DeleteDC
 //sys	DeleteObject(hObject HGDIOBJ) (ok bool) = gdi32.DeleteObject
 //sys	DestroyCaret() (destroyed bool) = user32.DestroyCaret
 //sys	DispatchMessage(msg *MSG) = user32.DispatchMessageW
@@ -44,6 +47,7 @@ package win32
 //sys	GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) [failretval==-1] = user32.GetMessageW
 //sys	getModuleHandle(moduleName *uint16) (hModule HMODULE, err error) [failretval==0] = kernel32.GetModuleHandleW
 //sys	GetParent(hwnd HWND) (parent HWND, err error) [failretval==0] = user32.GetParent
+//sys	GetPixel(hdc HDC, x int32, y int32) (color COLORREF) = gdi32.GetPixel
 //sys	GetProcAddress(module HANDLE, procname string) (proc uintptr, err error)
 //sys	GetScrollInfo(hwnd HWND, nBar int32, si *SCROLLINFO) (err error) [failretval==0] = user32.GetScrollInfo
 //sys	GetScrollPos(hwnd HWND, nBar int32) (ret int32, err error) [failretval==0] = user32.GetScrollPos

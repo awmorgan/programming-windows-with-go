@@ -42,9 +42,11 @@ var (
 	modwinmm    = NewLazySystemDLL("winmm.dll")
 
 	procCombineRgn                = modgdi32.NewProc("CombineRgn")
+	procCreateDCW                 = modgdi32.NewProc("CreateDCW")
 	procCreateEllipticRgn         = modgdi32.NewProc("CreateEllipticRgn")
 	procCreateEllipticRgnIndirect = modgdi32.NewProc("CreateEllipticRgnIndirect")
 	procCreateFontW               = modgdi32.NewProc("CreateFontW")
+	procCreateICW                 = modgdi32.NewProc("CreateICW")
 	procCreatePen                 = modgdi32.NewProc("CreatePen")
 	procCreatePolyPolygonRgn      = modgdi32.NewProc("CreatePolyPolygonRgn")
 	procCreatePolygonRgn          = modgdi32.NewProc("CreatePolygonRgn")
@@ -53,12 +55,14 @@ var (
 	procCreateRoundRectRgn        = modgdi32.NewProc("CreateRoundRectRgn")
 	procCreateSolidBrush          = modgdi32.NewProc("CreateSolidBrush")
 	procDPtoLP                    = modgdi32.NewProc("DPtoLP")
+	procDeleteDC                  = modgdi32.NewProc("DeleteDC")
 	procDeleteObject              = modgdi32.NewProc("DeleteObject")
 	procEllipse                   = modgdi32.NewProc("Ellipse")
 	procExcludeClipRect           = modgdi32.NewProc("ExcludeClipRect")
 	procFillRgn                   = modgdi32.NewProc("FillRgn")
 	procFrameRgn                  = modgdi32.NewProc("FrameRgn")
 	procGetDeviceCaps             = modgdi32.NewProc("GetDeviceCaps")
+	procGetPixel                  = modgdi32.NewProc("GetPixel")
 	procGetStockObject            = modgdi32.NewProc("GetStockObject")
 	procGetTextFaceW              = modgdi32.NewProc("GetTextFaceW")
 	procGetTextMetricsW           = modgdi32.NewProc("GetTextMetricsW")
@@ -174,6 +178,12 @@ func CombineRgn(dest HRGN, src1 HRGN, src2 HRGN, mode int32) (ret int32) {
 	return
 }
 
+func CreateDC(driver *uint16, device *uint16, port *uint16, pdm *DEVMODE) (hdc HDC) {
+	r0, _, _ := syscall.Syscall6(procCreateDCW.Addr(), 4, uintptr(unsafe.Pointer(driver)), uintptr(unsafe.Pointer(device)), uintptr(unsafe.Pointer(port)), uintptr(unsafe.Pointer(pdm)), 0, 0)
+	hdc = HDC(r0)
+	return
+}
+
 func CreateEllipticRgn(x1 int32, y1 int32, x2 int32, y2 int32) (hrgn HRGN) {
 	r0, _, _ := syscall.Syscall6(procCreateEllipticRgn.Addr(), 4, uintptr(x1), uintptr(y1), uintptr(x2), uintptr(y2), 0, 0)
 	hrgn = HRGN(r0)
@@ -189,6 +199,12 @@ func CreateEllipticRgnIndirect(rect *RECT) (hrgn HRGN) {
 func CreateFont(height int32, width int32, escapement int32, orientation int32, weight int32, italic int32, underline int32, strikeOut int32, charset int32, outputPrecision int32, clipPrecision int32, quality int32, pitchAndFamily int32, face *uint16) (hfont HFONT) {
 	r0, _, _ := syscall.Syscall15(procCreateFontW.Addr(), 14, uintptr(height), uintptr(width), uintptr(escapement), uintptr(orientation), uintptr(weight), uintptr(italic), uintptr(underline), uintptr(strikeOut), uintptr(charset), uintptr(outputPrecision), uintptr(clipPrecision), uintptr(quality), uintptr(pitchAndFamily), uintptr(unsafe.Pointer(face)), 0)
 	hfont = HFONT(r0)
+	return
+}
+
+func CreateIC(driver *uint16, device *uint16, port *uint16, pdm *DEVMODE) (hdc HDC) {
+	r0, _, _ := syscall.Syscall6(procCreateICW.Addr(), 4, uintptr(unsafe.Pointer(driver)), uintptr(unsafe.Pointer(device)), uintptr(unsafe.Pointer(port)), uintptr(unsafe.Pointer(pdm)), 0, 0)
+	hdc = HDC(r0)
 	return
 }
 
@@ -252,6 +268,12 @@ func DPtoLP(hdc HDC, pt []POINT) (ok bool) {
 	return
 }
 
+func DeleteDC(hdc HDC) (ok bool) {
+	r0, _, _ := syscall.Syscall(procDeleteDC.Addr(), 1, uintptr(hdc), 0, 0)
+	ok = r0 != 0
+	return
+}
+
 func DeleteObject(hObject HGDIOBJ) (ok bool) {
 	r0, _, _ := syscall.Syscall(procDeleteObject.Addr(), 1, uintptr(hObject), 0, 0)
 	ok = r0 != 0
@@ -285,6 +307,12 @@ func FrameRgn(hdc HDC, hrgn HRGN, hbr HBRUSH, width int32, height int32) (ok boo
 func GetDeviceCaps(hdc HDC, index int32) (ret int32) {
 	r0, _, _ := syscall.Syscall(procGetDeviceCaps.Addr(), 2, uintptr(hdc), uintptr(index), 0)
 	ret = int32(r0)
+	return
+}
+
+func GetPixel(hdc HDC, x int32, y int32) (color COLORREF) {
+	r0, _, _ := syscall.Syscall(procGetPixel.Addr(), 3, uintptr(hdc), uintptr(x), uintptr(y))
+	color = COLORREF(r0)
 	return
 }
 

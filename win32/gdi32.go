@@ -1072,3 +1072,15 @@ const (
 	R2_WHITE       = 16
 	R2_LAST        = 16
 )
+
+func GetRValue(c COLORREF) byte {
+	return byte(c)
+}
+
+func GetGValue(c COLORREF) byte {
+	return byte(c >> 8)
+}
+
+func GetBValue(c COLORREF) byte {
+	return byte(c >> 16)
+}
