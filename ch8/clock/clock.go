@@ -30,7 +30,7 @@ func main() {
 		win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)
 		return
 	}
-	hwnd, _ := win32.CreateWindow(appName, "Digital Clock",
+	hwnd, _ := win32.CreateWindow(appName, "Analog Clock",
 		win32.WS_OVERLAPPEDWINDOW,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
@@ -56,11 +56,11 @@ func main() {
 
 }
 
-func SetIsotropic(hdc win32.HDC, cxClient, cyClient int32) {
+func SetIsotropic(hdc win32.HDC, cx, cy int32) {
 	win32.SetMapMode(hdc, win32.MM_ISOTROPIC)
 	win32.SetWindowExtEx(hdc, 1000, 1000, nil)
-	win32.SetViewportExtEx(hdc, cxClient/2, -cyClient/2, nil)
-	win32.SetViewportOrgEx(hdc, cxClient/2, cyClient/2, nil)
+	win32.SetViewportExtEx(hdc, cx/2, -cy/2, nil)
+	win32.SetViewportOrgEx(hdc, cx/2, cy/2, nil)
 }
 
 func RotatePoint(pt []win32.POINT, n, angle int32) {
@@ -83,7 +83,7 @@ func DrawClock(hdc win32.HDC) {
 		pt[0].Y = 900
 
 		RotatePoint(pt[:], 1, angle)
-		if angle%5 == 0 {
+		if angle%5 != 0 {
 			pt[2].X, pt[2].Y = 33, 33
 		} else {
 			pt[2].X, pt[2].Y = 100, 100
@@ -153,6 +153,8 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		SetIsotropic(hdc, cxClient, cyClient)
 		win32.SelectObject(hdc, win32.GetStockObject(win32.WHITE_PEN))
 		DrawHands(hdc, &stPrev, change)
+		win32.SelectObject(hdc, win32.GetStockObject(win32.BLACK_PEN))
+		DrawHands(hdc, &st, true)
 		win32.ReleaseDC(hwnd, hdc)
 		stPrev = st
 		return 0
