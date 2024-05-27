@@ -33,7 +33,7 @@ func main() {
 		0, 0, win32.HInstance(), 0)
 	win32.ShowWindow(hwnd, win32.NCmdShow())
 	win32.UpdateWindow(hwnd)
-	msg := win32.MSG{}
+	var msg win32.MSG
 	for {
 		ret := win32.PeekMessage(&msg, 0, 0, 0, win32.PM_REMOVE)
 		if ret {

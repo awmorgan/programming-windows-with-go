@@ -34,7 +34,7 @@ func main() {
 
 	win32.ShowWindow(hwnd, win32.NCmdShow())
 	win32.UpdateWindow(hwnd)
-	msg := win32.MSG{}
+	var msg win32.MSG
 	for {
 		ret, err := win32.GetMessage(&msg, 0, 0, 0)
 		if err != nil {
@@ -92,10 +92,10 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 			win32.SendMessage(hwnd, win32.WM_LBUTTONDOWN,
 				win32.MK_LBUTTON, uintptr(win32.MAKELONG(x*cxBlock, y*cyBlock)))
 		}
-		x = (x+divisions)%divisions
-		y = (y+divisions)%divisions
-		p.X = x * cxBlock + cxBlock/2
-		p.Y = y * cyBlock + cyBlock/2
+		x = (x + divisions) % divisions
+		y = (y + divisions) % divisions
+		p.X = x*cxBlock + cxBlock/2
+		p.Y = y*cyBlock + cyBlock/2
 		win32.ClientToScreen(hwnd, &p)
 		win32.SetCursorPos(p.X, p.Y)
 		return 0

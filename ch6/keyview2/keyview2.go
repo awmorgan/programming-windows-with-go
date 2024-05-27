@@ -32,7 +32,7 @@ func main() {
 
 	win32.ShowWindow(hwnd, win32.NCmdShow())
 	win32.UpdateWindow(hwnd)
-	msg := win32.MSG{}
+	var msg win32.MSG
 	for {
 		ret, err := win32.GetMessage(&msg, 0, 0, 0)
 		if err != nil {

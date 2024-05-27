@@ -34,7 +34,7 @@ func main() {
 
 	win32.ShowWindow(hwnd, win32.NCmdShow())
 	win32.UpdateWindow(hwnd)
-	msg := win32.MSG{}
+	var msg win32.MSG
 	for {
 		ret, err := win32.GetMessage(&msg, 0, 0, 0)
 		if err != nil {
@@ -210,7 +210,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 			break
 		}
 		val := win32.HIWORD(wParam)
-		if val & 0x8000 != 0 {
+		if val&0x8000 != 0 {
 			// sign extend
 			val -= 0x10000
 		}
