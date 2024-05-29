@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 )
@@ -52,12 +53,15 @@ func main() {
 		}
 	}
 
+	// semaphore to limit the number of concurrent builds
+	smphr := make(chan struct{}, runtime.NumCPU())
 	var wg sync.WaitGroup
 	for _, pkg := range tobuild {
 		wg.Add(1)
 		go func(pkg string) {
 			defer wg.Done()
-
+			smphr <- struct{}{} // acquire a semaphore
+			defer func() { <-smphr }() // release the semaphore
 			// put all executables in the same directory
 			exePath := "bin/" + filepath.Base(pkg) + ".exe" // Put executables in a 'bin' directory
 
@@ -66,10 +70,10 @@ func main() {
 			cmd.Stderr = os.Stderr
 			err := cmd.Run()
 			if err != nil {
-				fmt.Printf("Build failed for %s: %v\n", pkg, err)
+				fmt.Printf("%s failed: %v\n", pkg, err)
 				return
 			}
-			fmt.Printf("Successfully built %s\n", pkg)
+			fmt.Printf("%s ok\n", pkg)
 		}(pkg)
 	}
 	wg.Wait()
