@@ -187,7 +187,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		return uintptr(hBrushes[i])
 
 	case win32.WM_CTLCOLORSTATIC:
-		u, _ := win32.GetWindowLongPtr(hwnd, win32.GWLP_ID)
+		u, _ := win32.GetWindowLongPtr(win32.HWND(lParam), win32.GWLP_ID)
 		i = int32(u)
 		if 3 <= i && i <= 8 {
 			win32.SetTextColor(win32.HDC(wParam), crPrimaries[i%3])
