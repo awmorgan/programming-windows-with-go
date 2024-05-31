@@ -82,12 +82,14 @@ var (
 	procSaveDC                    = modgdi32.NewProc("SaveDC")
 	procSelectClipRgn             = modgdi32.NewProc("SelectClipRgn")
 	procSelectObject              = modgdi32.NewProc("SelectObject")
+	procSetBkColor                = modgdi32.NewProc("SetBkColor")
 	procSetBkMode                 = modgdi32.NewProc("SetBkMode")
 	procSetMapMode                = modgdi32.NewProc("SetMapMode")
 	procSetPixel                  = modgdi32.NewProc("SetPixel")
 	procSetPolyFillMode           = modgdi32.NewProc("SetPolyFillMode")
 	procSetROP2                   = modgdi32.NewProc("SetROP2")
 	procSetTextAlign              = modgdi32.NewProc("SetTextAlign")
+	procSetTextColor              = modgdi32.NewProc("SetTextColor")
 	procSetViewportExtEx          = modgdi32.NewProc("SetViewportExtEx")
 	procSetViewportOrgEx          = modgdi32.NewProc("SetViewportOrgEx")
 	procSetWindowExtEx            = modgdi32.NewProc("SetWindowExtEx")
@@ -102,6 +104,7 @@ var (
 	procGetSystemDirectoryW       = modkernel32.NewProc("GetSystemDirectoryW")
 	procLoadLibraryExW            = modkernel32.NewProc("LoadLibraryExW")
 	procBeginPaint                = moduser32.NewProc("BeginPaint")
+	procCallWindowProcW           = moduser32.NewProc("CallWindowProcW")
 	procClientToScreen            = moduser32.NewProc("ClientToScreen")
 	procCopyRect                  = moduser32.NewProc("CopyRect")
 	procCreateCaret               = moduser32.NewProc("CreateCaret")
@@ -121,10 +124,12 @@ var (
 	procGetDlgItem                = moduser32.NewProc("GetDlgItem")
 	procGetFocus                  = moduser32.NewProc("GetFocus")
 	procGetKeyNameTextW           = moduser32.NewProc("GetKeyNameTextW")
+	procGetKeyState               = moduser32.NewProc("GetKeyState")
 	procGetMessageW               = moduser32.NewProc("GetMessageW")
 	procGetParent                 = moduser32.NewProc("GetParent")
 	procGetScrollInfo             = moduser32.NewProc("GetScrollInfo")
 	procGetScrollPos              = moduser32.NewProc("GetScrollPos")
+	procGetSysColor               = moduser32.NewProc("GetSysColor")
 	procGetSystemMetrics          = moduser32.NewProc("GetSystemMetrics")
 	procGetUpdateRect             = moduser32.NewProc("GetUpdateRect")
 	procGetWindowLongPtrW         = moduser32.NewProc("GetWindowLongPtrW")
@@ -153,6 +158,7 @@ var (
 	procSendMessageW              = moduser32.NewProc("SendMessageW")
 	procSetCapture                = moduser32.NewProc("SetCapture")
 	procSetCaretPos               = moduser32.NewProc("SetCaretPos")
+	procSetClassLongPtrW          = moduser32.NewProc("SetClassLongPtrW")
 	procSetCursor                 = moduser32.NewProc("SetCursor")
 	procSetCursorPos              = moduser32.NewProc("SetCursorPos")
 	procSetFocus                  = moduser32.NewProc("SetFocus")
@@ -163,6 +169,7 @@ var (
 	procSetScrollRange            = moduser32.NewProc("SetScrollRange")
 	procSetTimer                  = moduser32.NewProc("SetTimer")
 	procSetWindowLongPtrW         = moduser32.NewProc("SetWindowLongPtrW")
+	procSetWindowTextW            = moduser32.NewProc("SetWindowTextW")
 	procShowCaret                 = moduser32.NewProc("ShowCaret")
 	procShowCursor                = moduser32.NewProc("ShowCursor")
 	procShowWindow                = moduser32.NewProc("ShowWindow")
@@ -447,6 +454,12 @@ func SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) {
 	return
 }
 
+func SetBkColor(hdc HDC, color COLORREF) (prevColor COLORREF) {
+	r0, _, _ := syscall.Syscall(procSetBkColor.Addr(), 2, uintptr(hdc), uintptr(color), 0)
+	prevColor = COLORREF(r0)
+	return
+}
+
 func SetBkMode(hdc HDC, mode int32) (prevMode int32) {
 	r0, _, _ := syscall.Syscall(procSetBkMode.Addr(), 2, uintptr(hdc), uintptr(mode), 0)
 	prevMode = int32(r0)
@@ -480,6 +493,12 @@ func SetROP2(hdc HDC, mode int32) (prevMode int32) {
 func SetTextAlign(hdc HDC, align uint32) (ret uint32) {
 	r0, _, _ := syscall.Syscall(procSetTextAlign.Addr(), 2, uintptr(hdc), uintptr(align), 0)
 	ret = uint32(r0)
+	return
+}
+
+func SetTextColor(hdc HDC, color COLORREF) (prevColor COLORREF) {
+	r0, _, _ := syscall.Syscall(procSetTextColor.Addr(), 2, uintptr(hdc), uintptr(color), 0)
+	prevColor = COLORREF(r0)
 	return
 }
 
@@ -608,6 +627,12 @@ func _LoadLibraryEx(libname *uint16, zero HANDLE, flags uintptr) (handle HANDLE,
 func BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) {
 	r0, _, _ := syscall.Syscall(procBeginPaint.Addr(), 2, uintptr(hwnd), uintptr(unsafe.Pointer(ps)), 0)
 	hdc = HDC(r0)
+	return
+}
+
+func CallWindowProc(lpPrevWndFunc uintptr, hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (ret uintptr) {
+	r0, _, _ := syscall.Syscall6(procCallWindowProcW.Addr(), 5, uintptr(lpPrevWndFunc), uintptr(hwnd), uintptr(msg), uintptr(wParam), uintptr(lParam), 0)
+	ret = uintptr(r0)
 	return
 }
 
@@ -765,6 +790,12 @@ func GetKeyNameText(lparam uintptr, buffer []uint16) (ret int32) {
 	return
 }
 
+func GetKeyState(nVirtKey int32) (state int16) {
+	r0, _, _ := syscall.Syscall(procGetKeyState.Addr(), 1, uintptr(nVirtKey), 0, 0)
+	state = int16(r0)
+	return
+}
+
 func GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) {
 	r0, _, e1 := syscall.Syscall6(procGetMessageW.Addr(), 4, uintptr(unsafe.Pointer(msg)), uintptr(hwnd), uintptr(msgFilterMin), uintptr(msgFilterMax), 0, 0)
 	ret = int32(r0)
@@ -797,6 +828,12 @@ func GetScrollPos(hwnd HWND, nBar int32) (ret int32, err error) {
 	if ret == 0 {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func GetSysColor(nIndex int32) (color COLORREF) {
+	r0, _, _ := syscall.Syscall(procGetSysColor.Addr(), 1, uintptr(nIndex), 0, 0)
+	color = COLORREF(r0)
 	return
 }
 
@@ -1050,6 +1087,15 @@ func SetCaretPos(x int32, y int32) (err error) {
 	return
 }
 
+func SetClassLongPtr(hwnd HWND, index int32, value uintptr) (prev uintptr, err error) {
+	r0, _, e1 := syscall.Syscall(procSetClassLongPtrW.Addr(), 3, uintptr(hwnd), uintptr(index), uintptr(value))
+	prev = uintptr(r0)
+	if prev == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) {
 	r0, _, _ := syscall.Syscall(procSetCursor.Addr(), 1, uintptr(hCursor), 0, 0)
 	hCursorOld = HCURSOR(r0)
@@ -1133,6 +1179,24 @@ func SetWindowLongPtr(hwnd HWND, index int32, value uintptr) (prev uintptr, err 
 	r0, _, e1 := syscall.Syscall(procSetWindowLongPtrW.Addr(), 3, uintptr(hwnd), uintptr(index), uintptr(value))
 	prev = uintptr(r0)
 	if prev == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func SetWindowText(hwnd HWND, text string) (ok bool, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(text)
+	if err != nil {
+		return
+	}
+	return _SetWindowText(hwnd, _p0)
+}
+
+func _SetWindowText(hwnd HWND, text *uint16) (ok bool, err error) {
+	r0, _, e1 := syscall.Syscall(procSetWindowTextW.Addr(), 2, uintptr(hwnd), uintptr(unsafe.Pointer(text)), 0)
+	ok = r0 != 0
+	if ok == false {
 		err = errnoErr(e1)
 	}
 	return

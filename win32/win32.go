@@ -78,6 +78,7 @@ type WNDCLASS struct {
 	LpszClassName *uint16
 }
 
+// type WNDPROC func(hwnd HWND, msg uint32, wParam, lParam uintptr) uintptr
 func NewWndProc(f func(hwnd HWND, msg uint32, wParam, lParam uintptr) uintptr) uintptr {
 	return syscall.NewCallback(f)
 }

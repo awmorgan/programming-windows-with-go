@@ -3,6 +3,7 @@ package win32
 //go:generate go run x/win32/mkwinsyscall -output zsyscall_win32.go syscall.go
 
 //sys	BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) = user32.BeginPaint
+//sys	CallWindowProc(lpPrevWndFunc uintptr, hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (ret uintptr) = user32.CallWindowProcW
 //sys	ClientToScreen(hwnd HWND, pt *POINT) (ok bool) = user32.ClientToScreen
 //sys	CombineRgn(dest HRGN, src1 HRGN, src2 HRGN, mode int32) (ret int32) = gdi32.CombineRgn
 //sys	CopyRect(dst *RECT, src *RECT) (ok bool) = user32.CopyRect
@@ -44,6 +45,7 @@ package win32
 //sys	GetDlgItem(hwnd HWND, id int32) (hwndChild HWND, err error) [failretval==0] = user32.GetDlgItem
 //sys	GetFocus() (hwnd HWND) = user32.GetFocus
 //sys	GetKeyNameText(lparam uintptr, buffer []uint16) (ret int32) = user32.GetKeyNameTextW
+//sys	GetKeyState(nVirtKey int32) (state int16) = user32.GetKeyState
 //sys	GetLocaleInfo(locale LCID, lctype LCTYPE, lcdata *uint16, n int) (cch int32, err error) [failretval==0] = kernel32.GetLocaleInfoW
 //sys	GetLocalTime(lpSystemTime *SYSTEMTIME)  = kernel32.GetLocalTime
 //sys	GetMessage(msg *MSG, hwnd HWND, msgFilterMin uint32, msgFilterMax uint32) (ret int32, err error) [failretval==-1] = user32.GetMessageW
@@ -55,6 +57,7 @@ package win32
 //sys	GetScrollPos(hwnd HWND, nBar int32) (ret int32, err error) [failretval==0] = user32.GetScrollPos
 //sys	GetStartupInfo(startupInfo *StartupInfo) = GetStartupInfoW
 //sys	GetStockObject(fnObject int32) (ret HGDIOBJ) = gdi32.GetStockObject
+//sys	GetSysColor(nIndex int32) (color COLORREF) = user32.GetSysColor
 //sys	getSystemDirectory(dir *uint16, dirLen uint32) (len uint32, err error) = kernel32.GetSystemDirectoryW
 //sys	GetSystemMetrics(nIndex int32) (ret int32) = user32.GetSystemMetrics
 //sys	GetTextFace(hdc HDC, n int32, faceName *uint16) (nOut int32) = gdi32.GetTextFaceW
@@ -102,9 +105,11 @@ package win32
 //sys	SelectClipRgn(hdc HDC, hrgn HRGN) (mode int32) = gdi32.SelectClipRgn
 //sys	SelectObject(hdc HDC, h HGDIOBJ) (ret HGDIOBJ) = gdi32.SelectObject
 //sys	SendMessage(hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (lResult uintptr) = user32.SendMessageW
+//sys	SetBkColor( hdc HDC, color COLORREF ) (prevColor COLORREF) = gdi32.SetBkColor
 //sys	SetBkMode(hdc HDC, mode int32) (prevMode int32) = gdi32.SetBkMode
 //sys	SetCapture(hwnd HWND) (prev HWND) = user32.SetCapture
 //sys	SetCaretPos(x int32, y int32) (err error) [failretval==0] = user32.SetCaretPos
+//sys	SetClassLongPtr(hwnd HWND, index int32, value uintptr) (prev uintptr, err error) [failretval==0] = user32.SetClassLongPtrW
 //sys	SetCursor(hCursor HCURSOR) (hCursorOld HCURSOR) = user32.SetCursor
 //sys	SetCursorPos(x int32, y int32) (err error) [failretval==0] = user32.SetCursorPos
 //sys	SetFocus(hwnd HWND) (hwndPrev HWND, err error) [failretval==0] = user32.SetFocus
@@ -118,12 +123,14 @@ package win32
 //sys	SetScrollPos(hwnd HWND, nBar int32, nPos int32, bRedraw bool) (ret int32, err error) [failretval==0] = user32.SetScrollPos
 //sys	SetScrollRange(hwnd HWND, nBar int32, nMinPos int32, nMaxPos int32, bRedraw bool) (err error) [failretval==0] = user32.SetScrollRange
 //sys	SetTextAlign(hdc HDC, align uint32) (ret uint32) = gdi32.SetTextAlign
+//sys	SetTextColor(hdc HDC, color COLORREF) (prevColor COLORREF) = gdi32.SetTextColor
 //sys	SetTimer(hwnd HWND, id uintptr, elapse uint32, proc uintptr) (timerID uintptr, err error) [failretval==0] = user32.SetTimer
 //sys	SetViewportExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) = gdi32.SetViewportExtEx
 //sys	SetViewportOrgEx(hdc HDC, x int32, y int32, pt *POINT) (ok bool) = gdi32.SetViewportOrgEx
 //sys	SetWindowExtEx(hdc HDC, x int32, y int32, size *SIZE) (ok bool) = gdi32.SetWindowExtEx
 //sys	SetWindowLongPtr(hwnd HWND, index int32, value uintptr) (prev uintptr, err error) [failretval==0] = user32.SetWindowLongPtrW
 //sys	SetWindowOrgEx(hdc HDC, x int32, y int32, pt *POINT) (ok bool) = gdi32.SetWindowOrgEx
+//sys	SetWindowText( hwnd HWND, text string ) (ok bool, err error) [failretval==false] = user32.SetWindowTextW
 //sys	ShowCaret(hwnd HWND) (err error) [failretval==0] = user32.ShowCaret
 //sys	ShowCursor(show bool) (count int32) = user32.ShowCursor
 //sys	ShowWindow(hwnd HWND, nCmdShow int32) (wasVisible bool) = user32.ShowWindow

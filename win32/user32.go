@@ -1885,3 +1885,31 @@ type HIGHCONTRAST struct {
 }
 
 const WHEEL_DELTA = 120
+
+// Scroll Bar Styles
+const (
+	SBS_HORZ                    = 0x0000
+	SBS_VERT                    = 0x0001
+	SBS_TOPALIGN                = 0x0002
+	SBS_LEFTALIGN               = 0x0002
+	SBS_BOTTOMALIGN             = 0x0004
+	SBS_RIGHTALIGN              = 0x0004
+	SBS_SIZEBOXTOPLEFTALIGN     = 0x0002
+	SBS_SIZEBOXBOTTOMRIGHTALIGN = 0x0004
+	SBS_SIZEBOX                 = 0x0008
+	SBS_SIZEGRIP                = 0x0010
+)
+
+//
+const (
+	GCL_CBCLSEXTRA     = -20
+	GCL_CBWNDEXTRA     = -18
+	GCLP_HBRBACKGROUND = -10
+	GCLP_HCURSOR       = -12
+	GCLP_HICON         = -14
+	GCLP_HICONSM       = -34
+	GCLP_HMODULE       = -16
+	GCLP_MENUNAME      = -8
+	GCL_STYLE          = -26
+	GCLP_WNDPROC       = -24
+)
