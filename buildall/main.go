@@ -60,7 +60,7 @@ func main() {
 		wg.Add(1)
 		go func(pkg string) {
 			defer wg.Done()
-			smphr <- struct{}{} // acquire a semaphore
+			smphr <- struct{}{}        // acquire a semaphore
 			defer func() { <-smphr }() // release the semaphore
 			// put all executables in the same directory
 			exePath := "bin/" + filepath.Base(pkg) + ".exe" // Put executables in a 'bin' directory

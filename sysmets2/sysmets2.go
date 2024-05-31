@@ -4,17 +4,19 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"x/sysmets"
+	"x/sysmetrics"
 	"x/win32"
 )
 
-var cxChar, cxCaps, cyChar int32
+var cxChar, cxCaps, cyChar, cyClient, iVscrollPos int32
 
 func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
+	var hdc win32.HDC
+	var ps win32.PAINTSTRUCT
+	var tm win32.TEXTMETRIC
 	switch msg {
 	case win32.WM_CREATE:
-		hdc := win32.GetDC(hwnd)
-		tm := win32.TEXTMETRIC{}
+		hdc = win32.GetDC(hwnd)
 		win32.GetTextMetrics(hdc, &tm)
 		cxChar = int32(tm.TmAveCharWidth)
 		cxCaps = cxChar
@@ -23,16 +25,41 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		}
 		cyChar = int32(tm.TmHeight + tm.TmExternalLeading)
 		win32.ReleaseDC(hwnd, hdc)
+		win32.SetScrollRange(hwnd, win32.SB_VERT, 0, int32(sysmetrics.NUMLINES-1), false)
+		win32.SetScrollPos(hwnd, win32.SB_VERT, iVscrollPos, true)
+		return 0
+	case win32.WM_SIZE:
+		cyClient = win32.HIWORD(lParam)
+		return 0
+	case win32.WM_VSCROLL:
+		switch win32.LOWORD(wParam) {
+		case win32.SB_LINEUP:
+			iVscrollPos--
+		case win32.SB_LINEDOWN:
+			iVscrollPos++
+		case win32.SB_PAGEUP:
+			iVscrollPos -= cyClient / cyChar
+		case win32.SB_PAGEDOWN:
+			iVscrollPos += cyClient / cyChar
+		case win32.SB_THUMBPOSITION:
+			iVscrollPos = win32.HIWORD(wParam)
+		}
+		iVscrollPos = max(0, min(iVscrollPos, int32(sysmetrics.NUMLINES-1)))
+		currentPos, _ := win32.GetScrollPos(hwnd, win32.SB_VERT)
+		if iVscrollPos != currentPos {
+			win32.SetScrollPos(hwnd, win32.SB_VERT, iVscrollPos, true)
+			win32.InvalidateRect(hwnd, nil, true)
+		}
 		return 0
 	case win32.WM_PAINT:
-		var ps win32.PAINTSTRUCT
-		hdc := win32.BeginPaint(hwnd, &ps)
-		for i, sm := range sysmets.Sysmetrics {
-			win32.TextOut(hdc, 0, cyChar*int32(i), sm.Label, len(sm.Label))
-			win32.TextOut(hdc, 22*cxCaps, cyChar*int32(i), sm.Desc, len(sm.Desc))
+		hdc = win32.BeginPaint(hwnd, &ps)
+		for i, sm := range sysmetrics.Sysmetrics {
+			y := cyChar * (int32(i) - iVscrollPos)
+			win32.TextOut(hdc, 0, y, sm.Label, len(sm.Label))
+			win32.TextOut(hdc, 22*cxCaps, y, sm.Desc, len(sm.Desc))
 			win32.SetTextAlign(hdc, win32.TA_RIGHT|win32.TA_TOP)
 			s := fmt.Sprintf("%5d", win32.GetSystemMetrics(sm.Index))
-			win32.TextOut(hdc, 22*cxCaps+40*cxChar, cyChar*int32(i), s, len(s))
+			win32.TextOut(hdc, 22*cxCaps+40*cxChar, y, s, len(s))
 			win32.SetTextAlign(hdc, win32.TA_LEFT|win32.TA_TOP)
 		}
 		win32.EndPaint(hwnd, &ps)
@@ -46,7 +73,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 
 func main() {
 	runtime.LockOSThread() // Windows messages are delivered to the thread that created the window.
-	appName := "Sysmets1"
+	appName := "Sysmets2"
 	wc := win32.WNDCLASS{
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
@@ -61,7 +88,7 @@ func main() {
 		win32.MessageBox(0, errMsg, appName, win32.MB_ICONERROR)
 		return
 	}
-	hwnd, _ := win32.CreateWindow(appName, "Get System Metrics No. 1", win32.WS_OVERLAPPEDWINDOW,
+	hwnd, _ := win32.CreateWindow(appName, "Get System Metrics No. 1", win32.WS_OVERLAPPEDWINDOW|win32.WS_VSCROLL,
 		win32.CW_USEDEFAULT, win32.CW_USEDEFAULT, win32.CW_USEDEFAULT, win32.CW_USEDEFAULT,
 		0, 0, win32.HInstance(), 0)
 
@@ -78,6 +105,7 @@ func main() {
 		if ret == 0 {
 			os.Exit(int(msg.WParam))
 		}
+
 		win32.TranslateMessage(&msg)
 		win32.DispatchMessage(&msg)
 	}

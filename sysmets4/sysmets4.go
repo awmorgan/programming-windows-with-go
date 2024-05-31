@@ -5,7 +5,7 @@ import (
 	"os"
 	"runtime"
 	"unsafe"
-	"x/sysmets"
+	"x/sysmetrics"
 	"x/win32"
 )
 
@@ -84,7 +84,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		si.CbSize = uint32(unsafe.Sizeof(si))
 		si.FMask = win32.SIF_RANGE | win32.SIF_PAGE
 		si.NMin = 0
-		si.NMax = int32(sysmets.NUMLINES - 1)
+		si.NMax = int32(sysmetrics.NUMLINES - 1)
 		si.NPage = uint32(cyClient / cyChar)
 		win32.SetScrollInfo(hwnd, win32.SB_VERT, &si, true)
 
@@ -206,7 +206,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 
 		// find painting limits
 		iPaintBeg = max(0, iVertPos+int32(ps.RcPaint.Top/cyChar))
-		iPaintEnd = min(int32(sysmets.NUMLINES)-1,
+		iPaintEnd = min(int32(sysmetrics.NUMLINES)-1,
 			iVertPos+int32(ps.RcPaint.Bottom/cyChar))
 
 		for i = iPaintBeg; i <= iPaintEnd; i++ {
@@ -214,16 +214,16 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 			y = cyChar * (i - iVertPos)
 
 			win32.TextOut(hdc, x, y,
-				sysmets.Sysmetrics[i].Label,
-				len(sysmets.Sysmetrics[i].Label))
+				sysmetrics.Sysmetrics[i].Label,
+				len(sysmetrics.Sysmetrics[i].Label))
 
 			win32.TextOut(hdc, x+22*cxChar, y,
-				sysmets.Sysmetrics[i].Desc,
-				len(sysmets.Sysmetrics[i].Desc))
+				sysmetrics.Sysmetrics[i].Desc,
+				len(sysmetrics.Sysmetrics[i].Desc))
 
 			win32.SetTextAlign(hdc, win32.TA_RIGHT|win32.TA_TOP)
 
-			s := fmt.Sprintf("%5d", win32.GetSystemMetrics(sysmets.Sysmetrics[i].Index))
+			s := fmt.Sprintf("%5d", win32.GetSystemMetrics(sysmetrics.Sysmetrics[i].Index))
 
 			win32.TextOut(hdc, x+22*cxChar+40*cxCaps, y, s, len(s))
 
