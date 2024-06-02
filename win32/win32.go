@@ -183,7 +183,7 @@ func StringToUTF16Ptr(s string) *uint16 {
 	return p
 }
 
-func Utf16PtrToString(p *uint16) string {
+func UTF16PtrToString(p *uint16) string {
 	if p == nil {
 		return ""
 	}

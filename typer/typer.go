@@ -146,7 +146,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 			hdc := win32.GetDC(hwnd)
 			f := win32.CreateFont(0, 0, 0, 0, 0, 0, 0, 0, charset, 0, 0, 0, win32.FIXED_PITCH, nil)
 			win32.SelectObject(hdc, win32.HGDIOBJ(f))
-			s := win32.Utf16PtrToString(buffer(xCaret, yCaret))
+			s := win32.UTF16PtrToString(buffer(xCaret, yCaret))
 			win32.TextOut(hdc, xCaret*cxChar, yCaret*cyChar, s, int(cxBuffer-xCaret))
 			win32.ReleaseDC(hwnd, hdc)
 			win32.ShowCaret(hwnd)
@@ -195,7 +195,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 				hdc := win32.GetDC(hwnd)
 				f := win32.CreateFont(0, 0, 0, 0, 0, 0, 0, 0, charset, 0, 0, 0, win32.FIXED_PITCH, nil)
 				win32.SelectObject(hdc, win32.HGDIOBJ(f))
-				s := win32.Utf16PtrToString(buffer(xCaret, yCaret))
+				s := win32.UTF16PtrToString(buffer(xCaret, yCaret))
 				win32.TextOut(hdc, xCaret*cxChar, yCaret*cyChar, s, 1)
 				win32.DeleteObject(win32.SelectObject(hdc, win32.GetStockObject(win32.SYSTEM_FONT)))
 				win32.ReleaseDC(hwnd, hdc)
@@ -217,7 +217,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		f := win32.CreateFont(0, 0, 0, 0, 0, 0, 0, 0, charset, 0, 0, 0, win32.FIXED_PITCH, nil)
 		win32.SelectObject(hdc, win32.HGDIOBJ(f))
 		for y := int32(0); y < cyBuffer; y++ {
-			s := win32.Utf16PtrToString(buffer(0, y))
+			s := win32.UTF16PtrToString(buffer(0, y))
 			win32.TextOut(hdc, 0, y*cyChar, s, len(s))
 		}
 

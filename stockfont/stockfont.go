@@ -120,7 +120,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		cxGrid := max(3*tm.TmAveCharWidth, 2*tm.TmMaxCharWidth)
 		cyGrid := tm.TmHeight + 3
 		s := fmt.Sprintf("%s: Face Name: %s, CharSet = %d",
-			stockfont[iFont].szStockFont, win32.Utf16PtrToString(&faceName[0]), tm.TmCharSet)
+			stockfont[iFont].szStockFont, win32.UTF16PtrToString(&faceName[0]), tm.TmCharSet)
 		win32.TextOut(hdc, 0, 0, s, len(s))
 		win32.SetTextAlign(hdc, win32.TA_TOP|win32.TA_CENTER)
 

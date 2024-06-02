@@ -126,7 +126,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		for i := int32(0); i < min(cLines, cyClient/cyChar-1); i++ {
 			var u16KeyName [32]uint16
 			win32.GetKeyNameText(pmsg[i].LParam, u16KeyName[:])
-			sKeyName := win32.Utf16PtrToString(&u16KeyName[0])
+			sKeyName := win32.UTF16PtrToString(&u16KeyName[0])
 
 			var message string
 			var isCharMsg bool

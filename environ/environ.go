@@ -105,7 +105,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 			win32.SendMessage(hwndList, win32.LB_GETTEXT, index, uintptr(unsafe.Pointer(text)))
 
 			// get the environment string
-			envStr := os.Getenv(win32.Utf16PtrToString(text))
+			envStr := os.Getenv(win32.UTF16PtrToString(text))
 			win32.SetWindowText(hwndText, envStr)
 		}
 		return 0
