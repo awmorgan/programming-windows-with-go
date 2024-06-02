@@ -5,12 +5,14 @@ package win32
 //sys	BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) = user32.BeginPaint
 //sys	CallWindowProc(lpPrevWndFunc uintptr, hwnd HWND, msg uint32, wParam uintptr, lParam uintptr) (ret uintptr) = user32.CallWindowProcW
 //sys	ClientToScreen(hwnd HWND, pt *POINT) (ok bool) = user32.ClientToScreen
+//sys	CloseHandle(handle HANDLE) (err error) [failretval==0] = CloseHandle
 //sys	CombineRgn(dest HRGN, src1 HRGN, src2 HRGN, mode int32) (ret int32) = gdi32.CombineRgn
 //sys	CopyRect(dst *RECT, src *RECT) (ok bool) = user32.CopyRect
 //sys	CreateCaret(hwnd HWND, hBitmap HBITMAP, width int32, height int32) (err error) [failretval==0] = user32.CreateCaret
 //sys	CreateDC(driver *uint16, device *uint16, port *uint16, pdm *DEVMODE) (hdc HDC) = gdi32.CreateDCW
 //sys	CreateEllipticRgn(x1 int32, y1 int32, x2 int32, y2 int32) (hrgn HRGN) = gdi32.CreateEllipticRgn
 //sys	CreateEllipticRgnIndirect(rect *RECT) (hrgn HRGN) = gdi32.CreateEllipticRgnIndirect
+//sys	CreateFile(filename string, access uint32, sharemode uint32, sa *SecurityAttributes, creation uint32, flags uint32, template HANDLE) (handle HANDLE, err error) [failretval==INVALID_HANDLE_VALUE] = CreateFileW
 //sys	CreateFont(height int32, width int32, escapement int32, orientation int32, weight int32, italic int32, underline int32, strikeOut int32, charset int32, outputPrecision int32, clipPrecision int32, quality int32, pitchAndFamily int32, face *uint16) (hfont HFONT) = gdi32.CreateFontW
 //sys	CreateIC( driver *uint16, device *uint16, port *uint16, pdm *DEVMODE) (hdc HDC) = gdi32.CreateICW
 //sys	CreatePen(style int32, width int32, color COLORREF) (hpen HPEN) = gdi32.CreatePen
@@ -29,6 +31,7 @@ package win32
 //sys	DPtoLP(hdc HDC, pt []POINT ) (ok bool) = gdi32.DPtoLP
 //sys	DrawFocusRect(hdc HDC, lprc *RECT) (ok bool) = user32.DrawFocusRect
 //sys	DrawText(hdc HDC, text string, n int32, rect *RECT, format uint32) (ret int32, err error) [failretval==0] = user32.DrawTextW
+//sys	DrawTextA(hdc HDC, text string, n int32, rect *RECT, format uint32) (ret int32, err error) [failretval==0] = user32.DrawTextA
 //sys	Ellipse(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bool) = gdi32.Ellipse
 //sys	EndPaint(hwnd HWND, ps *PAINTSTRUCT) = user32.EndPaint
 //sys	ExcludeClipRect(hdc HDC, left int32, top int32, right int32, bottom int32) (ret int32) = gdi32.ExcludeClipRect
@@ -93,6 +96,7 @@ package win32
 //sys	Polygon(hdc HDC, pt []POINT) (ok bool) = gdi32.Polygon
 //sys	Polyline(hdc HDC, pt []POINT) (ok bool) = gdi32.Polyline
 //sys	PostQuitMessage(exitCode int32) = user32.PostQuitMessage
+//sys	ReadFile(handle HANDLE, buffer []byte, bytesRead *uint32, overlapped *Overlapped) (err error) [failretval==0] = ReadFile
 //sys	Rectangle(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bool) = gdi32.Rectangle
 //sys	RegisterClass(wc *WNDCLASS) (atom ATOM, err error) [failretval==0] = user32.RegisterClassW
 //sys	ReleaseCapture() (err error) [failretval==0] = user32.ReleaseCapture

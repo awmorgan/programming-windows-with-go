@@ -95,6 +95,8 @@ var (
 	procSetWindowExtEx            = modgdi32.NewProc("SetWindowExtEx")
 	procSetWindowOrgEx            = modgdi32.NewProc("SetWindowOrgEx")
 	procTextOutW                  = modgdi32.NewProc("TextOutW")
+	procCloseHandle               = modkernel32.NewProc("CloseHandle")
+	procCreateFileW               = modkernel32.NewProc("CreateFileW")
 	procFreeLibrary               = modkernel32.NewProc("FreeLibrary")
 	procGetLocalTime              = modkernel32.NewProc("GetLocalTime")
 	procGetLocaleInfoW            = modkernel32.NewProc("GetLocaleInfoW")
@@ -103,6 +105,7 @@ var (
 	procGetStartupInfoW           = modkernel32.NewProc("GetStartupInfoW")
 	procGetSystemDirectoryW       = modkernel32.NewProc("GetSystemDirectoryW")
 	procLoadLibraryExW            = modkernel32.NewProc("LoadLibraryExW")
+	procReadFile                  = modkernel32.NewProc("ReadFile")
 	procBeginPaint                = moduser32.NewProc("BeginPaint")
 	procCallWindowProcW           = moduser32.NewProc("CallWindowProcW")
 	procClientToScreen            = moduser32.NewProc("ClientToScreen")
@@ -113,6 +116,7 @@ var (
 	procDestroyCaret              = moduser32.NewProc("DestroyCaret")
 	procDispatchMessageW          = moduser32.NewProc("DispatchMessageW")
 	procDrawFocusRect             = moduser32.NewProc("DrawFocusRect")
+	procDrawTextA                 = moduser32.NewProc("DrawTextA")
 	procDrawTextW                 = moduser32.NewProc("DrawTextW")
 	procEndPaint                  = moduser32.NewProc("EndPaint")
 	procFillRect                  = moduser32.NewProc("FillRect")
@@ -543,6 +547,32 @@ func _TextOut(hdc HDC, x int32, y int32, text *uint16, n int) (err error) {
 	return
 }
 
+func CloseHandle(handle HANDLE) (err error) {
+	r1, _, e1 := syscall.Syscall(procCloseHandle.Addr(), 1, uintptr(handle), 0, 0)
+	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func CreateFile(filename string, access uint32, sharemode uint32, sa *SecurityAttributes, creation uint32, flags uint32, template HANDLE) (handle HANDLE, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(filename)
+	if err != nil {
+		return
+	}
+	return _CreateFile(_p0, access, sharemode, sa, creation, flags, template)
+}
+
+func _CreateFile(filename *uint16, access uint32, sharemode uint32, sa *SecurityAttributes, creation uint32, flags uint32, template HANDLE) (handle HANDLE, err error) {
+	r0, _, e1 := syscall.Syscall9(procCreateFileW.Addr(), 7, uintptr(unsafe.Pointer(filename)), uintptr(access), uintptr(sharemode), uintptr(unsafe.Pointer(sa)), uintptr(creation), uintptr(flags), uintptr(template), 0, 0)
+	handle = HANDLE(r0)
+	if handle == INVALID_HANDLE_VALUE {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func FreeLibrary(handle HANDLE) (err error) {
 	r1, _, e1 := syscall.Syscall(procFreeLibrary.Addr(), 1, uintptr(handle), 0, 0)
 	if r1 == 0 {
@@ -624,6 +654,18 @@ func _LoadLibraryEx(libname *uint16, zero HANDLE, flags uintptr) (handle HANDLE,
 	return
 }
 
+func ReadFile(handle HANDLE, buffer []byte, bytesRead *uint32, overlapped *Overlapped) (err error) {
+	var _p0 *byte
+	if len(buffer) > 0 {
+		_p0 = &buffer[0]
+	}
+	r1, _, e1 := syscall.Syscall6(procReadFile.Addr(), 5, uintptr(handle), uintptr(unsafe.Pointer(_p0)), uintptr(len(buffer)), uintptr(unsafe.Pointer(bytesRead)), uintptr(unsafe.Pointer(overlapped)), 0)
+	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func BeginPaint(hwnd HWND, ps *PAINTSTRUCT) (hdc HDC) {
 	r0, _, _ := syscall.Syscall(procBeginPaint.Addr(), 2, uintptr(hwnd), uintptr(unsafe.Pointer(ps)), 0)
 	hdc = HDC(r0)
@@ -699,6 +741,24 @@ func DispatchMessage(msg *MSG) {
 func DrawFocusRect(hdc HDC, lprc *RECT) (ok bool) {
 	r0, _, _ := syscall.Syscall(procDrawFocusRect.Addr(), 2, uintptr(hdc), uintptr(unsafe.Pointer(lprc)), 0)
 	ok = r0 != 0
+	return
+}
+
+func DrawTextA(hdc HDC, text string, n int32, rect *RECT, format uint32) (ret int32, err error) {
+	var _p0 *byte
+	_p0, err = syscall.BytePtrFromString(text)
+	if err != nil {
+		return
+	}
+	return _DrawTextA(hdc, _p0, n, rect, format)
+}
+
+func _DrawTextA(hdc HDC, text *byte, n int32, rect *RECT, format uint32) (ret int32, err error) {
+	r0, _, e1 := syscall.Syscall6(procDrawTextA.Addr(), 5, uintptr(hdc), uintptr(unsafe.Pointer(text)), uintptr(n), uintptr(unsafe.Pointer(rect)), uintptr(format), 0)
+	ret = int32(r0)
+	if ret == 0 {
+		err = errnoErr(e1)
+	}
 	return
 }
 

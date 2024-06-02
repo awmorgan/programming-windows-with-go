@@ -2024,3 +2024,24 @@ const (
 	LBN_SETFOCUS  = 4
 	LBN_KILLFOCUS = 5
 )
+
+// DlgDirList, DlgDirListComboBox flags values
+const (
+	DDL_READWRITE = 0x0000
+	DDL_READONLY  = 0x0001
+	DDL_HIDDEN    = 0x0002
+	DDL_SYSTEM    = 0x0004
+	DDL_DIRECTORY = 0x0010
+	DDL_ARCHIVE   = 0x0020
+
+	DDL_POSTMSGS  = 0x2000
+	DDL_DRIVES    = 0x4000
+	DDL_EXCLUSIVE = 0x8000
+)
+
+// Listbox Return Values
+const (
+	LB_OKAY     = 0
+	LB_ERR      = -1
+	LB_ERRSPACE = -2
+)
