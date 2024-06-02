@@ -65,8 +65,7 @@ func main() {
 			// put all executables in the same directory
 			exePath := "bin/" + filepath.Base(pkg) + ".exe" // Put executables in a 'bin' directory
 
-			// Run "go build -v" command specifying output directly
-			cmd := exec.Command("go", "build", "-o", exePath, pkg)
+			cmd := exec.Command("go", "build", "-ldflags", "-H=windowsgui", "-o", exePath, pkg)
 			cmd.Stderr = os.Stderr
 			err := cmd.Run()
 			if err != nil {
