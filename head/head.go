@@ -123,6 +123,12 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 			} else {
 				bValidFile = false
 				// try setting the directory
+				for i := range buf {
+					if buf[i] == 0 {
+						buf[i-1] = 0
+						break
+					}
+				}
 				err := os.Chdir(win32.UTF16PtrToString(&buf[1]))
 				if err != nil {
 					buf[3] = ':'
