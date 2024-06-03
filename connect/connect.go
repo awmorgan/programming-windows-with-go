@@ -14,8 +14,8 @@ func main() {
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
 		HInstance:     win32.HInstance(),
-		HIcon:         win32.ApplicationIcon(),
-		HCursor:       win32.ArrowCursor(),
+		HIcon:         win32.LoadIcon(0, win32.IDI_APPLICATION),
+		HCursor:       win32.LoadCursor(0, win32.IDC_ARROW),
 		HbrBackground: win32.WhiteBrush(),
 		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
@@ -83,7 +83,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		ps := win32.PAINTSTRUCT{}
 		win32.BeginPaint(hwnd, &ps)
 
-		win32.SetCursor(win32.WaitCursor())
+		win32.SetCursor(win32.LoadCursor(0, win32.IDC_WAIT))
 		win32.ShowCursor(true)
 
 		for i := 0; i < nCount-1; i++ {
@@ -94,7 +94,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		}
 
 		win32.ShowCursor(false)
-		win32.SetCursor(win32.ArrowCursor())
+		win32.SetCursor(win32.LoadCursor(0, win32.IDC_ARROW))
 
 		win32.EndPaint(hwnd, &ps)
 		return 0

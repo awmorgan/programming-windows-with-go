@@ -200,36 +200,20 @@ func _MAKEINTRESOURCE(id uintptr) *uint16 {
 	return (*uint16)(unsafe.Pointer(id))
 }
 
-func loadIconFromID(id uintptr) HICON {
-	h, err := _LoadIcon(0, _MAKEINTRESOURCE(id))
+func LoadIcon(hInstance HINSTANCE, id uintptr) HICON {
+	h, err := loadIcon(hInstance, _MAKEINTRESOURCE(id))
 	if err != nil {
 		panic(err)
 	}
 	return h
 }
 
-func ApplicationIcon() HICON {
-	return loadIconFromID(IDI_APPLICATION)
-}
-
-func loadCursorFromID(id uintptr) HCURSOR {
-	h, err := _LoadCursor(0, _MAKEINTRESOURCE(id))
+func LoadCursor(hInstance HINSTANCE, id uintptr) HCURSOR {
+	h, err := loadCursor(hInstance, _MAKEINTRESOURCE(id))
 	if err != nil {
 		panic(err)
 	}
 	return h
-}
-
-func ArrowCursor() HCURSOR {
-	return loadCursorFromID(IDC_ARROW)
-}
-
-func CrossCursor() HCURSOR {
-	return loadCursorFromID(IDC_CROSS)
-}
-
-func WaitCursor() HCURSOR {
-	return loadCursorFromID(IDC_WAIT)
 }
 
 // func BoolToBOOL(value bool) BOOL {

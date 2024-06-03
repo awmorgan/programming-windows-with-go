@@ -14,8 +14,8 @@ func main() {
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
 		HInstance:     win32.HInstance(),
-		HIcon:         win32.ApplicationIcon(),
-		HCursor:       win32.ArrowCursor(),
+		HIcon:         win32.LoadIcon(0, win32.IDI_APPLICATION),
+		HCursor:       win32.LoadCursor(0, win32.IDC_ARROW),
 		HbrBackground: win32.WhiteBrush(),
 		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
@@ -67,13 +67,13 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		ptBeg.X, ptEnd.X = win32.LOWORD(lParam), win32.LOWORD(lParam)
 		ptBeg.Y, ptEnd.Y = win32.HIWORD(lParam), win32.HIWORD(lParam)
 		DrawBoxOutline(hwnd, ptBeg, ptEnd)
-		win32.SetCursor(win32.CrossCursor())
+		win32.SetCursor(win32.LoadCursor(0, win32.IDC_CROSS))
 		blocking = true
 		return 0
 
 	case win32.WM_MOUSEMOVE:
 		if blocking {
-			win32.SetCursor(win32.CrossCursor())
+			win32.SetCursor(win32.LoadCursor(0, win32.IDC_CROSS))
 			DrawBoxOutline(hwnd, ptBeg, ptEnd)
 			ptEnd.X, ptEnd.Y = win32.LOWORD(lParam), win32.HIWORD(lParam)
 			DrawBoxOutline(hwnd, ptBeg, ptEnd)
@@ -85,7 +85,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 			DrawBoxOutline(hwnd, ptBeg, ptEnd)
 			ptBoxBeg = ptBeg
 			ptBoxEnd.X, ptBoxEnd.Y = win32.LOWORD(lParam), win32.HIWORD(lParam)
-			win32.SetCursor(win32.ArrowCursor())
+			win32.SetCursor(win32.LoadCursor(0, win32.IDC_ARROW))
 			blocking = false
 			validbox = true
 			win32.InvalidateRect(hwnd, nil, true)
@@ -95,7 +95,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 	case win32.WM_CHAR:
 		if blocking && wParam == '\x1B' {
 			DrawBoxOutline(hwnd, ptBeg, ptEnd)
-			win32.SetCursor(win32.ArrowCursor())
+			win32.SetCursor(win32.LoadCursor(0, win32.IDC_ARROW))
 			blocking = false
 		}
 		return 0

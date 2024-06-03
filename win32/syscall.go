@@ -30,6 +30,7 @@ package win32
 //sys	DispatchMessage(msg *MSG) = user32.DispatchMessageW
 //sys	DPtoLP(hdc HDC, pt []POINT ) (ok bool) = gdi32.DPtoLP
 //sys	DrawFocusRect(hdc HDC, lprc *RECT) (ok bool) = user32.DrawFocusRect
+//sys	DrawIcon(hdc HDC, x int32, y int32, hIcon HICON) (err error) [failretval==0] = user32.DrawIcon
 //sys	DrawText(hdc HDC, text string, n int32, rect *RECT, format uint32) (ret int32, err error) [failretval==0] = user32.DrawTextW
 //sys	DrawTextA(hdc HDC, text string, n int32, rect *RECT, format uint32) (ret int32, err error) [failretval==0] = user32.DrawTextA
 //sys	Ellipse(hdc HDC, left int32, top int32, right int32, bottom int32) (ok bool) = gdi32.Ellipse
@@ -79,8 +80,8 @@ package win32
 //sys	IsRectEmpty(rect *RECT) (empty bool) = user32.IsRectEmpty
 //sys	KillTimer(hwnd HWND, id uintptr) (err error) [failretval==0] = user32.KillTimer
 //sys	LineTo(hdc HDC, x int32, y int32) (ok bool) = gdi32.LineTo
-//sys	LoadCursor(hInstance HINSTANCE, cursorName string) (hCursor HCURSOR, err error) [failretval==0] = user32.LoadCursorW
-//sys	LoadIcon(hInstance HINSTANCE, iconName string) (hIcon HICON, err error) [failretval==0] = user32.LoadIconW
+//sys	loadCursor(hInstance HINSTANCE, cursorName *uint16) (hCursor HCURSOR, err error) [failretval==0] = user32.LoadCursorW
+//sys	loadIcon(hInstance HINSTANCE, iconName *uint16) (hIcon HICON, err error) [failretval==0] = user32.LoadIconW
 //sys	LoadLibraryEx(libname string, zero HANDLE, flags uintptr) (handle HANDLE, err error) = LoadLibraryExW
 //sys	MessageBeep(uType uint32) (err error) [failretval==0] = user32.MessageBeep
 //sys	MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) [failretval==0] = user32.MessageBoxW

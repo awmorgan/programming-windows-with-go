@@ -17,8 +17,8 @@ func main() {
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
 		HInstance:     win32.HInstance(),
-		HIcon:         win32.ApplicationIcon(),
-		HCursor:       win32.ArrowCursor(),
+		HIcon:         win32.LoadIcon(0, win32.IDI_APPLICATION),
+		HCursor:       win32.LoadCursor(0, win32.IDC_ARROW),
 		HbrBackground: win32.WhiteBrush(),
 		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
@@ -60,7 +60,7 @@ func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintpt
 		cxClient = win32.LOWORD(lParam)
 		cyClient = win32.HIWORD(lParam)
 
-		hCursor := win32.SetCursor(win32.WaitCursor())
+		hCursor := win32.SetCursor(win32.LoadCursor(0, win32.IDC_WAIT))
 		win32.ShowCursor(true)
 
 		if hRgnClip != 0 {

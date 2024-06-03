@@ -116,6 +116,7 @@ var (
 	procDestroyCaret              = moduser32.NewProc("DestroyCaret")
 	procDispatchMessageW          = moduser32.NewProc("DispatchMessageW")
 	procDrawFocusRect             = moduser32.NewProc("DrawFocusRect")
+	procDrawIcon                  = moduser32.NewProc("DrawIcon")
 	procDrawTextA                 = moduser32.NewProc("DrawTextA")
 	procDrawTextW                 = moduser32.NewProc("DrawTextW")
 	procEndPaint                  = moduser32.NewProc("EndPaint")
@@ -744,6 +745,14 @@ func DrawFocusRect(hdc HDC, lprc *RECT) (ok bool) {
 	return
 }
 
+func DrawIcon(hdc HDC, x int32, y int32, hIcon HICON) (err error) {
+	r1, _, e1 := syscall.Syscall6(procDrawIcon.Addr(), 4, uintptr(hdc), uintptr(x), uintptr(y), uintptr(hIcon), 0, 0)
+	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func DrawTextA(hdc HDC, text string, n int32, rect *RECT, format uint32) (ret int32, err error) {
 	var _p0 *byte
 	_p0, err = syscall.BytePtrFromString(text)
@@ -992,16 +1001,7 @@ func KillTimer(hwnd HWND, id uintptr) (err error) {
 	return
 }
 
-func LoadCursor(hInstance HINSTANCE, cursorName string) (hCursor HCURSOR, err error) {
-	var _p0 *uint16
-	_p0, err = syscall.UTF16PtrFromString(cursorName)
-	if err != nil {
-		return
-	}
-	return _LoadCursor(hInstance, _p0)
-}
-
-func _LoadCursor(hInstance HINSTANCE, cursorName *uint16) (hCursor HCURSOR, err error) {
+func loadCursor(hInstance HINSTANCE, cursorName *uint16) (hCursor HCURSOR, err error) {
 	r0, _, e1 := syscall.Syscall(procLoadCursorW.Addr(), 2, uintptr(hInstance), uintptr(unsafe.Pointer(cursorName)), 0)
 	hCursor = HCURSOR(r0)
 	if hCursor == 0 {
@@ -1010,16 +1010,7 @@ func _LoadCursor(hInstance HINSTANCE, cursorName *uint16) (hCursor HCURSOR, err 
 	return
 }
 
-func LoadIcon(hInstance HINSTANCE, iconName string) (hIcon HICON, err error) {
-	var _p0 *uint16
-	_p0, err = syscall.UTF16PtrFromString(iconName)
-	if err != nil {
-		return
-	}
-	return _LoadIcon(hInstance, _p0)
-}
-
-func _LoadIcon(hInstance HINSTANCE, iconName *uint16) (hIcon HICON, err error) {
+func loadIcon(hInstance HINSTANCE, iconName *uint16) (hIcon HICON, err error) {
 	r0, _, e1 := syscall.Syscall(procLoadIconW.Addr(), 2, uintptr(hInstance), uintptr(unsafe.Pointer(iconName)), 0)
 	hIcon = HICON(r0)
 	if hIcon == 0 {

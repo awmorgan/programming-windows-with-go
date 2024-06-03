@@ -20,8 +20,8 @@ func main() {
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
 		HInstance:     win32.HInstance(),
-		HIcon:         win32.ApplicationIcon(),
-		HCursor:       win32.ArrowCursor(),
+		HIcon:         win32.LoadIcon(0, win32.IDI_APPLICATION),
+		HCursor:       win32.LoadCursor(0, win32.IDC_ARROW),
 		HbrBackground: win32.WhiteBrush(),
 		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
