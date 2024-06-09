@@ -7,19 +7,20 @@ import (
 	"x/win32"
 )
 
-// const IDI_ICON = uintptr(101)
-const IDI_ICON = win32.IDI_APPLICATION
+var hIcon win32.HICON
+const IDI_ICON = 101
 
 func main() {
 	runtime.LockOSThread() // Windows messages are delivered to the thread that created the window.
 	appName := "IconDemo"
+	hIcon = win32.LoadIcon(win32.HInstance(), IDI_ICON)
 	wc := win32.WNDCLASS{
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
 		HInstance:     win32.HInstance(),
-		HIcon:         win32.LoadIcon(0, IDI_ICON),
+		HIcon:         hIcon,
 		HCursor:       win32.LoadCursor(0, win32.IDC_ARROW),
-		HbrBackground: win32.COLOR_BTNFACE + 1,
+		HbrBackground: win32.HBRUSH(win32.GetStockObject(win32.WHITE_BRUSH)),
 		LpszClassName: win32.StringToUTF16Ptr(appName),
 	}
 	if _, err := win32.RegisterClass(&wc); err != nil {
@@ -53,17 +54,11 @@ func main() {
 
 }
 
-var hIcon win32.HICON
 var cxIcon, cyIcon, cxClient, cyClient int32
 
 func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
 	switch msg {
 	case win32.WM_CREATE:
-		// createStruct := (*win32.CREATESTRUCT)(unsafe.Pointer(lParam))
-		// hInstance := createStruct.Instance
-
-		// hIcon = win32.LoadIcon(hInstance, IDI_ICON)
-		hIcon = win32.LoadIcon(0, IDI_ICON)
 		cxIcon = win32.GetSystemMetrics(win32.SM_CXICON)
 		cyIcon = win32.GetSystemMetrics(win32.SM_CYICON)
 		return 0
