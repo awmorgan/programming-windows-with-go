@@ -9,18 +9,16 @@ import (
 
 // make the icon with visual studio 2022 community edition
 // delete all the icon types except the 32x32 24 bit and the 16x16 24 bit icon
-// verify the .rc file shows the icon number as 101
+// change the name of the icon to the name of the application in the properties of the icon
 // compile the rc file with visual studio
 // then run llvm windres --output icondemo.syso icondemo.res
 // where icondemo.res is the compiled rc file
 var hIcon win32.HICON
 
-const IDI_ICON = 101
-
 func main() {
 	runtime.LockOSThread() // Windows messages are delivered to the thread that created the window.
 	appName := "IconDemo"
-	hIcon = win32.LoadIcon(win32.HInstance(), IDI_ICON)
+	hIcon = win32.LoadIconFromString(win32.HInstance(), appName)
 	wc := win32.WNDCLASS{
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),

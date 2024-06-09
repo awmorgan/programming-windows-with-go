@@ -208,6 +208,15 @@ func LoadIcon(hInstance HINSTANCE, id uintptr) HICON {
 	return h
 }
 
+func LoadIconFromString(hInstance HINSTANCE, id string) HICON {
+	_id := StringToUTF16Ptr(id)
+	h, err := loadIcon(hInstance, _id)
+	if err != nil {
+		panic(err)
+	}
+	return h
+}
+
 func LoadCursor(hInstance HINSTANCE, id uintptr) HCURSOR {
 	h, err := loadCursor(hInstance, _MAKEINTRESOURCE(id))
 	if err != nil {
