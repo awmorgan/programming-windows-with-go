@@ -7,7 +7,14 @@ import (
 	"x/win32"
 )
 
+// make the icon with visual studio 2022 community edition
+// delete all the icon types except the 32x32 24 bit and the 16x16 24 bit icon
+// verify the .rc file shows the icon number as 101
+// compile the rc file with visual studio
+// then run llvm windres --output icondemo.syso icondemo.res
+// where icondemo.res is the compiled rc file
 var hIcon win32.HICON
+
 const IDI_ICON = 101
 
 func main() {
