@@ -105,6 +105,7 @@ var (
 	procGetStartupInfoW           = modkernel32.NewProc("GetStartupInfoW")
 	procGetSystemDirectoryW       = modkernel32.NewProc("GetSystemDirectoryW")
 	procLoadLibraryExW            = modkernel32.NewProc("LoadLibraryExW")
+	procLoadStringW               = modkernel32.NewProc("LoadStringW")
 	procReadFile                  = modkernel32.NewProc("ReadFile")
 	procBeginPaint                = moduser32.NewProc("BeginPaint")
 	procCallWindowProcW           = moduser32.NewProc("CallWindowProcW")
@@ -650,6 +651,19 @@ func _LoadLibraryEx(libname *uint16, zero HANDLE, flags uintptr) (handle HANDLE,
 	r0, _, e1 := syscall.Syscall(procLoadLibraryExW.Addr(), 3, uintptr(unsafe.Pointer(libname)), uintptr(zero), uintptr(flags))
 	handle = HANDLE(r0)
 	if handle == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func LoadString(hInstance HINSTANCE, id uint32, buffer []uint16) (n int32, err error) {
+	var _p0 *uint16
+	if len(buffer) > 0 {
+		_p0 = &buffer[0]
+	}
+	r0, _, e1 := syscall.Syscall6(procLoadStringW.Addr(), 4, uintptr(hInstance), uintptr(id), uintptr(unsafe.Pointer(_p0)), uintptr(len(buffer)), 0, 0)
+	n = int32(r0)
+	if n == 0 {
 		err = errnoErr(e1)
 	}
 	return

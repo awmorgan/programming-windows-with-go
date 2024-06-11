@@ -83,6 +83,7 @@ package win32
 //sys	loadCursor(hInstance HINSTANCE, cursorName *uint16) (hCursor HCURSOR, err error) [failretval==0] = user32.LoadCursorW
 //sys	loadIcon(hInstance HINSTANCE, iconName *uint16) (hIcon HICON, err error) [failretval==0] = user32.LoadIconW
 //sys	LoadLibraryEx(libname string, zero HANDLE, flags uintptr) (handle HANDLE, err error) = LoadLibraryExW
+//sys	LoadString(hInstance HINSTANCE, id uint32, buffer []uint16) (n int32, err error) [failretval==0] = LoadStringW
 //sys	MessageBeep(uType uint32) (err error) [failretval==0] = user32.MessageBeep
 //sys	MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) [failretval==0] = user32.MessageBoxW
 //sys	MoveToEx(hdc HDC, x int32, y int32, lpPoint *POINT) (ok bool) = gdi32.MoveToEx
