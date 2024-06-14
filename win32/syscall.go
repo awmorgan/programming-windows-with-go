@@ -38,6 +38,7 @@ package win32
 //sys	ExcludeClipRect(hdc HDC, left int32, top int32, right int32, bottom int32) (ret int32) = gdi32.ExcludeClipRect
 //sys	FillRect( hdc HDC, lprc *RECT, hbr HBRUSH ) (ok bool) = user32.FillRect
 //sys	FillRgn(hdc HDC, hrgn HRGN, hbr HBRUSH) (ok bool) = gdi32.FillRgn
+//sys	FindResource(hModule HMODULE, name string, typ string) (hResInfo HRSRC, err error) [failretval==0] = kernel32.FindResourceW
 //sys	FrameRect( hdc HDC, lprc *RECT, hbr HBRUSH ) (ok bool) = user32.FrameRect
 //sys	FrameRgn(hdc HDC, hrgn HRGN, hbr HBRUSH, width int32, height int32) (ok bool) = gdi32.FrameRgn
 //sys	FreeLibrary(handle HANDLE) (err error)
@@ -83,7 +84,8 @@ package win32
 //sys	loadCursor(hInstance HINSTANCE, cursorName *uint16) (hCursor HCURSOR, err error) [failretval==0] = user32.LoadCursorW
 //sys	loadIcon(hInstance HINSTANCE, iconName *uint16) (hIcon HICON, err error) [failretval==0] = user32.LoadIconW
 //sys	LoadLibraryEx(libname string, zero HANDLE, flags uintptr) (handle HANDLE, err error) = LoadLibraryExW
-//sys	LoadString(hInstance HINSTANCE, id uint32, buffer []uint16) (n int32, err error) [failretval==0] = LoadStringW
+//sys	LoadResource(hModule HMODULE, hResInfo HRSRC) (hResData HGLOBAL, err error) [failretval==0] = kernel32.LoadResource
+//sys	LoadString(hInstance HINSTANCE, id uint32, buffer []uint16) (n int32, err error) [failretval==0] = user32.LoadStringW
 //sys	MessageBeep(uType uint32) (err error) [failretval==0] = user32.MessageBeep
 //sys	MessageBox(hwnd HWND, text string, caption string, boxtype uint32) (ret int32, err error) [failretval==0] = user32.MessageBoxW
 //sys	MoveToEx(hdc HDC, x int32, y int32, lpPoint *POINT) (ok bool) = gdi32.MoveToEx

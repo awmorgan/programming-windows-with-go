@@ -13,23 +13,29 @@ import (
 // where res.res is the compiled rc file
 
 var hIcon win32.HICON
+
 const (
 	IDS_APPNAME = 1
 	IDS_CAPTION = 2
 	IDS_ERRMSG  = 3
 )
+
 func main() {
 	runtime.LockOSThread() // Windows messages are delivered to the thread that created the window.
 
-	var appName [16]uint16
-	var caption [64]uint16
-	var errMsg [64]uint16
+	var appNameArray [16]uint16
+	var captionArray [64]uint16
+	var errMsgArray [64]uint16
 
-	win32.LoadString(win32.HInstance(), IDS_APPNAME, appName[:])
-	win32.LoadString(win32.HInstance(), IDS_CAPTION, caption[:])
+	win32.LoadString(win32.HInstance(), IDS_APPNAME, appNameArray[:])
+	win32.LoadString(win32.HInstance(), IDS_CAPTION, captionArray[:])
+	win32.LoadString(win32.HInstance(), IDS_ERRMSG, errMsgArray[:])
 
+	appName := win32.UTF16PtrToString(&appNameArray[0])
+	caption := win32.UTF16PtrToString(&captionArray[0])
 
 	hIcon = win32.LoadIconFromString(win32.HInstance(), appName)
+
 	wc := win32.WNDCLASS{
 		Style:         win32.CS_HREDRAW | win32.CS_VREDRAW,
 		LpfnWndProc:   win32.NewWndProc(wndproc),
@@ -70,40 +76,34 @@ func main() {
 
 }
 
-var cxIcon, cyIcon, cxClient, cyClient int32
+var (
+	pText string
+	hResource win32.HGLOBAL
+	hScroll win32.HWND
+	iPosition, cxChar, cyChar, cyClient, iNumLines, xScroll int32
+)
 
 func wndproc(hwnd win32.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
 	switch msg {
 	case win32.WM_CREATE:
-		cxIcon = win32.GetSystemMetrics(win32.SM_CXICON)
-		cyIcon = win32.GetSystemMetrics(win32.SM_CYICON)
-		return 0
+		hdc := win32.GetDC(hwnd)
+		var tm win32.TEXTMETRIC
+		win32.GetTextMetrics(hdc, &tm)
+		cxChar = tm.TmAveCharWidth
+		cyChar = tm.TmHeight + tm.TmExternalLeading
+		win32.ReleaseDC(hwnd, hdc)
 
-	case win32.WM_SIZE:
-		cxClient = win32.LOWORD(lParam)
-		cyClient = win32.HIWORD(lParam)
-		return 0
+		xScroll = win32.GetSystemMetrics(win32.SM_CXVSCROLL)
 
-	case win32.WM_PAINT:
-		var ps win32.PAINTSTRUCT
-		hdc := win32.BeginPaint(hwnd, &ps)
-		for y := int32(0); y < cyClient; y += cyIcon {
-			for x := int32(0); x < cxClient; x += cxIcon {
-				err := win32.DrawIcon(hdc, x, y, hIcon)
-				if err != nil {
-					errMsg := fmt.Sprintf("DrawIcon failed: %v", err)
-					win32.MessageBox(0, errMsg, "Icon Demo", win32.MB_ICONERROR)
-					return 0
-				}
-			}
-		}
+		hScroll, _ = win32.CreateWindow("scrollbar", "",
+			win32.WS_CHILD | win32.WS_VISIBLE | win32.SBS_VERT,
+			0, 0, 0, 0,
+			hwnd, win32.HMENU(1), win32.HInstance(), 0)
 
-		win32.EndPaint(hwnd, &ps)
-		return 0
+		res, _ := win32.FindResource(win32.HInstance(), "Annabellee", "TEXT")
+		hResource, _ = win32.LoadResource( win32.HInstance(), res)
+		pText = 
 
-	case win32.WM_DESTROY:
-		win32.PostQuitMessage(0)
-		return 0
 	}
 	return win32.DefWindowProc(hwnd, msg, wParam, lParam)
 }

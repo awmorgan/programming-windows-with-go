@@ -97,6 +97,7 @@ var (
 	procTextOutW                  = modgdi32.NewProc("TextOutW")
 	procCloseHandle               = modkernel32.NewProc("CloseHandle")
 	procCreateFileW               = modkernel32.NewProc("CreateFileW")
+	procFindResourceW             = modkernel32.NewProc("FindResourceW")
 	procFreeLibrary               = modkernel32.NewProc("FreeLibrary")
 	procGetLocalTime              = modkernel32.NewProc("GetLocalTime")
 	procGetLocaleInfoW            = modkernel32.NewProc("GetLocaleInfoW")
@@ -105,7 +106,7 @@ var (
 	procGetStartupInfoW           = modkernel32.NewProc("GetStartupInfoW")
 	procGetSystemDirectoryW       = modkernel32.NewProc("GetSystemDirectoryW")
 	procLoadLibraryExW            = modkernel32.NewProc("LoadLibraryExW")
-	procLoadStringW               = modkernel32.NewProc("LoadStringW")
+	procLoadResource              = modkernel32.NewProc("LoadResource")
 	procReadFile                  = modkernel32.NewProc("ReadFile")
 	procBeginPaint                = moduser32.NewProc("BeginPaint")
 	procCallWindowProcW           = moduser32.NewProc("CallWindowProcW")
@@ -150,6 +151,7 @@ var (
 	procKillTimer                 = moduser32.NewProc("KillTimer")
 	procLoadCursorW               = moduser32.NewProc("LoadCursorW")
 	procLoadIconW                 = moduser32.NewProc("LoadIconW")
+	procLoadStringW               = moduser32.NewProc("LoadStringW")
 	procMessageBeep               = moduser32.NewProc("MessageBeep")
 	procMessageBoxW               = moduser32.NewProc("MessageBoxW")
 	procMoveWindow                = moduser32.NewProc("MoveWindow")
@@ -575,6 +577,29 @@ func _CreateFile(filename *uint16, access uint32, sharemode uint32, sa *Security
 	return
 }
 
+func FindResource(hModule HMODULE, name string, typ string) (hResInfo HRSRC, err error) {
+	var _p0 *uint16
+	_p0, err = syscall.UTF16PtrFromString(name)
+	if err != nil {
+		return
+	}
+	var _p1 *uint16
+	_p1, err = syscall.UTF16PtrFromString(typ)
+	if err != nil {
+		return
+	}
+	return _FindResource(hModule, _p0, _p1)
+}
+
+func _FindResource(hModule HMODULE, name *uint16, typ *uint16) (hResInfo HRSRC, err error) {
+	r0, _, e1 := syscall.Syscall(procFindResourceW.Addr(), 3, uintptr(hModule), uintptr(unsafe.Pointer(name)), uintptr(unsafe.Pointer(typ)))
+	hResInfo = HRSRC(r0)
+	if hResInfo == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func FreeLibrary(handle HANDLE) (err error) {
 	r1, _, e1 := syscall.Syscall(procFreeLibrary.Addr(), 1, uintptr(handle), 0, 0)
 	if r1 == 0 {
@@ -656,14 +681,10 @@ func _LoadLibraryEx(libname *uint16, zero HANDLE, flags uintptr) (handle HANDLE,
 	return
 }
 
-func LoadString(hInstance HINSTANCE, id uint32, buffer []uint16) (n int32, err error) {
-	var _p0 *uint16
-	if len(buffer) > 0 {
-		_p0 = &buffer[0]
-	}
-	r0, _, e1 := syscall.Syscall6(procLoadStringW.Addr(), 4, uintptr(hInstance), uintptr(id), uintptr(unsafe.Pointer(_p0)), uintptr(len(buffer)), 0, 0)
-	n = int32(r0)
-	if n == 0 {
+func LoadResource(hModule HMODULE, hResInfo HRSRC) (hResData HGLOBAL, err error) {
+	r0, _, e1 := syscall.Syscall(procLoadResource.Addr(), 2, uintptr(hModule), uintptr(hResInfo), 0)
+	hResData = HGLOBAL(r0)
+	if hResData == 0 {
 		err = errnoErr(e1)
 	}
 	return
@@ -1028,6 +1049,19 @@ func loadIcon(hInstance HINSTANCE, iconName *uint16) (hIcon HICON, err error) {
 	r0, _, e1 := syscall.Syscall(procLoadIconW.Addr(), 2, uintptr(hInstance), uintptr(unsafe.Pointer(iconName)), 0)
 	hIcon = HICON(r0)
 	if hIcon == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func LoadString(hInstance HINSTANCE, id uint32, buffer []uint16) (n int32, err error) {
+	var _p0 *uint16
+	if len(buffer) > 0 {
+		_p0 = &buffer[0]
+	}
+	r0, _, e1 := syscall.Syscall6(procLoadStringW.Addr(), 4, uintptr(hInstance), uintptr(id), uintptr(unsafe.Pointer(_p0)), uintptr(len(buffer)), 0, 0)
+	n = int32(r0)
+	if n == 0 {
 		err = errnoErr(e1)
 	}
 	return
